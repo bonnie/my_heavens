@@ -35,8 +35,9 @@ def return_stars():
     lat = '37.7749dN'  # san francisco
     lng = '122.4194dW' # san francisco
     utc_now = datetime.utcnow()  # current time
+    max_magnitude = 5 # dimmest stars to show
 
-    stars = get_user_star_coords(lat, lng, utc_now)
+    stars = get_user_star_coords(lat, lng, utc_now, max_magnitude)
 
     return jsonify({'radius': STARFIELD_RADIUS, 'stars': stars})
 

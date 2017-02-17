@@ -17,7 +17,7 @@ def pol2cart(rho, phi):
     return(x, y)
 
 
-def get_user_star_coords(lat, lng, utctime):
+def get_user_star_coords(lat, lng, utctime, max_mag):
     """return json of stars in for the location and current time, in user coords
 
     lat and lng are in degrees in this format: 
@@ -46,6 +46,10 @@ def get_user_star_coords(lat, lng, utctime):
 
 
     for star in db_stars:
+
+        if star.magnitude > max_mag: 
+            # skip stars that are too dim
+            continue
 
         # convert RA and dec into alt and az
         coords = RADec(float(star.ra), float(star.dec))

@@ -5,6 +5,7 @@ csv data downloaded from http://astronexus.com/files/downloads/hygfull.csv.gz"""
 import csv
 from model import db, Star, connect_to_db
 import math
+import re
 
 DATA_FILE = 'seed_data/hygfull.csv'
 
@@ -31,6 +32,12 @@ def load_stars():
             ra_in_rad = float(starline['RA']) * math.pi / 12
             dec_in_rad = float(starline['Dec']) * math.pi / 180
 
+            # sometimes color_index is a bunch of space characters
+            if re.match(r"\S", starline['ColorIndex']):
+                color_index = starline['ColorIndex']
+            else:
+                color_index = None
+
             star = Star(
                 name=starline['ProperName'],
                 ra=ra_in_rad,
@@ -39,7 +46,7 @@ def load_stars():
                 magnitude=magnitude,
                 absolute_magnitude=starline['AbsMag'],
                 spectrum=starline['Spectrum'].strip(),
-                color_index=starline['ColorIndex'])
+                color_index=color_index)
 
             db.session.add(star)
 

@@ -25,15 +25,15 @@ class Star(db.Model):
     magnitude = db.Column(db.Numeric(4, 2), nullable=False)
     absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
     spectrum = db.Column(db.String(16), nullable=False)
-    color_index = db.column(db.Numeric(4, 3))
+    color_index = db.Column(db.Numeric(4, 3), nullable=True)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
         return "<Star star_id=%s name=%s ra=%s dec=%s>" % (self.star_id, 
                                                            self.name,
-                                                           self.right_ascension,
-                                                           self.declination)
+                                                           self.ra,
+                                                           self.dec)
 
     
 ##############################################################################

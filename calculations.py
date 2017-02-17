@@ -48,9 +48,9 @@ def get_user_star_coords(lat, lng, utctime):
     for star in db_stars:
 
         # convert RA and dec into alt and az
-        coords = RADec(star.ra, star.dec)
-        ha = coords.hourAngle(utctime, sf_lon_in_rad)
-        altaz = coords.altAz(ha, sf_lat_in_rad)
+        coords = RADec(float(star.ra), float(star.dec))
+        ha = coords.hourAngle(utctime, longitude_in_radians)
+        altaz = coords.altAz(ha, latitude_in_radians)
 
         # convert alt and az into x and y, considering the size of our star field
 
@@ -61,10 +61,18 @@ def get_user_star_coords(lat, lng, utctime):
         x, y = pol2cart(rho, phi)
 
         # add it to the list in a neat little package
+        #
+        # cast magnitude and color to floats, as they come back as decimals, 
+        # to which json objects
         star_field.append({'x': x, 
                            'y': y, 
-                           'magnitude': star.magnitude, 
-                           'color': star.color_index})
+                           'magnitude': float(star.magnitude), 
+                           # 'color': float(star.color_index) # do color later. It's hard. 
+                           })
 
+        # print x
+        # print y
+        # print star.magnitude
+        # print star.color_index
 
     return star_field

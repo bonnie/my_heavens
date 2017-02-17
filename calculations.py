@@ -12,9 +12,9 @@ from display_constants import STARFIELD_RADIUS
 def pol2cart(rho, phi):
     """ from http://stackoverflow.com/questions/20924085/python-conversion-between-coordinates"""
 
-        x = rho * np.cos(phi)
-        y = rho * np.sin(phi)
-        return(x, y)
+    x = rho * np.cos(phi)
+    y = rho * np.sin(phi)
+    return(x, y)
 
 
 def get_user_star_coords(lat, lng, utctime):

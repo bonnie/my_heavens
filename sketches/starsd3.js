@@ -1,3 +1,5 @@
+// good reference: https://www.dashingd3js.com/creating-svg-elements-based-on-data
+
 d3.json('/static/data.json', printStarData);
 
 function printStarData(starData) {

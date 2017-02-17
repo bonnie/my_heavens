@@ -4,6 +4,7 @@ csv data downloaded from http://astronexus.com/files/downloads/hygfull.csv.gz"""
 
 import csv
 from model import db, Star, connect_to_db
+import math
 
 DATA_FILE = 'seed_data/hygfull.csv'
 
@@ -21,12 +22,21 @@ def load_stars():
             if line_num % 500 == 0:
                 print line_num
 
+            # skip really dim stars
+            magnitude = float(starline['Mag'].strip())
+            if magnitude > 7:
+                continue
+
+            # translate ra and dec into radians, for easier sidereal module use
+            ra_in_rad = float(starline['RA']) * math.pi / 12
+            dec_in_rad = float(starline['Dec']) * math.pi / 180
+
             star = Star(
                 name=starline['ProperName'],
-                right_ascension=starline['RA'],
-                declination=starline['Dec'],
+                ra=ra_in_rad,
+                dec=dec_in_rad,
                 distance=starline['Distance'],
-                magnitude=starline['Mag'].strip(),
+                magnitude=magnitude,
                 absolute_magnitude=starline['AbsMag'],
                 spectrum=starline['Spectrum'].strip(),
                 color_index=starline['ColorIndex'])

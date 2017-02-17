@@ -19,8 +19,8 @@ class Star(db.Model):
 
     star_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(128), nullable=True)
-    right_ascension = db.Column(db.Numeric(5, 3), nullable=False)
-    declination = db.Column(db.Numeric(5, 3), nullable=False)
+    ra = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+    dec = db.Column(db.Numeric(5, 3), nullable=False) # in radians
     distance = db.Column(db.Numeric(12, 2), nullable=True)
     magnitude = db.Column(db.Numeric(4, 2), nullable=False)
     absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)

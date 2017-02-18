@@ -28,7 +28,7 @@ function printStarData(starData) {
                         .attr('cx', function(d) {return d.x})
                         .attr('cy', function(d) {return d.y})
                         .attr('r', function(d) {return (5 - d.magnitude) * 0.75})
-                        .attr('fill', 'white')
+                        .attr('fill', function(d) {return d.color})
 }
 
 

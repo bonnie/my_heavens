@@ -26,6 +26,7 @@ class Star(db.Model):
     absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
     spectrum = db.Column(db.String(16), nullable=False)
     color_index = db.Column(db.Numeric(4, 3), nullable=True)
+    color = db.Column(db.String(7), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""

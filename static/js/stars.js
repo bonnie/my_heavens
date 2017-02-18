@@ -8,11 +8,18 @@ function printStarData(starData) {
 
     // make a place to draw the stars
     var svgContainer = svgBodySelection.append("svg")
-                                    .attr("width", starData.radius)
-                                    .attr("height", starData.radius);
+                                    .attr("width", 2 * starData.radius)
+                                    .attr("height", 2 * starData.radius);
+
+    // show the background
+    background = svgContainer.append('circle')
+                              .attr('cx', starData.radius)
+                              .attr('cy', starData.radius)
+                              .attr('r', starData.radius)
+                              .attr('fill', 'black')
 
     // add the stars
-    var stars = svgContainer.selectAll("circle")
+    var stars = svgContainer.selectAll("circle.star")
                             .data(starData.stars)
                             .enter()
                             .append('circle');
@@ -20,8 +27,8 @@ function printStarData(starData) {
     var starAttributes = stars
                         .attr('cx', function(d) {return d.x})
                         .attr('cy', function(d) {return d.y})
-                        .attr('r', function(d) {return 4 - d.magnitude})
-                        .attr('fill', 'black')
+                        .attr('r', function(d) {return (5 - d.magnitude) * 0.75})
+                        .attr('fill', 'white')
 }
 
 

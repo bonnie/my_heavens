@@ -10,10 +10,20 @@ from display_constants import STARFIELD_RADIUS
 
 
 def pol2cart(rho, phi):
-    """ from http://stackoverflow.com/questions/20924085/python-conversion-between-coordinates"""
+    """translate between polar coords and svg-style cartesian coords
 
-    x = rho * np.cos(phi)
-    y = rho * np.sin(phi)
+    in svg, the origin is in the upper left and y is positive going down
+
+    adapted from 
+    http://stackoverflow.com/questions/20924085/python-conversion-between-coordinates"""
+
+    x_from_center = rho * np.cos(phi)
+    y_from_center = rho * np.sin(phi)
+
+    # transform for the wacky svg axes
+    x = x_from_center + STARFIELD_RADIUS
+    y = STARFIELD_RADIUS - y_from_center
+
     return(x, y)
 
 
@@ -59,10 +69,15 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
         # convert alt and az into x and y, considering the size of our star field
 
         # translate alt and az into polar coords
-        rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi * 2)
+        rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi)
         phi = altaz.az
 
         x, y = pol2cart(rho, phi)
+
+        if star.name == 'Polaris':
+            print "x: {}, y: {}, alt: {}, az: {}".format(x, y, altaz.alt, altaz.az)
+            # x: 57.9669674332, y: -0.936814115136, alt: 0.660134429974, az: 6.26702554224
+
 
         # add it to the list in a neat little package
         #

@@ -1,3 +1,3 @@
 """common constants for display"""
 
-STARFIELD_RADIUS = 800
+STARFIELD_RADIUS = 400

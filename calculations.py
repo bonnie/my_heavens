@@ -81,17 +81,11 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
 
         # add it to the list in a neat little package
         #
-        # cast magnitude and color to floats, as they come back as decimals, 
-        # to which json objects
+        # cast magnitude to float, as it comes back as a Decimal obj: bad json
         star_field.append({'x': x, 
                            'y': y, 
                            'magnitude': float(star.magnitude), 
-                           # 'color': float(star.color_index) # do color later. It's hard. 
+                           'color': star.color 
                            })
-
-        # print x
-        # print y
-        # print star.magnitude
-        # print star.color_index
 
     return star_field

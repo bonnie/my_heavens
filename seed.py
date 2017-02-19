@@ -5,15 +5,34 @@ csv data downloaded from http://astronexus.com/files/downloads/hygfull.csv.gz"""
 import csv
 import math
 import re
+from sqlalchemy.orm.exc import NoResultFound
 
-from model import db, Star, connect_to_db
+from model import db, connect_to_db, Star, Constellation, ConstLineVertex, \
+                  ConstLineGroup, BoundVertex, ConstBoundVertex
+
 from colors import COLOR_BY_SPECTRAL_CLASS
 
-DATA_FILE = 'seed_data/hygfull.csv'
+STARDATA_FILE = 'seed_data/hygfull.csv'
+CONST_FILE = 'seed_data/const_abbrevs.csv'
+CONSTBOUNDS_FILE = 'seed_data/constellation_boundaries.txt'
+CONSTLINES_FILE = 'seed_data/constellation_lines.txt'
+
 SC_RE = re.compile(r'([OBAFGKM]\d) ?\(?([VI]*)\)?')
 
 # for stars with unrecognizable spectral classes
 DEFAULT_COLOR = "#ffffff"
+
+
+def get_radian_coords(ra_in_hrs, dec_in_degs):
+    """return a tuple of radian equivalents of input (input in string format) 
+
+    right ascension input in hours, declination input in degrees"""
+
+    ra_in_rad = float(ra_in_hrs) * math.pi / 12
+    dec_in_rad = float(dec_in_degs) * math.pi / 180
+
+    return ra_in_rad, dec_in_rad
+
 
 def get_color(spectral_class):
     """get hex color from spectral class"""
@@ -42,19 +61,100 @@ def get_color(spectral_class):
         print "unclassifiable spectrum: {}".format(spectral_class)
         return DEFAULT_COLOR
 
+
+def load_constellations():
+    """Load constellation names and abbreviations from csv into db."""
+
+    print
+    print '*'*20, 'loading constellations'
+
+
+    # a dict to store constellations and their associated data
+    constellations = {}
+
+    # first read in all the constellations and make objects for them
+    with open(CONST_FILE) as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        # make a new const obj for each line and add to db
+        for constline in reader: 
+            newconst = Constellation(const_code=constline['Abbrev'],
+                                     name=constline['Name'])
+            db.session.add(newconst)
+
+    db.session.commit()
+
+def load_const_boundaries():
+    """Add the boundary vertices for each constellation into the db"""
+
+    print
+    print '*'*20, 'loading constellation boundaries'
+
+    boundfile = open(CONSTBOUNDS_FILE)
+    
+    # keep track of what constellation we're on, in order to reset indexes when
+    # we switch constellations
+    last_const = None
+
+    for boundline in boundfile:
+        try: 
+            ra, dec, const = boundline.strip().split()
+        except: 
+            print "bad line in boundfile: [{}]".format(boundline) 
+            continue
+
+        # translate ra and dec into radians
+        ra_in_rad, dec_in_rad = get_radian_coords(ra, dec)
+
+        # reset the index if necessary
+        if const != last_const:
+            index = 0
+            last_const = const
+
+        # account for the fact that the input file has greater precision than
+        # what's stored in the db
+        rounded_ra = int(ra_in_rad * 1000) / 1000.0
+        rounded_dec = int(dec_in_rad * 1000) / 1000.0
+
+        # create the vertex, if it doesn't already exist
+        try:
+            vertex = BoundVertex.query.filter_by(ra=rounded_ra, dec=rounded_dec).one()
+
+        except NoResultFound:
+            vertex = BoundVertex(ra=ra_in_rad, dec=dec_in_rad)
+            db.session.add(vertex)
+
+            # to get an id, and make available for future iterations
+            db.session.flush()
+
+        # add the vertex to the constellation boundary
+        const_bound_vertex = ConstBoundVertex(const_code=const,
+                                              vertex_id=vertex.vertex_id,
+                                              index=index)
+        db.session.add(const_bound_vertex)
+
+
+        # increment the index
+        index += 1
+
+    db.session.commit()
+
 def load_stars():
-    """load star data from csv into the database"""
+    """Load star data from csv into the database."""
+
+    print
+    print '*'*20, 'loading stars'
 
     line_num = 0
 
-    with open(DATA_FILE) as csvfile:
+    with open(STARDATA_FILE) as csvfile:
         reader = csv.DictReader(csvfile)
         for starline in reader:
             
             # display progress
             line_num += 1
             if line_num % 500 == 0:
-                print line_num
+                print line_num, 'stars'
 
             # skip really dim stars
             magnitude = float(starline['Mag'].strip())
@@ -62,8 +162,7 @@ def load_stars():
                 continue
 
             # translate ra and dec into radians, for easier sidereal module use
-            ra_in_rad = float(starline['RA']) * math.pi / 12
-            dec_in_rad = float(starline['Dec']) * math.pi / 180
+            ra_in_rad, dec_in_rad = get_radian_coords(starline['RA'], starline['Dec'])
 
             # sometimes color_index is a bunch of space characters
             if re.match(r"\S", starline['ColorIndex']):
@@ -91,18 +190,6 @@ def load_stars():
     db.session.commit()
 
 
-#     name = db.Column(db.String(128), nullable=True)
-#     right_ascension = db.Column(db.Integer, nullable=False)
-#     declination = db.Column(db.Integer, nullable=False)
-#     distance = db.Column(db.Numeric(8, 3), nullable=True)
-#     magnitude = db.Column(db.Numeric(3, 2), nullable=False)
-#     absolute_magnitude = db.Column(db.Numeric(5, 4), nullable=True)
-#     spectrum = db.Column(db.String(8), nullable=False)
-#     color_index = db.column(db.Numeric(4, 3))
-
-
-# StarID,Hip,HD,HR,Gliese,BayerFlamsteed,ProperName,RA,Dec,Distance,Mag,AbsMag,Spectrum,ColorIndex
-
 if __name__ == '__main__':
 
     from server import app
@@ -111,4 +198,6 @@ if __name__ == '__main__':
 
     db.drop_all()
     db.create_all()
-    load_stars()
+    # load_stars()
+    load_constellations()
+    load_const_boundaries()

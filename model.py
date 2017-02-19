@@ -36,7 +36,122 @@ class Star(db.Model):
                                                            self.ra,
                                                            self.dec)
 
-    
+class Constellation(db.Model):
+    """Constellation names and codes."""
+
+    __tablename__ = "constellations"
+
+    const_code = db.Column(db.String(3), primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
+
+    # be able to get list of vertices
+    vertices = db.relationship("BoundVertex",
+                             secondary="const_bound_vertices",
+                             order_by="ConstBoundVertex.index")
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Constellation code=%s name=%s>" % (self.const_code, self.name)
+
+
+class ConstLineVertex(db.Model):
+    """a vertex that forms one endpoint of a constellation line. 
+
+    this corresponds to a star"""
+
+    __tablename__ = "const_line_vertices"
+
+    const_line_vertex_id = db.Column(db.Integer, 
+                            autoincrement=True, 
+                            primary_key=True)
+
+    const_line_group_id = db.Column(db.Integer, 
+                            db.ForeignKey("const_line_group.const_line_group_id"), 
+                            nullable=False)
+
+    star_id = db.Column(db.Integer, 
+                            db.ForeignKey("stars.star_id"), 
+                            nullable=False)
+
+    # where in the constellation line sequence is this? 
+    index = db.Column(db.Integer, nullable=False)
+
+
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<ConstLineVertex id=%s const_code=%s star_id>" % (
+                                            self.const_line_vertex_id,
+                                            self.const_code, 
+                                            self.star_id)
+
+
+class ConstLineGroup(db.Model):
+    """a group of vertices that make up a continuous constellation line"""
+
+    __tablename__ = "const_line_group"
+
+    const_line_group_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    const_code = db.Column(db.String(3), db.ForeignKey("constellations.const_code"))
+
+    # be able to get a list of stars in this group easily
+    constline_vertices = db.relationship("ConstLineVertex",
+                                         order_by="ConstLineVertex.index")
+
+
+class BoundVertex(db.Model):
+    """Vertices of constellation boundaries, not attached to constellations.
+
+    Each vertex can be a part of multiple constellation boundaries, and 
+    each constellation boundary is made up of multiple vertices."""
+
+    __tablename__ = "bound_vertices"
+
+    vertex_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    ra = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+    dec = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<BoundVertex id=%s ra=%s dec=%s>" % (self.vertex_id, 
+                                                      self.ra,
+                                                      self.dec)
+
+class ConstBoundVertex(db.Model):
+    """Constellation boundary vertices.
+
+    Association table between Constellation and BoundVertex"""
+
+    __tablename__ = "const_bound_vertices"
+
+    const_bound_vertex_id = db.Column(db.Integer, 
+                                autoincrement=True, 
+                                primary_key=True)
+
+    const_code = db.Column(db.String(3), 
+                            db.ForeignKey('constellations.const_code'), 
+                            nullable=False)
+
+    vertex_id = db.Column(db.Integer, 
+                            db.ForeignKey('bound_vertices.vertex_id'), 
+                            nullable=False)
+
+    # the order in the vertex list for this constellation vertex
+    index = db.Column(db.Integer, nullable=False) 
+
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<ConstBoundVertex id=%s const_code=%s vertex_id=%s>" % (
+                                                          self.const_bound_vertex_id, 
+                                                          self.const_code,
+                                                          self.vertex_id)
+
+
 ##############################################################################
 # Helper functions
 

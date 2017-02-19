@@ -1,0 +1,18 @@
+Sources for data found in this directory
+
+hygfull.csv
+http://astronexus.com/files/downloads/hygfull.csv.gz
+
+const_abbrevs.csv
+https://ircatalog.gsfc.nasa.gov/constel_names.html
+Note: SER changed to SE1 and SE2 to account for Serpens Cauda and Serpens Caput
+
+constellation_boundaries.txt
+http://pbarbier.com/constellations/boundaries.html#bnd18
+
+constellation_lines.csv
+http://observe.phy.sfasu.edu/SFAStarCharts/ExcelCharts/ConstellationLinesAll2002.xls
+Note: SER changed to SE1 
+
+colors.txt
+http://www.vendian.org/mncharity/dir3/starcolor/UnstableURLs/starcolors.txt

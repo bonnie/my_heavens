@@ -85,7 +85,8 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
         star_field.append({'x': x, 
                            'y': y, 
                            'magnitude': float(star.magnitude), 
-                           'color': star.color 
+                           'color': star.color,
+                           'name': star.name
                            })
 
     return star_field

@@ -34,7 +34,7 @@ function printStarData(starData) {
                                     .attr("id", "cons");
 
 
-    // add data to constellations
+    // add basic data to constellations
     var constellations = constGroup.selectAll("g")
         .data(constInfo)
         .enter()
@@ -42,21 +42,15 @@ function printStarData(starData) {
         .attr("class", "constellation");
 
 
-    ///////////////// something's not right here: all constellations get all boundaries!! ////////////
-
-    // create paths constellation boundaries
-    constBounds = constellations.selectAll("path.const-bounds")
-        .data(constInfo)
-        .enter()
-        .append("path")
-        .attr("class", "const-bounds")
-
-
-    // draw constellation boundaries
-    constBounds.attr("d", function(d) { return getLine(d.bound_verts) })
-        .attr("stroke", "#333333")
-        .attr("stroke-width", 0)
-
+    // create constellation boundaries
+    constellations.each(function(d) {
+        d3.select(this).append("path")
+          .attr("class", "const-bounds")
+          .attr("d", getLine(d.bound_verts))
+          .attr("stroke", "#333333")
+          .attr("stroke-width", 2)
+    })
+                
 
     //// I think the below will make more sense once I figure out how to do one boundary for each constellation, 
     //// not all constellation boundaries for each constellation

@@ -34,7 +34,7 @@ function printStarData(starData) {
                                     .attr("id", "cons");
 
 
-    // add basic data to constellations
+    // create constellations
     var constellations = constGroup.selectAll("g")
         .data(constInfo)
         .enter()
@@ -42,40 +42,36 @@ function printStarData(starData) {
         .attr("class", "constellation");
 
 
-    // create constellation boundaries
     constellations.each(function(d) {
-        d3.select(this).append("path")
+
+        // create constellation boundaries
+        constBounds = d3.select(this).append("path")
           .attr("class", "const-bounds")
           .attr("d", getLine(d.bound_verts))
-          .attr("stroke", "#333333")
-          .attr("stroke-width", 2)
+          .attr("stroke", "#000099")
+          .attr("stroke-width", 1);
+
+
+        // create constellation line groups
+        constLineGroups = d3.select(this).selectAll("g.constline-group")
+            .data(d.line_groups)
+            .enter()
+            .append("g")
+            .attr("class", "constline-group")
+
+        // add lines for each group
+        constLineGroups.each(function(d, i) {
+
+                d3.select(this).append("path")
+                    .attr("class", "constline")
+                    .attr("d", getLine(d))
+                    .attr("stroke", "#333333")
+                    .attr("stroke-width", 2)
+
+            });
+
     })
                 
-
-    //// I think the below will make more sense once I figure out how to do one boundary for each constellation, 
-    //// not all constellation boundaries for each constellation
-
-    // create groups for constellation lines
-    // constLineGroups = constellations.selectAll("g.const-line-group")
-    //     .data(constInfo)
-    //     .enter()
-    //     .append("g")
-    //     .attr("class", "const-line-group")
-
-
-    // // create paths for each line in the groups
-    // constLines = constLineGroups.selectAll("path.const-line")
-    //     .enter()
-    //     .append("path")
-    //     .attr("class", "const-line")
-
-
-    // // draw constellation lines
-    // constLines.attr("d", function(d, i) { return getLine(d.group_lines[i]) })
-    //     .attr("stroke", "#333333")
-    //     .attr("stroke-width", 2)
-
-
 
     // add the stars
     var stars = svgContainer.selectAll("circle.star")

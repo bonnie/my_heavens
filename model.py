@@ -12,30 +12,6 @@ db = SQLAlchemy()
 ##############################################################################
 # Model definitions
 
-class Star(db.Model):
-    """Star in the universe."""
-
-    __tablename__ = "stars"
-
-    star_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    name = db.Column(db.String(128), nullable=True)
-    ra = db.Column(db.Numeric(5, 3), nullable=False) # in radians
-    dec = db.Column(db.Numeric(5, 3), nullable=False) # in radians
-    distance = db.Column(db.Numeric(12, 2), nullable=True)
-    magnitude = db.Column(db.Numeric(4, 2), nullable=False)
-    absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
-    spectrum = db.Column(db.String(16), nullable=False)
-    color_index = db.Column(db.Numeric(4, 3), nullable=True)
-    color = db.Column(db.String(7), nullable=False)
-
-    def __repr__(self):
-        """Provide helpful representation when printed."""
-
-        return "<Star star_id=%s name=%s ra=%s dec=%s>" % (self.star_id, 
-                                                           self.name,
-                                                           self.ra,
-                                                           self.dec)
-
 class Constellation(db.Model):
     """Constellation names and codes."""
 
@@ -54,6 +30,31 @@ class Constellation(db.Model):
 
         return "<Constellation code=%s name=%s>" % (self.const_code, self.name)
 
+
+class Star(db.Model):
+    """Star in the universe."""
+
+    __tablename__ = "stars"
+
+    star_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    const_code = db.Column(db.String(3), db.ForeignKey("constellations.const_code"))
+    name = db.Column(db.String(128), nullable=True)
+    ra = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+    dec = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+    distance = db.Column(db.Numeric(12, 2), nullable=True)
+    magnitude = db.Column(db.Numeric(4, 2), nullable=False)
+    absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
+    spectrum = db.Column(db.String(16), nullable=False)
+    color_index = db.Column(db.Numeric(4, 3), nullable=True)
+    color = db.Column(db.String(7), nullable=False)
+
+    def __repr__(self):
+        """Provide helpful representation when printed."""
+
+        return "<Star star_id=%s name=%s ra=%s dec=%s>" % (self.star_id, 
+                                                           self.name,
+                                                           self.ra,
+                                                           self.dec)
 
 class ConstLineVertex(db.Model):
     """a vertex that forms one endpoint of a constellation line. 
@@ -94,7 +95,7 @@ class ConstLineGroup(db.Model):
     __tablename__ = "const_line_group"
 
     const_line_group_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    const_code = db.Column(db.String(3), db.ForeignKey("constellations.const_code"))
+    const_code = db.Column(db.String(3), db.ForeignKey("constellations.const_code"), nullable=False)
 
     # be able to get a list of stars in this group easily
     constline_vertices = db.relationship("ConstLineVertex",

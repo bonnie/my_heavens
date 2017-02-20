@@ -39,7 +39,8 @@ function printStarData(starData) {
         .data(constInfo)
         .enter()
         .append("g")
-        .attr("class", "constellation");
+        .attr("class", "constellation")
+        .attr("data-name", function(d) { return d.name });
 
 
     constellations.each(function(d) {
@@ -49,7 +50,10 @@ function printStarData(starData) {
           .attr("class", "const-bounds")
           .attr("d", getLine(d.bound_verts))
           .attr("stroke", "#000099")
-          .attr("stroke-width", 1);
+          .attr("stroke-width", 1)
+
+          // to keep bounds from stepping on each other
+          .attr("fill-opacity", 0);
 
 
         // create constellation line groups
@@ -67,6 +71,9 @@ function printStarData(starData) {
                     .attr("d", getLine(d))
                     .attr("stroke", "#333333")
                     .attr("stroke-width", 2)
+
+                    // these aren't meant to be closed shapes
+                    .attr("fill-opacity", 0)
 
             });
 

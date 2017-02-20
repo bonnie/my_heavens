@@ -12,7 +12,8 @@ http://pbarbier.com/constellations/boundaries.html#bnd18
 
 constellation_lines.csv
 http://observe.phy.sfasu.edu/SFAStarCharts/ExcelCharts/ConstellationLinesAll2002.xls
-Note: SER changed to SE1 
+Notes: 
+    * SER changed to SE1 
 
 colors.txt
 http://www.vendian.org/mncharity/dir3/starcolor/UnstableURLs/starcolors.txt

@@ -4,7 +4,7 @@ from flask import Flask, render_template, jsonify
 from datetime import datetime
 
 from model import connect_to_db, Constellation
-from calculations import get_user_star_coords
+from calculations import get_user_star_coords, get_latlng_rads
 from display_constants import STARFIELD_RADIUS
 
 
@@ -37,8 +37,9 @@ def return_stars():
     utc_now = datetime.utcnow()  # current time
     max_magnitude = 5 # dimmest stars to show
 
-    stars = get_user_star_coords(lat, lng, utc_now, max_magnitude)
-    constellations = Constellation.get_constellation_data()
+    lat_rads, lng_rads = get_latlng_rads(lat, lng)
+    stars = get_user_star_coords(lat_rads, lng_rads, utc_now, max_magnitude)
+    constellations = Constellation.get_constellation_data(lat_rads, lng_rads, utc_now)
 
     return jsonify({'constellations': constellations, 
                     'radius': STARFIELD_RADIUS, 

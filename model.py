@@ -34,19 +34,31 @@ class Constellation(db.Model):
 
     ##### methods #####
     @classmethod
-    def get_constellation_data(cls):
-        """Return a list of constellation data dicts.
+    def get_constellation_data(cls, lat, lng, utctime):
+        """Return a list of constellation data, transformed for d3
+
+        * lat and lng are in radians
+        * utctime is a datetime obj
+
+        Coordinates for boundary vertices and constellation lines are in 
+        x and y format based on the user's lat, lng, and the time
+
+        This function makes use of the get_star_coords function from 
+        calculations.py -- the same function used to plot stars
 
         each dict has this format: 
 
         'code': <string>
         'name': <string>
-        'bound_verts': <list of dicts with 'ra' and 'dec' keys>
-        'line_groups': <list of lists of dicts with 'ra' and 'dec' keys>
+        'bound_verts': <list of dicts with 'x' and 'y' keys>
+        'line_groups': <list of lists of dicts with 'x' and 'y' keys>
 
         for the line_groups list, each sub-list represents an independent line
         for this constellation.
         """
+
+        # importing here, to avoid circular imports
+        from calculations import get_star_coords
 
         constellation_data = []
 
@@ -69,19 +81,19 @@ class Constellation(db.Model):
             c['name'] = const.name
 
             # collect the boundaries
-            c['bound_verts'] = [
-                                 {'ra': float(vert.ra), 'dec':float(vert.dec)} 
-                                 for vert in const.bound_vertices
-                               ]
+            c['bound_verts'] = []
+            for vert in const.bound_vertices:
+                x, y = get_star_coords(lat, lng, utctime, vert.ra, vert.dec)
+                c['bound_verts'].append({'x': x, 'y': y})
 
             # get the constellation lines
-            c['line_groups'] = [ 
-                                 [
-                                   {'ra': float(vert.star.ra), 'dec': float(vert.star.dec)} 
-                                   for vert in grp.constline_vertices
-                                 ] 
-                                 for grp in const.line_groups
-                               ]
+            c['line_groups'] = []
+            for grp in const.line_groups:
+                grp_verts = []
+                for vert in grp.constline_vertices:
+                    x, y = get_star_coords(lat, lng, utctime, vert.star.ra, vert.star.dec)
+                    grp_verts.append({'x': x, 'y': y})
+                c['line_groups'].append(grp_verts)
 
             constellation_data.append(c)
 

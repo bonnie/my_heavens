@@ -17,13 +17,68 @@ class Constellation(db.Model):
 
     __tablename__ = "constellations"
 
+    ##### columns #####
     const_code = db.Column(db.String(3), primary_key=True)
     name = db.Column(db.String(64), nullable=False)
 
-    # be able to get list of vertices
-    vertices = db.relationship("BoundVertex",
+
+    ##### relationships #####
+    bound_vertices = db.relationship("BoundVertex",
                              secondary="const_bound_vertices",
                              order_by="ConstBoundVertex.index")
+
+    stars = db.relationship("Star")
+
+    line_groups = db.relationship("ConstLineGroup")
+
+
+    ##### methods #####
+    @classmethod
+    def get_constellation_data(cls):
+        """Return a list of constellation data dicts.
+
+        each dict has this format: 
+
+        'code': <string>
+        'name': <string>
+        'bound_verts': <list of dicts with 'ra' and 'dec' keys>
+        'line_groups': <list of lists of dicts with 'ra' and 'dec' keys>
+
+        for the line_groups list, each sub-list represents an independent line
+        for this constellation.
+        """
+
+        constellation_data = []
+
+        consts = cls.query.all()
+
+        for const in consts:
+
+            # temporary dict to store data for this constellation
+            c = {}
+
+            c['code'] = const.const_code
+            c['name'] = const.name
+
+            # collect the boundaries
+            c['bound_verts'] = [
+                                 {'ra': float(vert.ra), 'dec':float(vert.dec)} 
+                                 for vert in const.bound_vertices
+                               ]
+
+            # get the constellation lines
+            c['line_groups'] = [ 
+                                 [
+                                   {'ra': float(vert.star.ra), 'dec': float(vert.star.dec)} 
+                                   for vert in grp.constline_vertices
+                                 ] 
+                                 for grp in const.line_groups
+                               ]
+
+            constellation_data.append(c)
+
+
+        return constellation_data
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -78,6 +133,8 @@ class ConstLineVertex(db.Model):
     # where in the constellation line sequence is this? 
     index = db.Column(db.Integer, nullable=False)
 
+    ##### relationships #####
+    star = db.relationship("Star")
 
 
     def __repr__(self):

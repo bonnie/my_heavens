@@ -50,7 +50,15 @@ class Constellation(db.Model):
 
         constellation_data = []
 
-        consts = cls.query.all()
+        # do joinedloads to make the data collection faster
+        query = cls.query
+        const_joins = query.options(
+                            db.joinedload("bound_vertices"),
+                            db.joinedload("line_groups"))
+
+        consts = const_joins.all()
+
+        # consts = cls.query.all()
 
         for const in consts:
 

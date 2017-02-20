@@ -13,6 +13,8 @@ function printStarData(starData) {
 
     console.log(starData);
 
+    var constInfo = starData.constellations;
+
     var svgBodySelection = d3.select("body");
 
     // make a place to draw the stars
@@ -28,38 +30,57 @@ function printStarData(starData) {
                               .attr('fill', 'black')
 
     // set up constellations
-    var constellations = svgContainer.append("g")
+    var constGroup = svgContainer.append("g")
                                     .attr("id", "cons");
 
 
     // add data to constellations
-    var g = constellations.selectAll("g")
-        .data(starData.constellations)
+    var constellations = constGroup.selectAll("g")
+        .data(constInfo)
         .enter()
-        .append("g");
+        .append("g")
+        .attr("class", "constellation");
 
+
+    ///////////////// something's not right here: all constellations get all boundaries!! ////////////
 
     // create paths constellation boundaries
-    constBounds = g.selectAll("path")
-        .data(starData.constellations)
+    constBounds = constellations.selectAll("path.const-bounds")
+        .data(constInfo)
         .enter()
         .append("path")
+        .attr("class", "const-bounds")
 
 
     // draw constellation boundaries
-    constBounds.attr("class", "const-bounds")
-        .attr("d", function(d) { return getLine(d.bound_verts) })
-        // .attr("d", getLine({x: 10, y:10}, {x:20, y:20}))
-
-        // works!!
-        // the second arg is a result of doing this in the terminal with a debugger right at the beginning of printStarData: 
-        // bounds = starData.constellations[0].bound_verts
-        // getLine(bounds)
-        // .attr("d", "M339.8019412114568,528.4672000165192L344.1320518476296,527.4231098992378L367.69759784975133,520.2687459222661L388.4405671779828,511.8732234007942L387.0781535583861,509.6091686586589L412.29378363098056,496.9539805966417L397.01821366983916,467.8405839566501L395.6455119875311,468.3340656915737L393.07222087985497,461.4673144025827L389.68128884478426,462.52788727418124L381.66814054957274,430.19234622190015L380.65199831820644,430.33714152948437L369.20830660951583,431.88562446965307L370.12317984101196,437.5163325858095L359.2936522217372,439.08146704336724L358.9334573222166,436.8821981014901L346.67533215970917,438.3652109536258L347.58287688496847,443.9592048537573L354.3610262374083,443.0449899245852L356.07993564559024,451.7149872126686L357.1035268088501,451.54063989428863L359.9975699320602,463.2930128169436L358.97162088219574,463.509980696122L362.29482825940846,474.56468607637845L326.97092959341217,481.66274229991933L339.530071547254,517.3855482981743L335.2606885207184,518.3175807608449")
-
-
+    constBounds.attr("d", function(d) { return getLine(d.bound_verts) })
         .attr("stroke", "#333333")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", 0)
+
+
+    //// I think the below will make more sense once I figure out how to do one boundary for each constellation, 
+    //// not all constellation boundaries for each constellation
+
+    // create groups for constellation lines
+    // constLineGroups = constellations.selectAll("g.const-line-group")
+    //     .data(constInfo)
+    //     .enter()
+    //     .append("g")
+    //     .attr("class", "const-line-group")
+
+
+    // // create paths for each line in the groups
+    // constLines = constLineGroups.selectAll("path.const-line")
+    //     .enter()
+    //     .append("path")
+    //     .attr("class", "const-line")
+
+
+    // // draw constellation lines
+    // constLines.attr("d", function(d, i) { return getLine(d.group_lines[i]) })
+    //     .attr("stroke", "#333333")
+    //     .attr("stroke-width", 2)
+
 
 
     // add the stars

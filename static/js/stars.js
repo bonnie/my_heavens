@@ -40,6 +40,8 @@ function printStarData(starData) {
         .enter()
         .append("g")
         .attr("class", "constellation")
+
+        // for debugging
         .attr("data-name", function(d) { return d.name })
 
         // don't display initially
@@ -49,10 +51,22 @@ function printStarData(starData) {
         .on("mouseover", function() { d3.select(this).style("visibility", "visible"); })
         .on("mouseout", function() { d3.select(this).style("visibility", "hidden"); });
 
+
+    // add sub-elements for each constellation
     constellations.each(function(d) {
 
+        thisConst = d3.select(this);
+
+        // text for constellation name
+        constLabels = thisConst.append("text")
+            .text(d.name)
+            .attr("x", starData.radius - 3*d.name.length)
+            .attr("y", 15)
+            .attr("class", "const-name");
+
+
         // create constellation boundaries
-        constBounds = d3.select(this).append("path")
+        constBounds = thisConst.append("path")
           .attr("class", "const-bounds")
           .attr("d", getLine(d.bound_verts))
           .attr("stroke", "#000099")
@@ -63,11 +77,12 @@ function printStarData(starData) {
 
 
         // create constellation line groups
-        constLineGroups = d3.select(this).selectAll("g.constline-group")
+        constLineGroups = thisConst.selectAll("g.constline-group")
             .data(d.line_groups)
             .enter()
             .append("g")
             .attr("class", "constline-group")
+
 
         // add lines for each group
         constLineGroups.each(function(d, i) {

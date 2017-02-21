@@ -3,3 +3,8 @@
 g.constellation {
   pointer-events: all;
 }
+
+/* constellation names */
+text.const-name {
+    stroke: #fff;
+}

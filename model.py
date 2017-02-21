@@ -86,6 +86,10 @@ class Constellation(db.Model):
                 x, y = get_star_coords(lat, lng, utctime, vert.ra, vert.dec)
                 c['bound_verts'].append({'x': x, 'y': y})
 
+            # add the final boundary point to close the boundary loop
+            if c['bound_verts']:
+                c['bound_verts'].append(c['bound_verts'][0])
+
             # get the constellation lines
             c['line_groups'] = []
             for grp in const.line_groups:

@@ -1,0 +1,5 @@
+
+/* make sure our constellation groups recognize mouseover events */
+g.constellation {
+  pointer-events: all;
+}

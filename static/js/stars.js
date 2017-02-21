@@ -40,8 +40,14 @@ function printStarData(starData) {
         .enter()
         .append("g")
         .attr("class", "constellation")
-        .attr("data-name", function(d) { return d.name });
+        .attr("data-name", function(d) { return d.name })
 
+        // don't display initially
+        .attr("visibility", "hidden")
+
+        // reveal boundaries and lines on mouseover
+        .on("mouseover", function() { d3.select(this).style("visibility", "visible"); })
+        .on("mouseout", function() { d3.select(this).style("visibility", "hidden"); });
 
     constellations.each(function(d) {
 

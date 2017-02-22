@@ -45,12 +45,19 @@ def get_latlng_rads(lat, lng):
     return lat_in_radians, lng_in_radians
 
 
-def get_star_coords(lat, lng, utctime, ra, dec):
+def get_star_coords(lat, lng, utctime, ra, dec, return_invisible=False):
     """reusable function to get x and y for a particular ra and dec
 
     * lat and lng are in radians
     * utctime is a datetime obj, in utc
     * ra and dec are Decimal objects
+    * if "below_horiz" is True, return points beyond the horizon
+
+    return value: dict with these keys: 
+
+        x (float)
+        y (float)
+        below_horiz (boolean saying whether the point was below the horizon)
 
     """
 
@@ -60,20 +67,22 @@ def get_star_coords(lat, lng, utctime, ra, dec):
     ha = coords.hourAngle(utctime, lng)
     altaz = coords.altAz(ha, lat)
 
-    # discard stars below the horizon
-    if altaz.alt < 0:
-        return None, None
+    # is this point below the horizon? 
+    visible = altaz.alt > 0
 
+    # for points below the horizon
+    if not (visible or return_invisible):
+        # discard this point
+        return {'x': None, 'y': None, 'visible': False}
 
     # convert alt and az into x and y, considering the size of our star field
 
     # translate alt and az into polar coords
     rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi / 2)
     phi = altaz.az
-
     x, y = pol2cart(rho, phi)
 
-    return x, y
+    return {'x': x, 'y': y, 'visible': visible}
 
 
 def get_user_star_coords(lat, lng, utctime, max_mag):
@@ -106,17 +115,17 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
             continue
 
         # convert RA and dec into alt and az
-        x, y = get_star_coords(lat, lng, utctime, star.ra, star.dec)
+        p = get_star_coords(lat, lng, utctime, star.ra, star.dec)
 
         # if the star is below the horizon, don't add it to the list
-        if not x:
+        if not p['visible']:
             continue
 
         # add it to the list in a neat little package
         #
         # cast magnitude to float, as it comes back as a Decimal obj: bad json
-        star_field.append({'x': x, 
-                           'y': y, 
+        star_field.append({'x': p['x'], 
+                           'y': p['y'], 
                            'magnitude': float(star.magnitude), 
                            'color': star.color,
                            'name': star.name

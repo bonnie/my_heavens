@@ -77,27 +77,38 @@ class Constellation(db.Model):
             # temporary dict to store data for this constellation
             c = {}
 
+            # track whether any points are above the horizon
+            visible = False
+
             c['code'] = const.const_code
             c['name'] = const.name
-
-            # collect the boundaries
-            c['bound_verts'] = []
-            for vert in const.bound_vertices:
-                x, y = get_star_coords(lat, lng, utctime, vert.ra, vert.dec)
-                c['bound_verts'].append({'x': x, 'y': y})
-
-            # add the final boundary point to close the boundary loop
-            if c['bound_verts']:
-                c['bound_verts'].append(c['bound_verts'][0])
 
             # get the constellation lines
             c['line_groups'] = []
             for grp in const.line_groups:
                 grp_verts = []
                 for vert in grp.constline_vertices:
-                    x, y = get_star_coords(lat, lng, utctime, vert.star.ra, vert.star.dec)
-                    grp_verts.append({'x': x, 'y': y})
+                    p = get_star_coords(lat, lng, utctime, vert.star.ra, vert.star.dec, return_invisible=True)
+                    grp_verts.append({'x': p['x'], 'y': p['y']})
+
+                    if p['visible']:
+                        visible = True
+
                 c['line_groups'].append(grp_verts)
+
+            # if there are no visible constellation lines, scrap this constellation
+            if not visible: 
+                continue
+
+            # collect the boundaries
+            c['bound_verts'] = []
+            for vert in const.bound_vertices:
+                p = get_star_coords(lat, lng, utctime, vert.ra, vert.dec, return_invisible=True)
+                c['bound_verts'].append({'x': p['x'], 'y': p['y']})
+
+            # add the final boundary point to close the boundary loop
+            if c['bound_verts']:
+                c['bound_verts'].append(c['bound_verts'][0])
 
             constellation_data.append(c)
 

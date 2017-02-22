@@ -6,5 +6,5 @@ g.constellation {
 
 /* constellation names */
 text.const-name {
-    stroke: #fff;
+    fill: #fff;
 }

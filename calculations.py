@@ -68,7 +68,7 @@ def get_star_coords(lat, lng, utctime, ra, dec):
     # convert alt and az into x and y, considering the size of our star field
 
     # translate alt and az into polar coords
-    rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi)
+    rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi / 2)
     phi = altaz.az
 
     x, y = pol2cart(rho, phi)

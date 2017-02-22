@@ -8,6 +8,9 @@ from datetime import datetime
 from model import connect_to_db, Star
 from display_constants import STARFIELD_RADIUS
 
+# optional debugging output
+DEBUG = True
+
 
 def pol2cart(rho, phi):
     """translate between polar coords and svg-style cartesian coords
@@ -57,6 +60,11 @@ def get_star_coords(lat, lng, utctime, ra, dec):
     ha = coords.hourAngle(utctime, lng)
     altaz = coords.altAz(ha, lat)
 
+    # discard stars below the horizon
+    if altaz.alt < 0:
+        return None, None
+
+
     # convert alt and az into x and y, considering the size of our star field
 
     # translate alt and az into polar coords
@@ -86,6 +94,10 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
 
     star_field = []
 
+    if DEBUG: 
+        print 'lat', lat
+        print 'lng', lng
+        print 'utctime = strptime("{}", "%Y-%m-%d %H-%M-%S.%f'.format(utctime)
 
     for star in db_stars:
 
@@ -96,10 +108,9 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
         # convert RA and dec into alt and az
         x, y = get_star_coords(lat, lng, utctime, star.ra, star.dec)
 
-        # if star.name == 'Polaris':
-        #     print "x: {}, y: {}, alt: {}, az: {}".format(x, y, altaz.alt, altaz.az)
-            # x: 57.9669674332, y: -0.936814115136, alt: 0.660134429974, az: 6.26702554224
-
+        # if the star is below the horizon, don't add it to the list
+        if not x:
+            continue
 
         # add it to the list in a neat little package
         #
@@ -110,5 +121,10 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
                            'color': star.color,
                            'name': star.name
                            })
+
+
+        if DEBUG: 
+            if star.const_code == 'LUP': 
+                print "x: {}, y: {}, ra={}, dec={}".format(x, y, star.ra, star.dec)
 
     return star_field

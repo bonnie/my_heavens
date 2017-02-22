@@ -257,7 +257,7 @@ def load_constellation_lines():
 
                     # some of the magnitudes are way off. Try without the magnitude
                     try:
-                        query.one()
+                        star = query.one()
                         print "matched {} {} without magnitude".format(constpoint['CON'], constpoint['NAME'])
 
                     except NoResultFound:

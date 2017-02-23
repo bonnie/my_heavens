@@ -1,5 +1,6 @@
 """add star and constellation data to the stars db. """
 
+import os
 import csv
 import math
 import re
@@ -10,11 +11,13 @@ from model import db, connect_to_db, Star, Constellation, ConstLineVertex, \
 
 from colors import COLOR_BY_SPECTRAL_CLASS
 
-STARDATA_FILE = 'seed_data/hygfull.csv'
-CONST_FILE = 'seed_data/const_abbrevs.csv'
-CONSTBOUNDS_FILE = 'seed_data/constellation_boundaries.txt'
-CONSTLINES_FILE = 'seed_data/constellation_lines.csv'
+# for debugging output. False by default unless running the script directly. 
+DEBUG = False
 
+# to be able to distinguish between data dir for testing
+DATADIR = 'seed_data'
+
+# for spectral classes
 SC_RE = re.compile(r'([OBAFGKM]\d) ?\(?([VI]*)\)?')
 
 # for cleaning up BayerFlamsteed names
@@ -23,13 +26,37 @@ BF_RE = re.compile(r'^\d+\s*')
 # for stars with unrecognizable spectral classes
 DEFAULT_COLOR = "#ffffff"
 
+def open_datafile(datadir, file_type):
+    """Return path to the data file type using the datadir as the location.
+
+    Handy for testing when using a different datadir"""
+
+    if file_type == 'stars':
+        filename = 'hygfull.csv'
+
+    elif file_type == 'consts':
+        filename = 'const_abbrevs.csv'
+
+    elif file_type == 'bounds':
+        filename = 'constellation_boundaries.txt'
+
+    elif file_type == 'lines':
+        filename = 'constellation_lines.csv'
+
+    else:
+        return None
+
+    return open(os.path.join(datadir, filename))
+
+
 def announce(action):
     """Give feedback on where in the script we are."""
 
-    print
-    print '*'*20
-    print action
-    print '*'*20
+    if DEBUG: 
+        print
+        print '*'*20
+        print action
+        print '*'*20
 
 
 def get_radian_coords(ra_in_hrs, dec_in_degs):
@@ -68,6 +95,7 @@ def get_color(spectral_class):
         # we've got ourselves a white star!
         return DEFAULT_COLOR
 
+
 def get_name_and_constellation(star_info):
     """get the name and constellation from a line in the STARDATA file"""
 
@@ -96,7 +124,7 @@ def load_constellations():
     announce('loading constellations')
 
     # read in all the constellations and make objects for them
-    with open(CONST_FILE) as csvfile:
+    with open_datafile(DATADIR, 'consts') as csvfile:
         reader = csv.DictReader(csvfile)
 
         # make a new const obj for each line and add to db
@@ -108,12 +136,38 @@ def load_constellations():
     db.session.commit()
 
 
+def get_bounds_vertex(ra_in_rad, dec_in_rad):
+    """Search for the bounds vertex matching the input. Create a new one if needed.
+
+    returns BoundsVertex object.
+
+    """
+
+    # account for the fact that the input file has greater precision than
+    # what's stored in the db
+    rounded_ra = int(ra_in_rad * 1000) / 1000.0
+    rounded_dec = int(dec_in_rad * 1000) / 1000.0
+
+    # create the vertex, if it doesn't already exist
+    try:
+        vertex = BoundVertex.query.filter_by(ra=rounded_ra, dec=rounded_dec).one()
+
+    except NoResultFound:
+        vertex = BoundVertex(ra=ra_in_rad, dec=dec_in_rad)
+        db.session.add(vertex)
+
+        # to get an id, and make available for future iterations
+        db.session.flush()
+
+    return vertex
+
+
 def load_const_boundaries():
     """Add the boundary vertices for each constellation into the db"""
 
     announce('loading constellation boundaries')
 
-    boundfile = open(CONSTBOUNDS_FILE)
+    boundfile = open_datafile(DATADIR, 'bounds')
     
     # keep track of what constellation we're on, in order to reset indexes when
     # we switch constellations
@@ -123,7 +177,8 @@ def load_const_boundaries():
         try: 
             ra, dec, const = boundline.strip().split()
         except: 
-            print "bad line in boundfile: [{}]".format(boundline) 
+            if DEBUG: 
+                print "bad line in boundfile: [{}]".format(boundline) 
             continue
 
         # translate ra and dec into radians
@@ -134,21 +189,7 @@ def load_const_boundaries():
             index = 0
             last_const = const
 
-        # account for the fact that the input file has greater precision than
-        # what's stored in the db
-        rounded_ra = int(ra_in_rad * 1000) / 1000.0
-        rounded_dec = int(dec_in_rad * 1000) / 1000.0
-
-        # create the vertex, if it doesn't already exist
-        try:
-            vertex = BoundVertex.query.filter_by(ra=rounded_ra, dec=rounded_dec).one()
-
-        except NoResultFound:
-            vertex = BoundVertex(ra=ra_in_rad, dec=dec_in_rad)
-            db.session.add(vertex)
-
-            # to get an id, and make available for future iterations
-            db.session.flush()
+        vertex = get_bounds_vertex(ra_in_rad, dec_in_rad)
 
         # add the vertex to the constellation boundary
         const_bound_vertex = ConstBoundVertex(const_code=const,
@@ -170,7 +211,7 @@ def load_stars():
 
     line_num = 0
 
-    with open(STARDATA_FILE) as csvfile:
+    with open_datafile(DATADIR, 'stars') as csvfile:
         reader = csv.DictReader(csvfile)
         for starline in reader:
             
@@ -217,6 +258,48 @@ def load_stars():
     db.session.commit()
 
 
+def get_matching_star(ra_in_rad, dec_in_rad, mag, const, name):
+    """Get the closest star matching the input values.
+
+    const and name are strings used only for debugging. 
+
+    Returns a Star object"""
+
+   # find the star matching this constellation line point
+    query = Star.query.filter(db.func.abs(Star.ra - ra_in_rad) < 0.005, 
+                         db.func.abs(Star.dec - dec_in_rad) < 0.005)
+
+    query_with_magnitude = query.filter(db.func.abs(db.func.abs(Star.magnitude) - db.func.abs(mag)) < 0.5)
+                                 
+    try: 
+        try:
+            star = query_with_magnitude.one()
+
+        except NoResultFound:
+
+            # some of the magnitudes are way off (variable stars?). Try without the magnitude
+            try:
+                star = query.one()
+                if DEBUG: 
+                    print "matched {} {} without magnitude".format(const, name)
+
+            except NoResultFound:
+
+                error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
+                print error.format(const, name, ra_in_rad, dec_in_rad, mag)
+                print "exiting..."
+                exit()
+
+    except MultipleResultsFound:
+
+        # just go with the brightest star that matches the coordinates
+        star = query.order_by(Star.magnitude).first()
+        if DEBUG:
+            print "matched {} {} with brightest star in region".format(const, name)
+
+    return star
+
+
 def load_constellation_lines():
     """Add the constellation lines into the db.
 
@@ -229,7 +312,7 @@ def load_constellation_lines():
     # to track whether it's time for a new group
     group_break = True
 
-    with open(CONSTLINES_FILE) as csvfile:
+    with open_datafile(DATADIR, 'lines') as csvfile:
         reader = csv.DictReader(csvfile)
 
         for constpoint in reader: 
@@ -243,35 +326,8 @@ def load_constellation_lines():
             ra_in_rad, dec_in_rad = get_radian_coords(constpoint['RA'], constpoint['DEC'])
             mag = float(constpoint['MAG'])
 
-            # find the star matching this constellation line point
-            query = Star.query.filter(db.func.abs(Star.ra - ra_in_rad) < 0.005, 
-                                 db.func.abs(Star.dec - dec_in_rad) < 0.005)
-
-            query_with_magnitude = query.filter(db.func.abs(db.func.abs(Star.magnitude) - db.func.abs(mag)) < 0.5)
-                                 
-            try: 
-                try:
-                    star = query_with_magnitude.one()
-
-                except NoResultFound:
-
-                    # some of the magnitudes are way off. Try without the magnitude
-                    try:
-                        star = query.one()
-                        print "matched {} {} without magnitude".format(constpoint['CON'], constpoint['NAME'])
-
-                    except NoResultFound:
-
-                        error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
-                        print error.format(constpoint['CON'], constpoint['NAME'], ra_in_rad, dec_in_rad, mag)
-                        print "exiting..."
-                        exit()
-
-            except MultipleResultsFound:
-
-                # just go with the brightest star that matches the coordinates
-                star = query.order_by(Star.magnitude).first()
-                print "matched {} {} with brightest star in region".format(constpoint['CON'], constpoint['NAME'])
+            # find the matching star in the db
+            star = get_matching_star(ra_in_rad, dec_in_rad, mag, constpoint['CON'], constpoint['NAME'])
 
             # make a new group if necessary
             if group_break: 
@@ -297,6 +353,8 @@ if __name__ == '__main__':
     from server import app
     connect_to_db(app)
 
+    # if we're running it directly, we probably want to see debug
+    DEBUG = True
 
     db.drop_all()
     db.create_all()

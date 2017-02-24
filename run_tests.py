@@ -12,7 +12,7 @@ TESTDATA_DIR = 'tests/test_data'
 if __name__ == '__main__':
 
     # import the tests
-    from tests.seed_tests import SeedTests
+    from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb
     from tests.db_tests import DbTests
     from tests.calculation_tests import CalculationTests
     from tests.flask_tests import FlaskTests

@@ -60,7 +60,7 @@ def announce(action):
 
 
 def get_radian_coords(ra_in_hrs, dec_in_degs):
-    """return a tuple of radian equivalents of input (input in string format) 
+    """return a tuple of radian equivalents of input (input in string or Decimal format) 
 
     right ascension input in hours, declination input in degrees"""
 
@@ -100,10 +100,10 @@ def get_name_and_constellation(star_info):
     """get the name and constellation from a line in the STARDATA file"""
 
     # get the name
-    name = star_info['ProperName'].strip()
+    name = star_info['ProperName'].strip() or None
 
     # strip unnecessary BayerFlamsteed cruft
-    bf = BF_RE.sub('', star_info['BayerFlamsteed'].strip())
+    bf = re.sub(r' +', ' ', star_info['BayerFlamsteed'].strip()[2:]).strip()
 
     if not name and len(bf) > 3: 
         # if bf is just 3 characters long, it's only the constellation

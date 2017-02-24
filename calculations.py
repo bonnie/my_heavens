@@ -50,7 +50,7 @@ def get_star_coords(lat, lng, utctime, ra, dec, return_invisible=False):
 
     * lat and lng are in radians
     * utctime is a datetime obj, in utc
-    * ra and dec are Decimal objects
+    * ra and dec are Decimal objects (in radians)
     * if "below_horiz" is True, return points beyond the horizon
 
     return value: dict with these keys: 

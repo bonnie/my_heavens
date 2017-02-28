@@ -31,9 +31,13 @@ def return_stars():
     color
     """
 
+    lat = '51.5074dN' # london
+    lng = '0.1278dE'    # london
+
+
     # TODO: get this from user via form inputs
-    lat = '37.7749dN'  # san francisco
-    lng = '122.4194dW' # san francisco
+    # lat = '37.7749dN'  # san francisco
+    # lng = '122.4194dW' # san francisco
     utc_now = datetime.utcnow()  # current time
     max_magnitude = 5 # dimmest stars to show
 

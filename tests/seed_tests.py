@@ -1,6 +1,7 @@
 """Tests for the seeding code."""
 
 from unittest import TestCase
+import math
 
 # be able to import from parent dir
 import sys
@@ -8,8 +9,22 @@ sys.path.append('..')
 
 import seed
 from server import app
-from model import connect_to_db, db
+from model import connect_to_db, db, Constellation, Star, BoundVertex, ConstBoundVertex
 from run_tests import TESTDB_URI, TESTDATA_DIR
+
+def db_setup():
+    """Set up database for testing"""
+
+    connect_to_db(app, TESTDB_URI)
+    db.create_all()
+
+
+def db_teardown():
+    """Tear down database for testing"""
+
+    db.session.close()
+    db.drop_all()
+
 
 def is_within_tolerance(num, target):
     """Check to see whether a num is within a reasonable tolerance of target. 
@@ -33,7 +48,7 @@ class SeedTestsWithoutDb(TestCase):
         self.assertEqual(len(first_line_tokens), 14)
 
 
-    def test_get_radian_coords_decimal(self):
+    def test_get_radian_coords_N(self):
         """Test getting radian coords from ra in hours and dec in degrees N."""
 
         # betelgeuse
@@ -72,8 +87,9 @@ class SeedTestsWithoutDb(TestCase):
 
         color = seed.get_color('O9.5II      ')
 
-        # the color is chosen randomly from the possible 09 colors
-        self.assertIn(color, ['#9bb0ff', '#a4b9ff', '#9eb1ff', '#a4baff'])
+        # the color is chosen randomly from the possible O9 colors
+        O9_colors = ['#9bb0ff', '#a4b9ff', '#9eb1ff', '#a4baff']
+        self.assertIn(color, O9_colors)
 
 
     def test_get_color_unknown(self):
@@ -95,7 +111,7 @@ class SeedTestsWithoutDb(TestCase):
 
 
     def test_get_name_and_constellation_bfname(self):
-        """Test extracting the name and constellation for stars with an explicit name.""" 
+        """Test extracting the name and constellation for stars with out an explicit name.""" 
 
         star_info = {'ProperName': ' ',
                      'BayerFlamsteed': ' 70Xi  Ori'}
@@ -103,6 +119,17 @@ class SeedTestsWithoutDb(TestCase):
         name, const = seed.get_name_and_constellation(star_info)
         self.assertEqual(name, 'Xi Ori')
         self.assertEqual(const, 'ORI')
+
+
+    def test_get_name_and_constellation_bfname_no_leading_number(self):
+        """Test extracting the name and constellation for stars without an explicit name; BF data has no leading number.""" 
+
+        star_info = {'ProperName': ' ',
+                     'BayerFlamsteed': '   Del2Tel'}
+
+        name, const = seed.get_name_and_constellation(star_info)
+        self.assertEqual(name, 'Del2Tel')
+        self.assertEqual(const, 'TEL')
 
 
     def test_get_name_and_constellation_noname(self):
@@ -119,18 +146,166 @@ class SeedTestsWithoutDb(TestCase):
 class SeedTestsWithDb(TestCase):
     """Test the code that actually seeds the db."""
 
-    def SetUp(self):
+    def setUp(self):
         """Stuff to do before every test."""
 
-        connect_to_db(app, TESTDB_URI)
-        db.create_all()
+        db_setup()
 
 
-    def TearDown(self):
+    def tearDown(self):
         """Stuff to do after every test."""
 
-        db.session.close()
-        db.drop_all()
+        db_teardown()
 
 
+    def test_get_bounds_vertex_not_exists(self):
+        """Test code to detect an existing constellation bounds vertex."""
 
+        # bounds vertex for Orion
+        ra = 1.2086413796706992
+        dec = 0.27052603405912107
+
+        new_vertex = seed.get_bounds_vertex(ra, dec)
+        self.assertEqual(type(new_vertex), BoundVertex)        
+
+
+    def test_get_bounds_vertex_exists(self):
+        """Test code to detect an existing constellation bounds vertex."""
+
+        # bounds vertex for Orion
+        ra = 1.2086413796706992
+        dec = 0.27052603405912107
+
+        # create the vertex in the db
+        vertex = BoundVertex(ra=ra, dec=dec)
+        db.session.add(vertex)
+        db.session.commit
+
+        matched_vertex = seed.get_bounds_vertex(ra, dec)
+        self.assertEqual(type(matched_vertex), BoundVertex)
+
+
+class SeedConstellationTests(TestCase):
+    """Test code to loading constellations and constellation boundaries into the database."""
+
+    def setUp(self):
+        """Stuff to do before every test."""
+
+        db_setup()
+        seed.load_constellations(TESTDATA_DIR)
+
+    def tearDown(self):
+        """Stuff to do after every test."""
+
+        db_teardown()
+
+
+    def test_load_constellations(self):
+        """Test code to load constellations into db."""
+
+        # see how many constellations got added
+        self.assertEqual(Constellation.query.count(), 3)
+
+        # see whether the info made it into the right columns
+        orion = Constellation.query.filter_by(const_code='ORI').one()
+        self.assertEqual(orion.const_code, 'ORI')
+        self.assertEqual(orion.name, 'Orion')
+
+
+    def test_load_const_boundaries(self):
+        """Test code to load the constellation boundaries into the database."""
+
+        # then load the boundaries
+        seed.load_const_boundaries(TESTDATA_DIR)
+
+        # how does it look? 
+        ori_count = ConstBoundVertex.query.filter_by(const_code = 'ORI').count()
+        self.assertEqual(ori_count, 28)
+
+
+class SeedStarTests(TestCase):
+    """Test seeding stars into the database."""
+
+    def setUp(self):
+        """Stuff to do before every test."""
+
+        db_setup()
+        seed.load_constellations(TESTDATA_DIR)
+        seed.load_stars(TESTDATA_DIR)
+
+    def tearDown(self):
+        """Stuff to do after every test."""
+
+        db_teardown()
+
+
+    def test_star_data(self):
+        """Test code to load stars into the databse."""
+
+        rigel = Star.query.filter_by(name='Rigel').one()
+        self.assertEqual(rigel.const_code, 'ORI')
+        self.assertEqual(float(rigel.distance), 236.97)
+        self.assertEqual(float(rigel.magnitude), 0.18)
+        self.assertEqual(rigel.spectrum, 'B8Ia')
+        self.assertEqual(rigel.color, '#b6ceff')
+
+
+    def test_radian_range(self):
+        """Make sure all the ra and decs in the db are in radian range."""
+
+        ra_outofrange_count = Star.query.filter(db.not_(db.between(Star.ra, 0, 2 * math.pi))).count()
+        dec_outofrange_count = Star.query.filter(db.not_(db.between(Star.dec, -2 * math.pi, 2 * math.pi))).count()
+
+        self.assertEqual(ra_outofrange_count, 0)
+        self.assertEqual(dec_outofrange_count, 0)
+
+
+    def matching_star_test(self, ra, dec, mag, name):
+        """Test for matching stars from constellation lines data.
+
+        This is a generic test so that the following tests have less repeated
+        code.
+        """
+
+        ra_in_rad, dec_in_rad = seed.get_radian_coords(ra, dec)
+        star = seed.get_matching_star(ra_in_rad, dec_in_rad, mag)
+
+        self.assertEqual(type(star), Star)
+        self.assertEqual(star.name, name)
+
+
+    def test_get_matching_star_exact_match(self):
+        """Test finding a matching star by RA, dec, mag"""
+
+        # Betelgeuse (Alpha Ori)
+        ra = 5.919444
+        dec = 7.4000
+        mag = 0.80
+
+        self.matching_star_test(ra, dec, mag, 'Betelgeuse')
+
+
+    def test_get_matching_star_no_mag(self):
+        """Test finding a matching star by RA, dec when there's no mag match"""
+
+        # Beta Mon
+        ra = 6.480278
+        dec = -7.0333
+        mag = 4.60
+
+        self.matching_star_test(ra, dec, mag, 'Bet Mon')
+
+
+    def test_get_matching_star_brightest(self):
+        """Test finding a matching star by RA, dec when there's more than one match"""
+
+        # Delta Tel
+        ra = 18.529167
+        dec = -45.9167
+        mag = 4.95
+
+        self.matching_star_test(ra, dec, mag, 'Del1Tel')
+
+
+class SeedConstLineTests(TestCase):
+    """Test seeding constellation lines into the database."""

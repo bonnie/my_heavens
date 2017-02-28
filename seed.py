@@ -103,7 +103,9 @@ def get_name_and_constellation(star_info):
     name = star_info['ProperName'].strip() or None
 
     # strip unnecessary BayerFlamsteed cruft
-    bf = re.sub(r' +', ' ', star_info['BayerFlamsteed'].strip()[2:]).strip()
+    bf = star_info['BayerFlamsteed'].strip()
+    bf = re.sub(r' +', ' ', bf)
+    bf = re.sub(r'^[\d ]+', '', bf)
 
     if not name and len(bf) > 3: 
         # if bf is just 3 characters long, it's only the constellation
@@ -118,13 +120,13 @@ def get_name_and_constellation(star_info):
     return name, constellation
 
 
-def load_constellations():
+def load_constellations(datadir):
     """Load constellation names and abbreviations from csv into db."""
 
     announce('loading constellations')
 
     # read in all the constellations and make objects for them
-    with open_datafile(DATADIR, 'consts') as csvfile:
+    with open_datafile(datadir, 'consts') as csvfile:
         reader = csv.DictReader(csvfile)
 
         # make a new const obj for each line and add to db
@@ -138,6 +140,8 @@ def load_constellations():
 
 def get_bounds_vertex(ra_in_rad, dec_in_rad):
     """Search for the bounds vertex matching the input. Create a new one if needed.
+
+    ra_in_rad and dec_in_rad are floats.
 
     returns BoundsVertex object.
 
@@ -162,12 +166,12 @@ def get_bounds_vertex(ra_in_rad, dec_in_rad):
     return vertex
 
 
-def load_const_boundaries():
+def load_const_boundaries(datadir):
     """Add the boundary vertices for each constellation into the db"""
 
     announce('loading constellation boundaries')
 
-    boundfile = open_datafile(DATADIR, 'bounds')
+    boundfile = open_datafile(datadir, 'bounds')
     
     # keep track of what constellation we're on, in order to reset indexes when
     # we switch constellations
@@ -204,14 +208,14 @@ def load_const_boundaries():
     db.session.commit()
 
 
-def load_stars():
+def load_stars(datadir):
     """Load star data from csv into the database."""
 
     announce('loading stars')
 
     line_num = 0
 
-    with open_datafile(DATADIR, 'stars') as csvfile:
+    with open_datafile(datadir, 'stars') as csvfile:
         reader = csv.DictReader(csvfile)
         for starline in reader:
             
@@ -258,7 +262,7 @@ def load_stars():
     db.session.commit()
 
 
-def get_matching_star(ra_in_rad, dec_in_rad, mag, const, name):
+def get_matching_star(ra_in_rad, dec_in_rad, mag, const=None, name=None):
     """Get the closest star matching the input values.
 
     const and name are strings used only for debugging. 
@@ -300,7 +304,7 @@ def get_matching_star(ra_in_rad, dec_in_rad, mag, const, name):
     return star
 
 
-def load_constellation_lines():
+def load_constellation_lines(datadir):
     """Add the constellation lines into the db.
 
     * Each continuous line gets its own line group. 
@@ -312,7 +316,7 @@ def load_constellation_lines():
     # to track whether it's time for a new group
     group_break = True
 
-    with open_datafile(DATADIR, 'lines') as csvfile:
+    with open_datafile(datadir, 'lines') as csvfile:
         reader = csv.DictReader(csvfile)
 
         for constpoint in reader: 
@@ -348,6 +352,17 @@ def load_constellation_lines():
         db.session.commit()
 
 
+def load_seed_data(ddir):
+    """Run all the functions to load the seed data.
+
+    For ease in seeding test database with one line of code."""
+
+    load_constellations(ddir)
+    load_const_boundaries(ddir)
+    load_stars(ddir)
+    load_constellation_lines(ddir)
+
+
 if __name__ == '__main__':
 
     from server import app
@@ -358,7 +373,5 @@ if __name__ == '__main__':
 
     db.drop_all()
     db.create_all()
-    load_constellations()
-    load_const_boundaries()
-    load_stars()
-    load_constellation_lines()
+
+    load_seed_data(DATADIR)

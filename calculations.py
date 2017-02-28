@@ -131,9 +131,4 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
                            'name': star.name
                            })
 
-
-        if DEBUG: 
-            if star.const_code == 'LUP': 
-                print "x: {}, y: {}, ra={}, dec={}".format(x, y, star.ra, star.dec)
-
     return star_field

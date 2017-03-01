@@ -276,7 +276,7 @@ class SeedStarTests(DbTestCase):
     def test_get_matching_star_brightest(self):
         """Test finding a matching star by RA, dec when there's more than one match"""
 
-        # Delta Tel
+        # Delta Tel (1)
         ra = 18.529167
         dec = -45.9167
         mag = 4.95
@@ -308,9 +308,10 @@ class SeedConstLineTests(DbTestCase):
 
 
     def test_const_line_vertex_count(self):
-        """Test that the appropriate number of line groups were added to db."""
+        """Test that the appropriate number of line vertices were added to db."""
 
         vertex_query = db.session.query(ConstLineVertex)
         ori_vertex_query = vertex_query.filter(ConstLineGroup.const_code=='ORI')
-        ori_vertex_count = ori_vertex_query.count()
+        ori_vertex_join = ori_vertex_query.join(ConstLineGroup)
+        ori_vertex_count = ori_vertex_join.count()
         self.assertEqual(ori_vertex_count, 25)

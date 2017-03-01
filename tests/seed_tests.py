@@ -8,22 +8,9 @@ import sys
 sys.path.append('..')
 
 import seed
-from server import app
-from model import connect_to_db, db, Constellation, Star, BoundVertex, ConstBoundVertex
-from run_tests import TESTDB_URI, TESTDATA_DIR
-
-def db_setup():
-    """Set up database for testing"""
-
-    connect_to_db(app, TESTDB_URI)
-    db.create_all()
-
-
-def db_teardown():
-    """Tear down database for testing"""
-
-    db.session.close()
-    db.drop_all()
+from model import db, Constellation, Star, BoundVertex, \
+                  ConstBoundVertex, ConstLineGroup, ConstLineVertex
+from run_tests import TESTDATA_DIR, DbTestCase
 
 
 def is_within_tolerance(num, target):
@@ -143,19 +130,12 @@ class SeedTestsWithoutDb(TestCase):
         self.assertEqual(const, 'ORI')        
 
 
-class SeedTestsWithDb(TestCase):
-    """Test the code that actually seeds the db."""
+class SeedTestsWithDb(DbTestCase):
+    """Test the code that actually seeds the db.
 
-    def setUp(self):
-        """Stuff to do before every test."""
-
-        db_setup()
-
-
-    def tearDown(self):
-        """Stuff to do after every test."""
-
-        db_teardown()
+    setUpClass and tearDownClass methods inherited without change from 
+    dbTestCase
+    """
 
 
     def test_get_bounds_vertex_not_exists(self):
@@ -185,19 +165,17 @@ class SeedTestsWithDb(TestCase):
         self.assertEqual(type(matched_vertex), BoundVertex)
 
 
-class SeedConstellationTests(TestCase):
-    """Test code to loading constellations and constellation boundaries into the database."""
+class SeedConstellationTests(DbTestCase):
+    """Test code to loading constellations and constellation boundaries into the database.
 
-    def setUp(self):
-        """Stuff to do before every test."""
+    tearDownClass method inherited without change from DbTestCase"""
 
-        db_setup()
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(SeedConstellationTests, cls).setUpClass()
         seed.load_constellations(TESTDATA_DIR)
-
-    def tearDown(self):
-        """Stuff to do after every test."""
-
-        db_teardown()
 
 
     def test_load_constellations(self):
@@ -223,20 +201,19 @@ class SeedConstellationTests(TestCase):
         self.assertEqual(ori_count, 28)
 
 
-class SeedStarTests(TestCase):
-    """Test seeding stars into the database."""
+class SeedStarTests(DbTestCase):
+    """Test seeding stars into the database.
 
-    def setUp(self):
-        """Stuff to do before every test."""
+    tearDownClass method inherited without change from DbTestCase
+    """
 
-        db_setup()
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(SeedStarTests, cls).setUpClass()
         seed.load_constellations(TESTDATA_DIR)
         seed.load_stars(TESTDATA_DIR)
-
-    def tearDown(self):
-        """Stuff to do after every test."""
-
-        db_teardown()
 
 
     def test_star_data(self):
@@ -307,5 +284,33 @@ class SeedStarTests(TestCase):
         self.matching_star_test(ra, dec, mag, 'Del1Tel')
 
 
-class SeedConstLineTests(TestCase):
-    """Test seeding constellation lines into the database."""
+class SeedConstLineTests(DbTestCase):
+    """Test seeding constellation lines into the database.
+
+    tearDownClass method inherited without change from DbTestCase
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(SeedConstLineTests, cls).setUpClass()
+        seed.load_constellations(TESTDATA_DIR)
+        seed.load_stars(TESTDATA_DIR)
+        seed.load_constellation_lines(TESTDATA_DIR)
+
+
+    def test_const_line_group_count(self):
+        """Test that the appropriate number of line groups were added to db."""
+
+        ori_group_count = ConstLineGroup.query.filter_by(const_code='ORI').count()
+        self.assertEqual(ori_group_count, 4)
+
+
+    def test_const_line_vertex_count(self):
+        """Test that the appropriate number of line groups were added to db."""
+
+        vertex_query = db.session.query(ConstLineVertex)
+        ori_vertex_query = vertex_query.filter(ConstLineGroup.const_code=='ORI')
+        ori_vertex_count = ori_vertex_query.count()
+        self.assertEqual(ori_vertex_count, 25)

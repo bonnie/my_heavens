@@ -44,9 +44,9 @@ class CalculationTestsWithoutDb(TestCase):
     This class is for tests that do not require the database.
     """
 
-    ################################
-    # Generic tests for repetition #
-    ################################
+    #########################################################
+    # Polar to Cartesian Tests 
+    #########################################################
 
     def pol2cart_test(self, rho, phi, expected_x, expected_y):
         """generalized pol2cart test to avoid repeated code"""
@@ -56,31 +56,6 @@ class CalculationTestsWithoutDb(TestCase):
         self.assertEqual(x, expected_x)
         self.assertEqual(y, expected_y)
 
-
-    def rad_translation_test(self, lat, lng, expected_lat_rad, expected_lng_rad):
-        """generalized test for translating lat and lng to radians"""
-
-        lat_rad, lng_rad = calc.get_latlng_rads(lat, lng)
-
-        self.assertEqual(lat_rad, expected_lat_rad)
-        self.assertEqual(lng_rad, expected_lng_rad)
-
-
-    def star_coords_test(self, lat, lng, ra, dec, 
-                         expected_x, expected_y, expected_visible,
-                         calculate_invisible):
-
-        out = calc.get_star_coords(lat, lng, TEST_DATETIME, ra, dec, TEST_RADIUS,
-                                   calculate_invisible=calculate_invisible)
-
-        self.assertEqual(out['x'], expected_x)
-        self.assertEqual(out['y'], expected_y)
-        self.assertEqual(out['visible'], expected_visible)
-
-
-    ################
-    # Test methods #
-    ################
 
     def test_pol2cart_north_horizon(self):
         """Test polar to cartesian coordinates, for a point on northern horizon.
@@ -112,6 +87,19 @@ class CalculationTestsWithoutDb(TestCase):
                            phi=-math.pi / 2,
                            expected_x=TEST_RADIUS * 3/2,
                            expected_y=TEST_RADIUS)
+
+
+    #########################################################
+    # Lat/Lng from degrees to radians 
+    #########################################################
+
+    def rad_translation_test(self, lat, lng, expected_lat_rad, expected_lng_rad):
+        """generalized test for translating lat and lng to radians"""
+
+        lat_rad, lng_rad = calc.get_latlng_rads(lat, lng)
+
+        self.assertEqual(lat_rad, expected_lat_rad)
+        self.assertEqual(lng_rad, expected_lng_rad)
 
 
     def test_latlng_rad_SF(self):
@@ -146,6 +134,22 @@ class CalculationTestsWithoutDb(TestCase):
 
         self.star_coords_test(SF_LAT_RAD, SF_LNG_RAD, R_RA, R_DEC, x, y, vis, 
                               calculate_invisible=True)
+
+
+    #########################################################
+    # Star coords based on location, time, ra, dec
+    #########################################################
+
+    def star_coords_test(self, lat, lng, ra, dec, 
+                         expected_x, expected_y, expected_visible,
+                         calculate_invisible):
+
+        out = calc.get_star_coords(lat, lng, TEST_DATETIME, ra, dec, TEST_RADIUS,
+                                   calculate_invisible=calculate_invisible)
+
+        self.assertEqual(out['x'], expected_x)
+        self.assertEqual(out['y'], expected_y)
+        self.assertEqual(out['visible'], expected_visible)
 
 
     def test_altel_sf_position_calculate_invisible(self):
@@ -214,6 +218,7 @@ class CalculationTestsWithoutDb(TestCase):
 
         self.star_coords_test(J_LAT_RAD, J_LNG_RAD, R_RA, R_DEC, x, y, vis,
                               calculate_invisible=False)
+
 
 
 class CalculationTestsWithDb(DbTestCase):  

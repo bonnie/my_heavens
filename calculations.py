@@ -9,7 +9,7 @@ from model import Star
 from display_constants import STARFIELD_RADIUS
 
 # optional debugging output
-DEBUG = True
+DEBUG = False
 
 
 def pol2cart(rho, phi, starfield_radius):
@@ -91,7 +91,7 @@ def get_star_coords(lat, lng, utctime, ra, dec, starfield_radius,
     return {'x': x, 'y': y, 'visible': visible}
 
 
-def get_user_star_coords(lat, lng, utctime, max_mag):
+def get_user_star_coords(lat, lng, utctime, max_mag, starfield_radius):
     """return json of stars in for the location and current time, in user coords
 
     * lat and lng are in radians
@@ -121,7 +121,7 @@ def get_user_star_coords(lat, lng, utctime, max_mag):
             continue
 
         # convert RA and dec into alt and az
-        p = get_star_coords(lat, lng, utctime, star.ra, star.dec)
+        p = get_star_coords(lat, lng, utctime, star.ra, star.dec, starfield_radius)
 
         # if the star is below the horizon, don't add it to the list
         if not p['visible']:

@@ -5,14 +5,14 @@ import math
 import numpy as np
 from datetime import datetime
 
-from model import connect_to_db, Star
+from model import Star
 from display_constants import STARFIELD_RADIUS
 
 # optional debugging output
 DEBUG = True
 
 
-def pol2cart(rho, phi):
+def pol2cart(rho, phi, starfield_radius):
     """translate between polar coords and svg-style cartesian coords
 
     in svg, the origin is in the upper left and y is positive going down
@@ -20,12 +20,15 @@ def pol2cart(rho, phi):
     adapted from 
     http://stackoverflow.com/questions/20924085/python-conversion-between-coordinates"""
 
-    x_from_center = rho * np.cos(phi)
-    y_from_center = rho * np.sin(phi)
+    # rotate so that north is up, not to the right
+    rotated_phi = phi + math.pi / 2
+
+    x_from_center = rho * np.cos(rotated_phi)
+    y_from_center = rho * np.sin(rotated_phi)
 
     # transform for the wacky svg axes
-    x = x_from_center + STARFIELD_RADIUS
-    y = STARFIELD_RADIUS - y_from_center
+    x = x_from_center + starfield_radius
+    y = starfield_radius - y_from_center
 
     return(x, y)
 
@@ -80,7 +83,7 @@ def get_star_coords(lat, lng, utctime, ra, dec, return_invisible=False):
     # translate alt and az into polar coords
     rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi / 2)
     phi = altaz.az
-    x, y = pol2cart(rho, phi)
+    x, y = pol2cart(rho, phi, STARFIELD_RADIUS)
 
     return {'x': x, 'y': y, 'visible': visible}
 

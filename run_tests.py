@@ -16,11 +16,12 @@ TESTDATA_DIR = 'tests/test_data'
 class DbTestCase(unittest.TestCase):
     """Parent class for tests that need db setup"""
 
-    @classmethod(cls):
+    @classmethod
     def load_test_data(cls):
         """Load test data into db."""
 
         load_seed_data(TESTDATA_DIR)
+
 
     @classmethod
     def db_setup(cls):
@@ -28,6 +29,7 @@ class DbTestCase(unittest.TestCase):
 
         connect_to_db(app, TESTDB_URI)
         db.create_all()
+        
 
     @classmethod
     def db_teardown(cls):

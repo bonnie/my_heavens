@@ -56,10 +56,11 @@ class DbTestCase(unittest.TestCase):
 if __name__ == '__main__':
 
     # import the tests
-    from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
-        SeedConstellationTests, SeedStarTests, SeedConstLineTests
-    from tests.calculation_tests import CalculationTestsWithoutDb, \
-        StarFieldTests
+    # from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
+    #     SeedConstellationTests, SeedStarTests, SeedConstLineTests
+    # from tests.calculation_tests import CalculationTestsWithoutDb, \
+    #     StarFieldTests
+    from tests.starfield_tests import StarfieldTestsWithoutDb
     from tests.db_tests import DbTests
     from tests.flask_tests import FlaskTests
 

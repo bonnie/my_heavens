@@ -48,19 +48,22 @@ def get_latlng_rads(lat, lng):
     return lat_in_radians, lng_in_radians
 
 
-def get_star_coords(lat, lng, utctime, ra, dec, return_invisible=False):
+def get_star_coords(lat, lng, utctime, ra, dec, starfield_radius, 
+                    calculate_invisible=False):
     """reusable function to get x and y for a particular ra and dec
 
     * lat and lng are in radians
     * utctime is a datetime obj, in utc
     * ra and dec are Decimal objects (in radians)
-    * if "below_horiz" is True, return points beyond the horizon
+    * if "calculate_invisible" is True, calculate coords for points beyond 
+        the horizon; otherwise return without calculating (return None for x and
+        y)
 
     return value: dict with these keys: 
 
         x (float)
         y (float)
-        below_horiz (boolean saying whether the point was below the horizon)
+        visible (boolean saying whether the point was below the horizon)
 
     """
 
@@ -74,17 +77,17 @@ def get_star_coords(lat, lng, utctime, ra, dec, return_invisible=False):
     visible = altaz.alt > 0
 
     # for points below the horizon
-    if not (visible or return_invisible):
+    if not (visible or calculate_invisible):
         # discard this point
         return {'x': None, 'y': None, 'visible': False}
 
     # convert alt and az into x and y, considering the size of our star field
 
     # translate alt and az into polar coords
-    rho = (math.pi/2 - altaz.alt) * STARFIELD_RADIUS / (math.pi / 2)
+    rho = (math.pi/2 - altaz.alt) * starfield_radius / (math.pi / 2)
     phi = altaz.az
-    x, y = pol2cart(rho, phi, STARFIELD_RADIUS)
-
+    x, y = pol2cart(rho, phi, starfield_radius)
+    
     return {'x': x, 'y': y, 'visible': visible}
 
 

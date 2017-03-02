@@ -5,11 +5,16 @@ import math
 import numpy as np
 from datetime import datetime
 
-from model import Star
+from model import db, Star, Constellation
 from display_constants import STARFIELD_RADIUS
 
 # optional debugging output
 DEBUG = False
+
+
+# TODO: Make starfield object. It will have properties lat, lng, utctime, starfield_radius. 
+# It will have methods: get_starfield_constellations, get_starfield_stars. 
+# It will rock. 
 
 
 def pol2cart(rho, phi, starfield_radius):
@@ -138,3 +143,123 @@ def get_user_star_coords(lat, lng, utctime, max_mag, starfield_radius):
                            })
 
     return star_field
+
+def get_const_line_groups(const, lat, lng, utctime, starfield_radius):
+    """Return a list of constellation line group data for input constellation
+
+    * const is a Constellation instance
+    * lat and lng are in radians
+    * utctime is a datetime obj
+    * starfield_radius is the display radius for the starfield
+
+    Returns a tuple with two items: 
+
+    * boolean of whether there were any visible lines at all
+    * list of lists; each sub-list represents an independent visible line for
+    this constellation.
+    """
+
+    # track whether any points are above the horizon
+    visible = False
+
+    line_groups = []
+    for grp in const.line_groups:
+        grp_verts = []
+        for vert in grp.constline_vertices:
+            p = get_star_coords(lat, lng, utctime, vert.star.ra, vert.star.dec, 
+                                starfield_radius, calculate_invisible=True)
+            grp_verts.append({'x': p['x'], 'y': p['y']})
+
+            if p['visible']:
+                visible = True
+
+        line_groups.append(grp_verts)
+
+    return visible, line_groups
+
+
+def get_constellation_data(const, lat, lng, utctime, starfield_radius):
+    """Return a dictionary of constellation data, transformed for d3
+
+    * const is a Constellation instance
+    * lat and lng are in radians
+    * utctime is a datetime obj
+    * starfield_radius is the display radius for the starfield
+
+    Coordinates for boundary vertices and constellation lines are in 
+    x and y format based on the user's lat, lng, and the time
+
+    returned dict has this format: 
+
+    'code': <string>
+    'name': <string>
+    'bound_verts': <list of dicts with 'x' and 'y' keys>
+    'line_groups': <list of lists of dicts with 'x' and 'y' keys>
+
+    for the line_groups list, each sub-list represents an independent line
+    for this constellation.
+    """
+
+    # temporary dict to store data for this constellation
+    c = {}
+
+    c['code'] = const.const_code
+    c['name'] = const.name
+
+    # get the constellation lines
+    visible, line_groups = get_const_line_groups(const, lat, lng, utctime, starfield_radius)
+
+    # if there are no visible constellation lines, scrap this constellation
+    if not visible: 
+        return None
+
+    c['line_groups'] = line_groups
+
+    # collect the boundaries
+    c['bound_verts'] = []
+    for vert in const.bound_vertices:
+        p = get_star_coords(lat, lng, utctime, vert.ra, vert.dec, 
+                            STARFIELD_RADIUS, calculate_invisible=True)
+        c['bound_verts'].append({'x': p['x'], 'y': p['y']})
+
+    # add the final boundary point to close the boundary loop
+    if c['bound_verts']:
+        c['bound_verts'].append(c['bound_verts'][0])
+
+    return c
+
+def get_user_constellation_data(lat, lng, utctime, starfield_radius):
+    """Return a list of constellation data dicts, transformed for d3.
+
+    * lat and lng are in radians
+    * utctime is a datetime obj
+    * starfield_radius is the display radius for the starfield
+
+    Returns a list of dicts of constellation data.
+    See docstring for get_constellation_data for details on constellation dicts.
+    """
+
+    # importing here, to avoid circular imports
+    from calculations import get_star_coords
+
+    constellation_data = []
+
+    # do joinedloads to make the data collection faster
+    query = db.session.query(Constellation)
+    const_joins = query.options(
+                        db.joinedload("bound_vertices"),
+                        db.joinedload("line_groups"))
+
+    consts = const_joins.all()
+
+    for const in consts:
+
+        if DEBUG:
+            print "\nlooking at constellation {}".format(const.name)
+
+        const_data = get_constellation_data(const, lat, lng, utctime, starfield_radius)
+        if const_data: 
+            constellation_data.append(const_data)
+
+
+    return constellation_data

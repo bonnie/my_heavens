@@ -26,94 +26,9 @@ class Constellation(db.Model):
     bound_vertices = db.relationship("BoundVertex",
                              secondary="const_bound_vertices",
                              order_by="ConstBoundVertex.index")
-
     stars = db.relationship("Star")
-
     line_groups = db.relationship("ConstLineGroup")
 
-
-    ##### methods #####
-    @classmethod
-    def get_constellation_data(cls, lat, lng, utctime):
-        """Return a list of constellation data, transformed for d3
-
-        * lat and lng are in radians
-        * utctime is a datetime obj
-
-        Coordinates for boundary vertices and constellation lines are in 
-        x and y format based on the user's lat, lng, and the time
-
-        This function makes use of the get_star_coords function from 
-        calculations.py -- the same function used to plot stars
-
-        each dict has this format: 
-
-        'code': <string>
-        'name': <string>
-        'bound_verts': <list of dicts with 'x' and 'y' keys>
-        'line_groups': <list of lists of dicts with 'x' and 'y' keys>
-
-        for the line_groups list, each sub-list represents an independent line
-        for this constellation.
-        """
-
-        # importing here, to avoid circular imports
-        from calculations import get_star_coords
-
-        constellation_data = []
-
-        # do joinedloads to make the data collection faster
-        query = cls.query
-        const_joins = query.options(
-                            db.joinedload("bound_vertices"),
-                            db.joinedload("line_groups"))
-
-        consts = const_joins.all()
-
-        # consts = cls.query.all()
-
-        for const in consts:
-
-            # temporary dict to store data for this constellation
-            c = {}
-
-            # track whether any points are above the horizon
-            visible = False
-
-            c['code'] = const.const_code
-            c['name'] = const.name
-
-            # get the constellation lines
-            c['line_groups'] = []
-            for grp in const.line_groups:
-                grp_verts = []
-                for vert in grp.constline_vertices:
-                    p = get_star_coords(lat, lng, utctime, vert.star.ra, vert.star.dec, return_invisible=True)
-                    grp_verts.append({'x': p['x'], 'y': p['y']})
-
-                    if p['visible']:
-                        visible = True
-
-                c['line_groups'].append(grp_verts)
-
-            # if there are no visible constellation lines, scrap this constellation
-            if not visible: 
-                continue
-
-            # collect the boundaries
-            c['bound_verts'] = []
-            for vert in const.bound_vertices:
-                p = get_star_coords(lat, lng, utctime, vert.ra, vert.dec, return_invisible=True)
-                c['bound_verts'].append({'x': p['x'], 'y': p['y']})
-
-            # add the final boundary point to close the boundary loop
-            if c['bound_verts']:
-                c['bound_verts'].append(c['bound_verts'][0])
-
-            constellation_data.append(c)
-
-
-        return constellation_data
 
     def __repr__(self):
         """Provide helpful representation when printed."""

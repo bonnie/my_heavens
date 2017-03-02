@@ -15,8 +15,8 @@ DEBUG = False
 class StarField(object):
     """Class for calculating stars and constellation display"""
 
-    def __init__(self, lat, lng, utctime=None, display_radius=STARFIELD_RADIUS,
-                 max_mag=5):
+    def __init__(self, lat, lng, utctime=None, 
+                 display_radius=STARFIELD_RADIUS, max_mag=5):
         """Initialize Starfield object. 
 
         * lat is latitude in degrees (positive / negative)
@@ -128,7 +128,7 @@ class StarField(object):
         return {'x': x, 'y': y, 'visible': visible}
 
 
-    def get_star_data(self):
+    def get_stars(self):
         """return list of star dicts in for the starfield
 
         star dict keys: 

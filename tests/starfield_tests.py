@@ -22,15 +22,16 @@ J_LAT = -26.2041
 J_LNG = 28.0473
 J_LAT_RAD = -0.45734782252184614
 J_LNG_RAD = 0.4895177312946056
-J_STARF = StarField(lat=J_LAT, lng=J_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
+J_STARF = StarField(lat=J_LAT, lng=J_LNG, utctime=TEST_DATETIME, 
+                    display_radius=TEST_RADIUS, max_mag=MAX_MAG)
 
 # test lat/lngs: sf
 SF_LAT = 37.7749
 SF_LNG = -122.4194
 SF_LAT_RAD = 0.659296379611606
 SF_LNG_RAD = 4.14656370886364
-SF_STARF = StarField(lat=SF_LAT, lng=SF_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
-
+SF_STARF = StarField(lat=SF_LAT, lng=SF_LNG, utctime=TEST_DATETIME,
+                     display_radius=TEST_RADIUS, max_mag=MAX_MAG)
 
 # Rigel
 R_RA = 1.372
@@ -226,7 +227,8 @@ class StarFieldStarDataTests(DbTestCase):
 
         super(StarFieldStarDataTests, cls).setUpClass()
         super(StarFieldStarDataTests, cls).load_test_data()
-        cls.stars = SF_STARF.get_star_data()
+        cls.starf = SF_STARF
+        cls.stars = cls.starf.get_stars()
         cls.example_star = cls.stars[0]
 
 
@@ -255,7 +257,7 @@ class StarFieldStarDataTests(DbTestCase):
         """Test that no star's magnitude exceeds the maximum magnitude."""
 
         mags_over_max = [ star['magnitude'] for star in self.stars 
-                          if star['magnitude'] > MAX_MAG ]
+                          if star['magnitude'] > self.starf.max_mag ]
 
         self.assertEqual(mags_over_max, [])
 

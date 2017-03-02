@@ -6,6 +6,7 @@ organization). It also holds common constants."""
 import unittest
 from model import db, connect_to_db 
 from server import app
+from seed import load_seed_data
 
 
 TESTDB_URI = 'postgresql:///star_tests'
@@ -14,6 +15,12 @@ TESTDATA_DIR = 'tests/test_data'
 
 class DbTestCase(unittest.TestCase):
     """Parent class for tests that need db setup"""
+
+    @classmethod(cls):
+    def load_test_data(cls):
+        """Load test data into db."""
+
+        load_seed_data(TESTDATA_DIR)
 
     @classmethod
     def db_setup(cls):
@@ -50,7 +57,8 @@ if __name__ == '__main__':
     from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
         SeedConstellationTests, SeedStarTests, SeedConstLineTests
     from tests.db_tests import DbTests
-    from tests.calculation_tests import CalculationTests
+    from tests.calculation_tests import CalculationTestsWithoutDb, \
+        CalculationTestsWithDb
     from tests.flask_tests import FlaskTests
 
     # run the tests

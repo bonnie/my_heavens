@@ -8,7 +8,7 @@ from datetime import datetime
 import sys
 sys.path.append('..')
 
-from starfield import Starfield
+from starfield import StarField
 from run_tests import DbTestCase
 
 TEST_RADIUS = 100
@@ -22,14 +22,14 @@ J_LAT = -26.2041
 J_LNG = 28.0473
 J_LAT_RAD = -0.45734782252184614
 J_LNG_RAD = 0.4895177312946056
-J_STARF = Starfield(lat=J_LAT, lng=J_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
+J_STARF = StarField(lat=J_LAT, lng=J_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
 
 # test lat/lngs: sf
 SF_LAT = 37.7749
 SF_LNG = -122.4194
 SF_LAT_RAD = 0.659296379611606
 SF_LNG_RAD = 4.14656370886364
-SF_STARF = Starfield(lat=SF_LAT, lng=SF_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
+SF_STARF = StarField(lat=SF_LAT, lng=SF_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
 
 
 # Rigel
@@ -41,7 +41,7 @@ AT_RA = 4.851
 AT_DEC = -0.801
 
 
-class StarfieldTestsWithoutDb(TestCase):  
+class StarFieldTestsWithoutDb(TestCase):  
     """Test calculations to retrieve star and constellation data.
 
     This class is for tests that do not require the database.
@@ -56,7 +56,7 @@ class StarfieldTestsWithoutDb(TestCase):
 
         # this is a little artificial, to set the lat and lng directly, but it's
         # the only way to separate out this method from __init__
-        starf = Starfield(lat=0, lng=0)
+        starf = StarField(lat=0, lng=0)
         starf.lat = lat
         starf.lng = lng
 
@@ -90,7 +90,7 @@ class StarfieldTestsWithoutDb(TestCase):
         """generalized pol2cart test to avoid repeated code"""
 
         # dummy starfield to use for the radius
-        starf = Starfield(lat=0, lng=0, display_radius=TEST_RADIUS)
+        starf = StarField(lat=0, lng=0, display_radius=TEST_RADIUS)
         x, y = starf.pol2cart(rho, phi)
 
         self.assertEqual(x, expected_x)
@@ -213,3 +213,62 @@ class StarfieldTestsWithoutDb(TestCase):
         self.star_coords_test(J_STARF, R_RA, R_DEC, x, y, vis,
                               calculate_invisible=False)
 
+
+class StarFieldStarDataTests(DbTestCase):
+    """Test calculations for starfield star data
+
+    tearDownClass method inherited without change from DbTestCase
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(StarFieldStarDataTests, cls).setUpClass()
+        super(StarFieldStarDataTests, cls).load_test_data()
+        cls.stars = SF_STARF.get_star_data()
+        cls.example_star = cls.stars[0]
+
+
+    def test_star_count(self):
+        """Test the star count for the star field."""
+
+        # we expect 48 stars for the test data set, San Francisco, TEST_DATETIME
+        self.assertEqual(len(self.stars), 48)
+
+
+    def test_star_data_type(self):
+        """Test the that the example star is a dict."""
+
+        self.assertEqual(type(self.example_star), dict)
+
+
+    def test_star_keys(self):
+        """Test the keys of the star dict of the first item in self.stars."""
+
+        star_keys = set(self.example_star.keys())
+        expected_keys = set(['x', 'y', 'magnitude', 'color', 'name'])
+        self.assertEqual(star_keys, expected_keys)
+
+
+    def test_max_magnitude(self):
+        """Test that no star's magnitude exceeds the maximum magnitude."""
+
+        mags_over_max = [ star['magnitude'] for star in self.stars 
+                          if star['magnitude'] > MAX_MAG ]
+
+        self.assertEqual(mags_over_max, [])
+
+
+class StarFieldConstellationDataTests(DbTestCase):
+    """Test calculations for star and constellation data at a time and place.
+
+    tearDownClass method inherited without change from DbTestCase
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(StarFieldConstellationDataTests, cls).setUpClass()
+        super(StarFieldConstellationDataTests, cls).load_test_data()

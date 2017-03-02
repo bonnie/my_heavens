@@ -12,20 +12,24 @@ from display_constants import STARFIELD_RADIUS
 DEBUG = False
 
 
-class Starfield(object):
+class StarField(object):
     """Class for calculating stars and constellation display"""
 
-    def __init__(self, lat, lng, utctime=None, display_radius=STARFIELD_RADIUS):
+    def __init__(self, lat, lng, utctime=None, display_radius=STARFIELD_RADIUS,
+                 max_mag=5):
         """Initialize Starfield object. 
 
         * lat is latitude in degrees (positive / negative)
         * lng is longitude in degrees (positive / negative)
         * utctime, if provided is datetime. If not provided, will default to now
         * display_radius is display radius. Specifiable for ease of testing. 
+        * max_mag is the maximum magnitude to display for this starfield (to
+          eliminate dim stars)
         """
 
         self.utctime = utctime or datetime.utcnow()
         self.display_radius = display_radius
+        self.max_mag = max_mag
 
         # change lat and lng to radians
         self.lat = lat
@@ -122,3 +126,56 @@ class Starfield(object):
         x, y = self.pol2cart(rho, phi)
         
         return {'x': x, 'y': y, 'visible': visible}
+
+
+    def get_star_data(self):
+        """return list of star dicts in for the starfield
+
+        star dict keys: 
+            "x": display x coord for star
+            "y": display y coord for star
+            "magnitude": magnitude of star
+            "color": color corresponding to star's spectral class
+            "name": star's name
+
+        sample output: 
+
+        [ {"x": 15, "y": 130, "magnitude": 1.7, "color": "#ffffff", "name": "alpha Ori"}
+            ...
+        ]
+        """
+
+        # get list of stars
+        db_stars = Star.query.all()
+
+        star_field = []
+
+        if DEBUG: 
+            print 'lat', lat
+            print 'lng', lng
+            print 'utctime = strptime("{}", "%Y-%m-%d %H-%M-%S.%f'.format(utctime)
+
+        for star in db_stars:
+
+            if star.magnitude > self.max_mag: 
+                # skip stars that are too dim
+                continue
+
+            # convert RA and dec into alt and az
+            p = self.get_display_coords(star.ra, star.dec)
+
+            # if the star is below the horizon, don't add it to the list
+            if not p['visible']:
+                continue
+
+            # add it to the list in a neat little package
+            #
+            # cast magnitude to float, as it comes back as a Decimal obj: bad json
+            star_field.append({'x': p['x'], 
+                               'y': p['y'], 
+                               'magnitude': float(star.magnitude), 
+                               'color': star.color,
+                               'name': star.name
+                               })
+
+        return star_field

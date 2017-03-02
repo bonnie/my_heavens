@@ -83,3 +83,42 @@ class Starfield(object):
 
         return (x, y)
 
+
+    def get_display_coords(self, ra, dec, calculate_invisible=False):
+        """Return display x and y (for this starfield) for a particular ra and dec
+
+        * ra and dec are Decimal objects (in radians)
+        * if "calculate_invisible" is True, calculate coords for points beyond 
+            the horizon; otherwise return without calculating 
+            (return None for x and y, and False for visible)
+
+        return value: dict with these keys: 
+
+            x (float or None)
+            y (float or None)
+            visible (boolean saying whether the point was below the horizon)
+
+        """
+
+        # assume ra and dec come in as Decimal objects
+        coords = RADec(float(ra), float(dec))
+
+        ha = coords.hourAngle(self.utctime, self.lng)
+        altaz = coords.altAz(ha, self.lat)
+
+        # is this point below the horizon? 
+        visible = altaz.alt > 0
+
+        # for points below the horizon
+        if not (visible or calculate_invisible):
+            # discard this point
+            return {'x': None, 'y': None, 'visible': False}
+
+        # convert alt and az into x and y, considering the size of our star field
+
+        # translate alt and az into polar coords
+        rho = (math.pi/2 - altaz.alt) * self.display_radius / (math.pi / 2)
+        phi = altaz.az
+        x, y = self.pol2cart(rho, phi)
+        
+        return {'x': x, 'y': y, 'visible': visible}

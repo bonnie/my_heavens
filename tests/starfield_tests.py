@@ -22,12 +22,15 @@ J_LAT = -26.2041
 J_LNG = 28.0473
 J_LAT_RAD = -0.45734782252184614
 J_LNG_RAD = 0.4895177312946056
+J_STARF = Starfield(lat=J_LAT, lng=J_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
 
 # test lat/lngs: sf
 SF_LAT = 37.7749
 SF_LNG = -122.4194
 SF_LAT_RAD = 0.659296379611606
 SF_LNG_RAD = 4.14656370886364
+SF_STARF = Starfield(lat=SF_LAT, lng=SF_LNG, utctime=TEST_DATETIME, display_radius=TEST_RADIUS)
+
 
 # Rigel
 R_RA = 1.372
@@ -125,4 +128,88 @@ class StarfieldTestsWithoutDb(TestCase):
                            expected_x=TEST_RADIUS * 3/2,
                            expected_y=TEST_RADIUS)
 
+
+    #########################################################
+    # Star coords based on location, time, ra, dec
+    #########################################################
+
+    def star_coords_test(self, starf, ra, dec, 
+                         expected_x, expected_y, expected_visible,
+                         calculate_invisible):
+
+        out = starf.get_display_coords(ra, dec, calculate_invisible)
+
+        self.assertEqual(out['x'], expected_x)
+        self.assertEqual(out['y'], expected_y)
+        self.assertEqual(out['visible'], expected_visible)
+
+
+    def test_altel_sf_position_calculate_invisible(self):
+        """Test calculation of x, y, visible for Alpha Tel in SF at TEST_DATETIME.
+
+        Calculate coords even though it's invisible."""
+
+        starf = SF_STARF
+
+        # expected outcomes
+        x = -39.225014668891333
+        y = 221.53911897280611
+        vis = False
+
+        self.star_coords_test(SF_STARF, AT_RA, AT_DEC, x, y, vis,
+                              calculate_invisible=True)
+
+
+    def test_altel_sf_position_skip_invisible_calculation(self):
+        """Test calculation of x, y, visible for Alpha Tel in SF at TEST_DATETIME.
+
+        Only calculate coords if visible."""
+
+        # expected outcomes
+        x = None
+        y = None
+        vis = False
+
+        self.star_coords_test(SF_STARF, AT_RA, AT_DEC, x, y, vis,
+                              calculate_invisible=False)
+
+
+    def test_altel_johannesburg_position(self):
+        """Test calculation of x, y, visible for Alpha Tel in Johannesburg at TEST_DATETIME."""
+
+        # expected outcomes
+        x = 88.44111905561941
+        y = 122.69134380242504
+        vis = True
+
+        self.star_coords_test(J_STARF, AT_RA, AT_DEC, x, y, vis,
+                              calculate_invisible=True)
+
+
+    def test_rigel_johannesburg_position_calculate_invisible(self):
+        """Test calculation of x, y, visible for Rigel in Johannesburg at TEST_DATETIME.
+
+        Calculate coords even though it's invisible."""
+
+        # expected outcomes
+        x = 77.386186324330623
+        y = 259.86531235645788
+        vis = False
+
+        self.star_coords_test(J_STARF, R_RA, R_DEC, x, y, vis,
+                              calculate_invisible=True)
+
+
+    def test_rigel_johannesburg_position_skip_invisible_calculation(self):
+        """Test calculation of x, y, visible for Rigel in Johannesburg at TEST_DATETIME.
+
+        Only calculate coords if visible."""
+
+        # expected outcomes
+        x = None
+        y = None
+        vis = False
+
+        self.star_coords_test(J_STARF, R_RA, R_DEC, x, y, vis,
+                              calculate_invisible=False)
 

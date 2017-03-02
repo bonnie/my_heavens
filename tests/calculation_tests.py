@@ -13,6 +13,7 @@ from model import db
 from run_tests import DbTestCase
 
 TEST_RADIUS = 100
+MAX_MAG = 5
 
 # 9pm PST on March 1, 2017 (which is 5am on March 2 in utc)
 TEST_DATETIME = datetime(2017, 3, 2, 5, 0, 0)
@@ -219,12 +220,10 @@ class CalculationTestsWithoutDb(TestCase):
         self.star_coords_test(J_LAT_RAD, J_LNG_RAD, R_RA, R_DEC, x, y, vis,
                               calculate_invisible=False)
 
+class StarFieldTestCase(DbTestCase):
+    """Test calculations for star and constellation data at a time and place.
 
-
-class CalculationTestsWithDb(DbTestCase):  
-    """Test calculations to retrieve star and constellation data.
-
-    This class is for tests requiring the database.
+    This class is a parent to test star fields for cities.
     tearDownClass method inherited without change from DbTestCase
     """
 
@@ -232,6 +231,46 @@ class CalculationTestsWithDb(DbTestCase):
     def setUpClass(cls):
         """Stuff to do once before running all class test methods."""
 
-        super(CalculationTestsWithDb, cls).setUpClass()
-        super(CalculationTestsWithDb, cls).load_test_data()
+        super(StarFieldTestCase, cls).setUpClass()
+        super(StarFieldTestCase, cls).load_test_data()
+        cls.stars = calc.get_user_star_coords(cls.lat, cls.lng, TEST_DATETIME,
+                                              MAX_MAG, TEST_RADIUS)
 
+
+    def star_count_test(self, star_count):
+        """Test the star count for the star field."""
+
+        self.assertEqual(len(self.stars), star_count)
+
+
+class CalculationTestsSF(StarFieldTestCase):  
+    """Test calculations to retrieve star and constellation for San Francisco.
+
+    setUpClass and tearDownClass method inherited without change from 
+    StarFieldTestCase
+    """
+
+    lat = SF_LAT_RAD
+    lng = SF_LNG_RAD
+
+    def test_star_count(self):
+        """Test the count of stars returned."""
+
+        self.star_count_test(48)
+        
+
+class CalculationTestsJohannesburg(StarFieldTestCase):
+    """Test calculations to retrieve star and constellation for Johannesburg.
+
+    setUpClass and tearDownClass method inherited without change from 
+    StarFieldTestCase
+    """
+
+    lat = J_LAT_RAD
+    lng = J_LNG_RAD
+
+
+    def test_star_count(self):
+        """Test the count of stars returned."""
+
+        self.star_count_test(7)

@@ -60,7 +60,7 @@ if __name__ == '__main__':
         SeedConstellationTests, SeedStarTests, SeedConstLineTests
     from tests.db_tests import DbTests
     from tests.calculation_tests import CalculationTestsWithoutDb, \
-        CalculationTestsWithDb
+        CalculationTestsSF, CalculationTestsJohannesburg
     from tests.flask_tests import FlaskTests
 
     # run the tests

@@ -58,9 +58,9 @@ if __name__ == '__main__':
     # import the tests
     from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
         SeedConstellationTests, SeedStarTests, SeedConstLineTests
-    from tests.db_tests import DbTests
     from tests.calculation_tests import CalculationTestsWithoutDb, \
-        CalculationTestsSF, CalculationTestsJohannesburg
+        StarFieldTests
+    from tests.db_tests import DbTests
     from tests.flask_tests import FlaskTests
 
     # run the tests

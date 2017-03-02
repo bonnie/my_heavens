@@ -220,10 +220,10 @@ class CalculationTestsWithoutDb(TestCase):
         self.star_coords_test(J_LAT_RAD, J_LNG_RAD, R_RA, R_DEC, x, y, vis,
                               calculate_invisible=False)
 
-class StarFieldTestCase(DbTestCase):
+
+class StarFieldTests(DbTestCase):
     """Test calculations for star and constellation data at a time and place.
 
-    This class is a parent to test star fields for cities.
     tearDownClass method inherited without change from DbTestCase
     """
 
@@ -231,46 +231,41 @@ class StarFieldTestCase(DbTestCase):
     def setUpClass(cls):
         """Stuff to do once before running all class test methods."""
 
-        super(StarFieldTestCase, cls).setUpClass()
-        super(StarFieldTestCase, cls).load_test_data()
-        cls.stars = calc.get_user_star_coords(cls.lat, cls.lng, TEST_DATETIME,
-                                              MAX_MAG, TEST_RADIUS)
+        super(StarFieldTests, cls).setUpClass()
+        super(StarFieldTests, cls).load_test_data()
+        cls.stars = calc.get_user_star_coords(SF_LAT_RAD, 
+                                              SF_LNG_RAD, 
+                                              TEST_DATETIME, 
+                                              MAX_MAG, 
+                                              TEST_RADIUS)
+        cls.example_star = cls.stars[0]
 
 
-    def star_count_test(self, star_count):
+    def test_star_count(self):
         """Test the star count for the star field."""
 
-        self.assertEqual(len(self.stars), star_count)
+        # we expect 48 stars for the test data set, San Francisco, TEST_DATETIME
+        self.assertEqual(len(self.stars), 48)
 
 
-class CalculationTestsSF(StarFieldTestCase):  
-    """Test calculations to retrieve star and constellation for San Francisco.
+    def test_star_data_type(self):
+        """Test the that the example star is a dict."""
 
-    setUpClass and tearDownClass method inherited without change from 
-    StarFieldTestCase
-    """
-
-    lat = SF_LAT_RAD
-    lng = SF_LNG_RAD
-
-    def test_star_count(self):
-        """Test the count of stars returned."""
-
-        self.star_count_test(48)
-        
-
-class CalculationTestsJohannesburg(StarFieldTestCase):
-    """Test calculations to retrieve star and constellation for Johannesburg.
-
-    setUpClass and tearDownClass method inherited without change from 
-    StarFieldTestCase
-    """
-
-    lat = J_LAT_RAD
-    lng = J_LNG_RAD
+        self.assertEqual(type(self.example_star), dict)
 
 
-    def test_star_count(self):
-        """Test the count of stars returned."""
+    def test_star_keys(self):
+        """Test the keys of the star dict of the first item in self.stars."""
 
-        self.star_count_test(7)
+        star_keys = set(self.example_star.keys())
+        expected_keys = set(['x', 'y', 'magnitude', 'color', 'name'])
+        self.assertEqual(star_keys, expected_keys)
+
+
+    def test_max_magnitude(self):
+        """Test that no star's magnitude exceeds the maximum magnitude."""
+
+        mags_over_max = [ star['magnitude'] for star in self.stars 
+                          if star['magnitude'] > MAX_MAG ]
+
+        self.assertEqual(mags_over_max, [])

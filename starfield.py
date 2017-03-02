@@ -44,8 +44,8 @@ class Starfield(object):
     def update_latlng_rads(self):
         """given lat and long in degrees, return in radians
 
-        * lat is latitude in degrees (positive / negative)
-        * lng is longitude in degrees (positive / negative)
+        * self.lat is latitude in degrees (positive / negative)
+        * self.lng is longitude in degrees (positive / negative)
         """
 
         # update lat/lng to this format to make sidereal happy
@@ -61,3 +61,25 @@ class Starfield(object):
         # update degrees to radians
         self.lat = parseLat(lat)
         self.lng = parseLon(lng)
+
+
+    def pol2cart(self, rho, phi):
+        """translate between polar coords and svg-style cartesian coords
+
+        in svg, the origin is in the upper left and y is positive going down
+
+        adapted from 
+        http://stackoverflow.com/questions/20924085/python-conversion-between-coordinates"""
+
+        # rotate so that north (phi = 0) is up, not to the right
+        rotated_phi = phi + math.pi / 2
+
+        x_from_center = rho * np.cos(rotated_phi)
+        y_from_center = rho * np.sin(rotated_phi)
+
+        # transform for the wacky svg axes
+        x = x_from_center + self.display_radius
+        y = self.display_radius - y_from_center
+
+        return (x, y)
+

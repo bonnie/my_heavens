@@ -53,7 +53,7 @@ class StarfieldTestsWithoutDb(TestCase):
 
         # this is a little artificial, to set the lat and lng directly, but it's
         # the only way to separate out this method from __init__
-        starf = Starfield(0, 0)
+        starf = Starfield(lat=0, lng=0)
         starf.lat = lat
         starf.lng = lng
 
@@ -78,5 +78,51 @@ class StarfieldTestsWithoutDb(TestCase):
         # johannesburg
         self.update_latlng_rads_test(J_LAT, J_LNG, J_LAT_RAD, J_LNG_RAD)
 
+
+    #########################################################
+    # Polar to Cartesian Tests 
+    #########################################################
+
+    def pol2cart_test(self, rho, phi, expected_x, expected_y):
+        """generalized pol2cart test to avoid repeated code"""
+
+        # dummy starfield to use for the radius
+        starf = Starfield(lat=0, lng=0, display_radius=TEST_RADIUS)
+        x, y = starf.pol2cart(rho, phi)
+
+        self.assertEqual(x, expected_x)
+        self.assertEqual(y, expected_y)
+
+
+    def test_pol2cart_north_horizon(self):
+        """Test polar to cartesian coordinates, for a point on northern horizon.
+        """
+
+        self.pol2cart_test(rho=TEST_RADIUS,
+                           phi=0,
+                           expected_x=TEST_RADIUS,
+                           expected_y=0)
+
+
+    def test_pol2cart_overhead(self):
+        """Test polar to cartesian coordinates, for a point straight overhead.
+
+        phi is negative for this test.
+        """
+
+        self.pol2cart_test(rho=0,
+                           phi=0,
+                           expected_x=TEST_RADIUS,
+                           expected_y=TEST_RADIUS)
+
+
+    def test_pol2cart_neg_phi(self): 
+        """Test polar to cartesian coordinates for negative phi.
+        """
+
+        self.pol2cart_test(rho=TEST_RADIUS / 2,
+                           phi=-math.pi / 2,
+                           expected_x=TEST_RADIUS * 3/2,
+                           expected_y=TEST_RADIUS)
 
 

@@ -20,6 +20,7 @@ def display_chart():
 
     return render_template("stars.html")
 
+
 @app.route('/stars.json')
 def return_stars():
     """return a json of star info, along with the radius for the star field 
@@ -49,7 +50,7 @@ def return_stars():
     consts = stf.get_consts()
 
     return jsonify({'constellations': consts, 
-                    'radius': STARFIELD_RADIUS, 
+                    'radius': stf.display_radius, 
                     'stars': stars})
 
 

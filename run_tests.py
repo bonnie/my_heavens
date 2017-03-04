@@ -60,8 +60,7 @@ if __name__ == '__main__':
         SeedConstellationTests, SeedStarTests, SeedConstLineTests
     from tests.starfield_tests import StarFieldTestsWithoutDb, \
         StarFieldStarDataTests, StarFieldConstellationDataTests
-    from tests.db_tests import DbTests
-    from tests.flask_tests import FlaskTests
+    from tests.flask_tests import FlaskTests, FlaskTestsWithDb
 
     # run the tests
     unittest.main()

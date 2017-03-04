@@ -6,7 +6,6 @@ import numpy as np
 from datetime import datetime
 
 from model import db, Star, Constellation
-from display_constants import STARFIELD_RADIUS
 
 # optional debugging output
 DEBUG = False
@@ -15,8 +14,7 @@ DEBUG = False
 class StarField(object):
     """Class for calculating stars and constellation display"""
 
-    def __init__(self, lat, lng, utctime=None, 
-                 display_radius=STARFIELD_RADIUS, max_mag=5):
+    def __init__(self, lat, lng, display_radius, utctime=None, max_mag=5):
         """Initialize Starfield object. 
 
         * lat is latitude in degrees (positive / negative)
@@ -179,3 +177,128 @@ class StarField(object):
                                })
 
         return star_field
+
+    def get_const_line_groups(self, const):
+        """Return a list of constellation line group data for input constellation
+
+        * const is a Constellation instance
+
+        Returns a tuple with two items: 
+
+        * boolean of whether there were any visible lines at all
+        * list of lists; each sublist contains dicts with 'x' and 'y' keys, 
+        representing an independent line for this constellation. Coordinates are
+        in x and y format based on the starfield's lat, lng, and the time
+
+        """
+
+        # track whether any points are above the horizon
+        visible = False
+
+        line_groups = []
+        for grp in const.line_groups:
+            grp_verts = []
+            for vert in grp.constline_vertices:
+                p = self.get_display_coords(vert.star.ra, vert.star.dec, 
+                                       calculate_invisible=True)
+                grp_verts.append({'x': p['x'], 'y': p['y']})
+
+                if p['visible']:
+                    visible = True
+
+            line_groups.append(grp_verts)
+
+        return visible, line_groups
+
+
+    def get_const_bound_verts(self, const):
+        """Return a dictionary of constellation data, transformed for d3
+
+        * const is a Constellation instance
+
+        returned list has this format: 
+
+        * each element is a dict with 'x' and 'y' keys
+        * Coordinates for boundary vertices are in x and y format based on the 
+        starfield's lat, lng, and the time.
+        """
+
+        # collect the boundaries
+        bound_verts = []
+        for vert in const.bound_vertices:
+            p = self.get_display_coords(vert.ra, vert.dec, calculate_invisible=True)
+            bound_verts.append({'x': p['x'], 'y': p['y']})
+
+        # add the final boundary point to close the boundary loop
+        if bound_verts:
+            bound_verts.append(bound_verts[0])
+
+        return bound_verts
+
+
+    def get_const_data(self, const):
+        """Return a dictionary of constellation data, transformed for d3
+
+        * const is a Constellation instance
+
+        Coordinates for boundary vertices and constellation lines are in 
+        x and y format based on the user's lat, lng, and the time
+
+        returned dict has this format: 
+
+        'code': <string>
+        'name': <string>
+        'bound_verts': <list of dicts with 'x' and 'y' keys>
+        'line_groups': <list of lists of dicts with 'x' and 'y' keys>
+
+        for the line_groups list, each sub-list represents an independent line
+        for this constellation (see get_const_line_groups).
+        """
+
+        # temporary dict to store data for this constellation
+        c = {}
+
+        c['code'] = const.const_code
+        c['name'] = const.name
+
+        # get the constellation lines
+        visible, line_groups = self.get_const_line_groups(const)
+
+        # if there are no visible constellation lines, scrap this constellation
+        if not visible: 
+            return None
+
+        c['line_groups'] = line_groups
+        c['bound_verts'] = self.get_const_bound_verts(const)
+
+        return c    
+
+
+    def get_consts(self):
+        """Return a list of constellation data dicts, transformed for d3.
+
+        Returns a list of dicts of constellation data.
+        See docstring for get_const_data for details on constellation dicts.
+        """
+
+        visible_consts = []
+
+        # do joinedloads to make the data collection faster
+        query = db.session.query(Constellation)
+        const_joins = query.options(
+                            db.joinedload("bound_vertices"),
+                            db.joinedload("line_groups"))
+
+        consts = const_joins.all()
+
+        for const in consts:
+
+            if DEBUG:
+                print "\nlooking at constellation {}".format(const.name)
+
+            const_data = self.get_const_data(const)
+            if const_data: 
+                visible_consts.append(const_data)
+
+
+        return visible_consts

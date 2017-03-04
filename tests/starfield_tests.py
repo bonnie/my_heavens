@@ -58,7 +58,7 @@ class StarFieldTestsWithoutDb(TestCase):
 
         # this is a little artificial, to set the lat and lng directly, but it's
         # the only way to separate out this method from __init__
-        stf = StarField(lat=0, lng=0)
+        stf = StarField(lat=0, lng=0, display_radius=TEST_RADIUS)
         stf.lat = lat
         stf.lng = lng
 

@@ -4,9 +4,10 @@ from flask import Flask, render_template, jsonify
 from datetime import datetime
 
 from model import connect_to_db, Constellation
-from calculations import get_user_star_coords, get_latlng_rads, get_user_constellation_data
-from display_constants import STARFIELD_RADIUS
+from starfield import StarField
 
+# display radius
+STARFIELD_RADIUS = 400
 
 app = Flask(__name__)
 
@@ -31,21 +32,23 @@ def return_stars():
     color
     """
 
-    lat = '51.5074dN' # london
-    lng = '0.1278dE'    # london
-
+    # lat = '51.5074dN' # london
+    # lng = '0.1278dE'    # london
 
     # TODO: get this from user via form inputs
-    # lat = '37.7749dN'  # san francisco
-    # lng = '122.4194dW' # san francisco
-    utc_now = datetime.utcnow()  # current time
+    lat = 37.7749  # san francisco
+    lng = -122.4194 # san francisco
     max_magnitude = 5 # dimmest stars to show
 
-    lat_rads, lng_rads = get_latlng_rads(lat, lng)
-    stars = get_user_star_coords(lat_rads, lng_rads, utc_now, max_magnitude, STARFIELD_RADIUS)
-    constellations = get_user_constellation_data(lat_rads, lng_rads, utc_now, STARFIELD_RADIUS)
+    stf = StarField(lat=lat,
+                    lng=lng,
+                    max_mag=max_magnitude,
+                    display_radius=STARFIELD_RADIUS)
 
-    return jsonify({'constellations': constellations, 
+    stars = stf.get_stars()
+    consts = stf.get_consts()
+
+    return jsonify({'constellations': consts, 
                     'radius': STARFIELD_RADIUS, 
                     'stars': stars})
 

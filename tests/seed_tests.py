@@ -146,7 +146,7 @@ class SeedTestsWithDb(DbTestCase):
         dec = 0.27052603405912107
 
         new_vertex = seed.get_bounds_vertex(ra, dec)
-        self.assertEqual(type(new_vertex), BoundVertex)        
+        self.assertIsInstance(new_vertex, BoundVertex)        
 
 
     def test_get_bounds_vertex_exists(self):
@@ -162,7 +162,7 @@ class SeedTestsWithDb(DbTestCase):
         db.session.commit
 
         matched_vertex = seed.get_bounds_vertex(ra, dec)
-        self.assertEqual(type(matched_vertex), BoundVertex)
+        self.assertIsInstance(matched_vertex, BoundVertex)
 
 
 class SeedConstellationTests(DbTestCase):
@@ -247,7 +247,7 @@ class SeedStarTests(DbTestCase):
         ra_in_rad, dec_in_rad = seed.get_radian_coords(ra, dec)
         star = seed.get_matching_star(ra_in_rad, dec_in_rad, mag)
 
-        self.assertEqual(type(star), Star)
+        self.assertIsInstance(star, Star)
         self.assertEqual(star.name, name)
 
 

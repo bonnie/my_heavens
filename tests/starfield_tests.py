@@ -243,7 +243,7 @@ class StarFieldStarDataTests(DbTestCase):
     def test_star_data_type(self):
         """Test the that the example star is a dict."""
 
-        self.assertEqual(type(self.example_star), dict)
+        self.assertIsInstance(self.example_star, dict)
 
 
     def test_star_keys(self):
@@ -292,10 +292,10 @@ class StarFieldConstellationDataTests(DbTestCase):
         example_group = line_groups[0]
         example_vertex = example_group[0]
 
-        self.assertEqual(type(visible), bool)
-        self.assertEqual(type(line_groups), list) 
-        self.assertEqual(type(example_group), list) 
-        self.assertEqual(type(example_vertex), dict) 
+        self.assertIsInstance(visible, bool)
+        self.assertIsInstance(line_groups, list) 
+        self.assertIsInstance(example_group, list) 
+        self.assertIsInstance(example_vertex, dict) 
         self.assertEqual(set(example_vertex.keys()), set(['x', 'y']))
 
 
@@ -355,8 +355,8 @@ class StarFieldConstellationDataTests(DbTestCase):
 
         example_vertex = bound_verts[0]
 
-        self.assertEqual(type(bound_verts), list)
-        self.assertEqual(type(example_vertex), dict) 
+        self.assertIsInstance(bound_verts, list)
+        self.assertIsInstance(example_vertex, dict) 
         self.assertEqual(set(example_vertex.keys()), set(['x', 'y']))
 
 
@@ -399,16 +399,16 @@ class StarFieldConstellationDataTests(DbTestCase):
         example_line_group = example_line_groups[0]
         example_line_vertex = example_line_group[0]
 
-        self.assertEqual(type(const_data), dict) 
+        self.assertIsInstance(const_data, dict) 
         self.assertEqual(set(const_data.keys()), self.expected_const_keys)
 
-        self.assertEqual(type(example_bound_verts), list) 
-        self.assertEqual(type(example_bound_vertex), dict) 
+        self.assertIsInstance(example_bound_verts, list) 
+        self.assertIsInstance(example_bound_vertex, dict) 
         self.assertEqual(set(example_bound_vertex.keys()), set(['x', 'y']))
 
-        self.assertEqual(type(example_line_groups), list) 
-        self.assertEqual(type(example_line_group), list) 
-        self.assertEqual(type(example_line_vertex), dict) 
+        self.assertIsInstance(example_line_groups, list) 
+        self.assertIsInstance(example_line_group, list) 
+        self.assertIsInstance(example_line_vertex, dict) 
         self.assertEqual(set(example_line_vertex.keys()), set(['x', 'y']))
 
 
@@ -417,7 +417,7 @@ class StarFieldConstellationDataTests(DbTestCase):
 
         const_data = stf.get_const_data(const)
 
-        self.assertEqual(type(const_data), expected_type)
+        self.assertIsInstance(const_data, expected_type)
 
         if expected_type == dict:
             self.assertEqual(const_data['name'], expected_name)
@@ -457,8 +457,8 @@ class StarFieldConstellationDataTests(DbTestCase):
         consts = SF_STF.get_consts()
         example_const = consts[0]
 
-        self.assertEqual(type(consts), list) 
-        self.assertEqual(type(example_const), dict) 
+        self.assertIsInstance(consts, list) 
+        self.assertIsInstance(example_const, dict) 
         self.assertEqual(set(example_const.keys()), self.expected_const_keys)
 
 

@@ -28,7 +28,7 @@ div.star-info {
     text-anchor: middle;
 }
 
-#location-params {
-
+#error {
+    margin-top: 10px;
+    display: none;
 }
-

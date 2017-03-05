@@ -19,22 +19,19 @@
       </div>
       <div id="location-params" class="col-xs-12 col-md-6 col-lg-4">
         <h1>Where and when do you want to view the sky?</h1>
-        <div id="map"></div>
-        <div id="city-input-container">
-              City:  
-              <input id="city-input" type="text"
-                placeholder="Enter a location">
+        <div class="form-group">
+          <input type="text" class="form-control" id="city-input"
+                 placeholder="Enter a location">
         </div>
+
+        <button class='btn' id='show-stars'>Show me the stars!</button>
+        <div class='alert alert-danger' role='alert' id='error'></div>
       </div>
-
-
-
-
-      </div>
+    </div>
 
   </div> <!-- end container-fluid -->
 
+  <script type="text/javascript" src="/static/js/stars-d3.js"></script>
   <script type="text/javascript" src="/static/js/geocode.js"></script>
-  <script type="text/javascript" src="/static/js/stars.js"></script>
 </body>
 </html>

@@ -1,11 +1,31 @@
 'use strict';
 
-// get star data and display it
-d3.json('/stars.json', printStarData);
-
 ///////////////////////////
 // globals and functions //
 ///////////////////////////
+
+// when form is submitted (code in geocode.js)
+var getStars = function(lat, lng, datetime) {
+
+    // clear previous starfield
+    $('#star-field').empty();
+
+    // d3.request needs data in a query string format
+    var data = 'lat=' + lat;
+    data += '&lng=' + lng;
+    if (datetime !== undefined) {
+        data += '&datetime' + datetime;
+    }
+
+    d3.request('/stars.json')
+        .mimeType("application/json")
+        .response(function(xhr) { return JSON.parse(xhr.responseText); })
+        .header("Content-Type","application/x-www-form-urlencoded")
+        // .on('progress', function()) // TODO: show progress bar!
+        .post(data, printStarData);
+
+}
+
 
 // to make a path from a list of xs and ys
 // this code adapted from https://www.dashingd3js.com/svg-paths-and-d3js

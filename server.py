@@ -1,7 +1,7 @@
 """Flask web server for star charts app"""
 
 import os
-from flask import Flask, render_template, jsonify
+from flask import Flask, request, render_template, jsonify
 from datetime import datetime
 
 from model import connect_to_db, Constellation
@@ -23,24 +23,15 @@ def display_chart():
     return render_template("stars.html", google_key=GOOGLE_KEY)
 
 
-@app.route('/stars.json')
+@app.route('/stars.json', methods=['POST'])
 def return_stars():
-    """return a json of star info, along with the radius for the star field 
-
-    stars is a list of dictionaries with these keys: 
-
-    x
-    y
-    magnitude
-    color
+    """return a json of star and constellation info, plus star field radius
     """
 
-    # lat = '51.5074dN' # london
-    # lng = '0.1278dE'    # london
+    print request.form
 
-    # TODO: get this from user via form inputs
-    lat = 37.7749  # san francisco
-    lng = -122.4194 # san francisco
+    lat = request.form.get('lat')
+    lng = request.form.get('lng')
     max_magnitude = 5 # dimmest stars to show
 
     stf = StarField(lat=lat,

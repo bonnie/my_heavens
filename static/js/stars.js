@@ -142,7 +142,7 @@ function printStarData(starData) {
 
     var constInfo = starData.constellations;
 
-    var svgBodySelection = d3.select('body');
+    var svgBodySelection = d3.select('#star-field');
 
     // make a place to draw the stars
     var svgContainer = svgBodySelection.append('svg')

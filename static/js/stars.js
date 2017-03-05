@@ -1,5 +1,12 @@
 'use strict';
 
+// get star data and display it
+d3.json('/stars.json', printStarData);
+
+///////////////////////////
+// globals and functions //
+///////////////////////////
+
 // to make a path from a list of xs and ys
 // this code adapted from https://www.dashingd3js.com/svg-paths-and-d3js
 // (they use v3 and I'm using v4, so I had to change d3.svg.line to d3.line,
@@ -7,9 +14,6 @@
 var getLine = d3.line()
                     .x( function(d) { return d.x } )
                     .y( function(d) { return d.y } )
-
-// get star data and display it
-d3.json('/stars.json', printStarData);
 
 function isPointOnCircle(x, y, radius) {
     // determine whether a point is on the sky circle or not
@@ -37,16 +41,6 @@ function getCornersOnCircle(minX, minY, maxX, maxY, radius) {
     return corners;
 
 }
-
-// function distanceFromEdge(x, y, radius) {
-//     // determine whether a point is on the sky circle or not
-
-//     var xFromCenter = x - radius;
-//     var yFromCenter = radius - y;
-
-//     return radius - Math.sqrt(xFromCenter**2 + yFromCenter**2);
-
-// }
 
 function getFloatFromPixels(floatString) {
     // from a string like '2.978px', return the float 2.978
@@ -110,7 +104,39 @@ function getConstLabelCoords(bound_verts, radius, labelWidth, labelHeight) {
 
 }
 
+////////////////
+// d3 drawing //
+////////////////
+
+function printSkyBackground(svgContainer, radius) {
+    // print the radial gradient for the sky background
+
+    // adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
+    var radialGradient = svgContainer.append("defs")
+        .append("radialGradient")
+        .attr("id", "radial-gradient");
+
+    radialGradient.append("stop")
+        .attr("offset", "85%")
+        .attr("stop-color", 'black');
+
+    radialGradient.append("stop")
+        .attr("offset", "95%")
+        .attr("stop-color", "#101035");
+
+    radialGradient.append("stop")
+        .attr("offset", "100%")
+        .attr("stop-color", "#191970");
+
+    var background = svgContainer.append('circle')
+                              .attr('cx', radius)
+                              .attr('cy', radius)
+                              .attr('r', radius)
+                              .style("fill", "url(#radial-gradient)");
+}
+
 function printStarData(starData) {
+    // success function for d3 ajax call to get star data
 
     console.log(starData);
 
@@ -124,10 +150,7 @@ function printStarData(starData) {
                                     .attr('height', 2 * starData.radius);
 
     // show the background
-    var background = svgContainer.append('circle')
-                              .attr('cx', starData.radius)
-                              .attr('cy', starData.radius)
-                              .attr('r', starData.radius)
+    printSkyBackground(svgContainer, starData.radius);
 
     // create constellations
     var constellations = svgContainer.selectAll('g.constellation-group')
@@ -293,6 +316,4 @@ function printStarData(starData) {
     });
 
 }
-
-
 

@@ -14,7 +14,7 @@ var getStars = function(lat, lng, datetime) {
     var data = 'lat=' + lat;
     data += '&lng=' + lng;
     if (datetime !== undefined) {
-        data += '&datetime' + datetime;
+        data += '&datetime=' + datetime;
     }
 
     d3.request('/stars.json')

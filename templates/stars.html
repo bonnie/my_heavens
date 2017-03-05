@@ -2,28 +2,39 @@
 <html>
 <head>
   <title>Star Charts</title>
-  <link rel="stylesheet"
-        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/css/stars.css">
-  <script src="https://d3js.org/d3.v4.min.js"></script>
-  <script src="https://code.jquery.com/jquery.js"></script>
-  <script src="https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces"
+  <link rel='stylesheet'
+        href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+  <link rel='stylesheet' href='/static/css/stars.css'>
+  <script src='https://d3js.org/d3.v4.min.js'></script>
+  <script src='https://code.jquery.com/jquery.js'></script>
+  <script src='https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces'
         async defer></script>
 </head>
 <body>
 
-  <div class="container-fluid">
-    <div class="row">
-      <div id="star-field" class="col-xs-12 col-md-6 col-lg-8">
+  <div class='container-fluid'>
+    <div class='row'>
+      <div id='star-field' class='col-xs-12 col-md-6 col-lg-8'>
 
       </div>
-      <div id="location-params" class="col-xs-12 col-md-6 col-lg-4">
+      <div id='location-params' class='col-xs-12 col-md-6 col-lg-4'>
         <h1>Where and when do you want to view the sky?</h1>
-        <div class="form-group">
-          <input type="text" class="form-control" id="city-input"
-                 placeholder="Enter a location">
+        <div class='form-group'>
+          <input type='text' class='form-control' id='city-input'
+                 placeholder='Enter a location'>
         </div>
 
+        <div class='radio'>
+          <label><input type='radio' name='datetime' value='now' id='now-time' checked='checked'>Now</label>
+        </div>
+        <div class='radio'>
+          <label><input type='radio' name='datetime' value='not-now' id='change-time'>Other time</label>
+        </div>
+        <div class='form-group' id='datetime-selector'>
+            <div class='input-group date'>
+                <input type='datetime-local' id='datetime-input' class='form-control'>
+            </div>
+        </div>
         <button class='btn' id='show-stars'>Show me the stars!</button>
         <div class='alert alert-danger' role='alert' id='error'></div>
       </div>
@@ -31,8 +42,11 @@
 
   </div> <!-- end container-fluid -->
 
-  <script type="text/javascript" src="/static/js/star-utilities.js"></script>
-  <script type="text/javascript" src="/static/js/stars-d3.js"></script>
-  <script type="text/javascript" src="/static/js/geocode.js"></script>
+  <script type='text/javascript' 
+          src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+  <script type='text/javascript' src='/static/js/star-page-control.js'></script>
+  <script type='text/javascript' src='/static/js/geocode.js'></script>
+  <script type='text/javascript' src='/static/js/star-utilities.js'></script>
+  <script type='text/javascript' src='/static/js/stars-d3.js'></script>
 </body>
 </html>

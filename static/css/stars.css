@@ -5,7 +5,7 @@ svg {
 
 /* make sure our constellation groups recognize mouseover events */
 g.constellation-group {
-  pointer-events: all;
+    pointer-events: all;
 }
 
 /* constellation names */
@@ -31,4 +31,9 @@ div.star-info {
 #error {
     margin-top: 10px;
     display: none;
+}
+
+#datetime-selector {
+    display: none;
+    margin-bottom: 10px;
 }

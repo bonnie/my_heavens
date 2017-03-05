@@ -1,8 +1,10 @@
 // javascript for getting latitude and longitude of user via Google
 // autocomplete and geocoding
 
+"use strict";
+
 // global var for the autocomplete object
-var autocomplete
+var autocomplete;
 
 
 function initPlaces() {
@@ -15,37 +17,40 @@ function initPlaces() {
     autocomplete.setTypes(['(cities)']);
 }
 
+
 // on form 'submit'
-$('#show-stars').on('click', function() {
+var getLatLng = function() {
 
     // for use later
     var geocoder = new google.maps.Geocoder;
-    var errorDiv = $('#error');
 
-    // clear any old errors
-    errorDiv.empty().hide();
+    var place = autocomplete.getPlace();
 
-      // infowindow.close();
-      var place = autocomplete.getPlace();
+    // couldn't get a place? display an error and bail
+    if (!place || !place.place_id) { 
+        processFormInputs(); 
+        return; 
+    }
 
-      if (!place || !place.place_id) {
-
-        errorDiv.show().html('Please choose a city using autocomplete.');
-        return;
-
-      }
-      geocoder.geocode({'placeId': place.place_id}, function(results, status) {
+    // otherwise, get the data and return
+    geocoder.geocode({'placeId': place.place_id}, function(results, status) {
 
         if (status !== 'OK') {
-          window.alert('Geocoder failed due to: ' + status);
-          return;
+            window.alert('Geocoder failed due to: ' + status);
+            return;
         }
-          city = results[0].geometry.location;
+            
+        var city = results[0].geometry.location;
 
-        // get star data and display it
-        // getStars defined in stars-d3.js
-        getStars(city.lat(), city.lng());
+        // continue with the form processing, now that we have lat and lng
+        // processFormInputs is found in star-page-control.js
+        processFormInputs({ lat: city.lat(), lng: city.lng() });
 
-      });
+    });
 
+}
+
+$(document).ready(function() {
+    // getLatLng defined in geocode.js
+    $('#show-stars').on('click', getLatLng);
 });

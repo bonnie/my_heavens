@@ -1,6 +1,8 @@
 // utilities for drawing star field
 
-function isPointOnCircle(x, y, radius) {
+'use strict';
+
+var isPointOnCircle = function(x, y, radius) {
     // determine whether a point is on the sky circle or not
 
     var xFromCenter = x - radius;
@@ -10,7 +12,7 @@ function isPointOnCircle(x, y, radius) {
 
 }
 
-function getCornersOnCircle(minX, minY, maxX, maxY, radius) {
+var getCornersOnCircle = function(minX, minY, maxX, maxY, radius) {
     // return booleans for each corner on the circle (tl, tr, bl, br)
     // true if corner is on the circle, false if it's not
 
@@ -27,14 +29,14 @@ function getCornersOnCircle(minX, minY, maxX, maxY, radius) {
 
 }
 
-function getFloatFromPixels(floatString) {
+var getFloatFromPixels = function(floatString) {
     // from a string like '2.978px', return the float 2.978
 
     return parseFloat(floatString.substring(0, floatString.length - 2))
 }
 
 
-function getConstLabelCoords(bound_verts, radius, labelWidth, labelHeight) {
+var getConstLabelCoords = function(bound_verts, radius, labelWidth, labelHeight) {
     // return x, y object for label based on constellation bound vertices
     // the label position depends on the bounding rect and the position of the 
     // constellation in the svg

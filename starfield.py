@@ -5,12 +5,16 @@ import math
 import numpy as np
 from datetime import datetime
 import pytz
+import requests
 
 from model import db, Star, Constellation
 from time_functions import to_utc
 
 # how datetime comes in from bootstrap. For example "2017-01-01T01:00"
 BOOTSTRAP_DTIME_FORMAT = '%Y-%m-%dT%H:%M'
+
+# for getting time zones
+GOOGLE_TZ_URL = 'https://maps.googleapis.com/maps/api/timezone/json'
 
 # optional debugging output
 DEBUG = False
@@ -33,9 +37,9 @@ class StarField(object):
         self.display_radius = display_radius
         self.max_mag = max_mag
 
-        # change lat and lng to radians
-        self.lat = lat
-        self.lng = lng
+        # change lat and lng to radians, but store the degrees for google tz
+        self.lat_deg = lat
+        self.lng_deg = lng
         self.update_latlng_rads()
 
         # translate local time to utc if necessary
@@ -64,8 +68,8 @@ class StarField(object):
         # '37.7749dN'  (d for degrees, N for north)
         # '122.4194dW' (d for degrees, W for west)
 
-        lat = str(self.lat)
-        lng = str(self.lng)
+        lat = str(self.lat_deg)
+        lng = str(self.lng_deg)
 
         lat = lat[1:] + 'dS' if lat[0] == '-' else lat + 'dN'
         lng = lng[1:] + 'dW' if lng[0] == '-' else lng + 'dE'
@@ -73,6 +77,36 @@ class StarField(object):
         # update degrees to radians
         self.lat = parseLat(lat)
         self.lng = parseLon(lng)
+
+
+    def get_timezone(self, localtime):
+        """return the timezone based on the lat/lng and desired time.
+
+        localtime is a naive (non-timezone-aware) datetime object.
+
+        Use google timezone api to get timezone."""
+
+        # bury this here to avoid circular imports
+        from server import GOOGLE_KEY
+
+        # get timestamp / unixtime from the local time
+        localtime_tstamp = localtime.strftime('%s')
+
+        params = { 'key': GOOGLE_KEY,
+                   'location': '{},{}'.format(self.lat_deg, self.lng_deg),
+                   'timestamp': localtime_tstamp }
+
+        response = requests.get(GOOGLE_TZ_URL, params)
+        tz_data = response.json()
+
+        if tz_data['status'] != 'OK':
+            # TODO: make for better user experience here
+            print 'ERROR! google didn\'t want to play: {}'.format(tz_data['status']) 
+            return pytz.utc
+
+        tzid = tz_data['timeZoneId']
+
+        return pytz.timezone(tzid)
 
 
     def set_utc_time(self, localtime_string):
@@ -87,18 +121,11 @@ class StarField(object):
 
         else:
             
-            # bury this here to avoid circular imports
-            from server import GOOGLE_KEY
-
-            # for now... 
-            # https://developers.google.com/maps/documentation/timezone/intro
-            local_tz = pytz.timezone('US/Pacific')
-
-            # translate dtime string into datetime object
-            # automatically in utc based on local server time
-
             # get localtime with no timezone        
             dtime_local = datetime.strptime(localtime_string, BOOTSTRAP_DTIME_FORMAT)
+
+            # get time zone based on lat/lng 
+            local_tz = self.get_timezone(dtime_local)
 
             # give it a time zone
             local_tz.localize(dtime_local)

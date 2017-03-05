@@ -14,3 +14,4 @@ def to_utc(tz, dtime):
 
     return tz.normalize(tz.localize(dtime)).astimezone(pytz.utc)
 
+

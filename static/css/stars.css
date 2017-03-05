@@ -20,7 +20,7 @@ div.star-info {
     position: absolute;
     pointer-events: none; /* let mouse events pass through */
     opacity:0;
-    transition: opacity 0.3s; /* from https://codepen.io/billdwhite/pen/rgEbc */
+    padding: 2px;
 }
 
 .const-name {

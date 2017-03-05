@@ -137,11 +137,18 @@ function printStarData(starData) {
         .attr('class', 'constellation-group')
 
         // don't display initially
-        .attr('visibility', 'hidden')
+        .attr('opacity', 0)
 
         // reveal boundaries and lines on mouseover
-        .on('mouseover', function() { d3.select(this).style('visibility', 'visible'); })
-        .on('mouseout', function() { d3.select(this).style('visibility', 'hidden'); });
+        .on('mouseover', function() { 
+                  d3.select(this).transition()        
+                    .duration(200)      
+                    .style("opacity", 1);})
+
+        .on('mouseout', function() { 
+                  d3.select(this).transition()        
+                    .duration(500)      
+                    .style("opacity", 0);});
 
 
     // add sub-elements for each constellation
@@ -218,6 +225,13 @@ function printStarData(starData) {
     // stars //
     ///////////
 
+    // One div for every star info window
+    var starInfoDiv = d3.select("body").append("div")   
+        .attr("class", "star-info")               
+        .style("opacity", 0)
+        .style('border-radius', '4px');            
+
+
     // add the star groups
     var stars = svgContainer.selectAll('g.star-group')
                             .data(starData.stars)
@@ -230,14 +244,6 @@ function printStarData(starData) {
 
         var thisStar = d3.select(this);
 
-        // info window for star
-        var starInfo = thisStar.append('div')
-                             .style('top', d.x)
-                             .style('left', d.y)
-                             .style('height', '100px')
-                             .style('width', '100px')
-                             .attr('class', 'star-info');
-
         // circle to represent star
         var starCircle = thisStar.append('circle')
                              .attr('cx', d.x)
@@ -247,12 +253,42 @@ function printStarData(starData) {
                              .attr('class', 'star')
                              .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
-        // show and hide the star info window on mouseover of star circle, not
-        // the whole groups
-        
-        // starCircle.on('mouseover', function() { console.log('hi'); starInfo.attr('visibility', 'visible') })
-        //           .on('mouseout', function() { console.log('bye'); starInfo.attr('visibility', 'hidden') });
+        // info window for star
+        // var starInfo = thisStar.append('p')
+        //                      .attr('x', d.x)
+        //                      .attr('y', d.y)
+        //                      .attr('fill', '#444444')
+        //                      .attr('height', '100px')
+        //                      .attr('width', '100px')
+        //                      .attr('class', 'star-info')
+        //                      .attr('visibility', 'hidden');
 
+
+        // update starInfoDiv position and text when star gets a mouseover
+        // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+        // TODO: make dimensions relative to radius, rather than hard-coded
+
+        if (d.name !== null) {
+            starCircle.on("mouseover", function() { 
+
+                // snazzy fading in
+                starInfoDiv.transition()        
+                    .duration(200)      
+                    .style("opacity", .9);   
+
+                // add text and reposition   
+                starInfoDiv.html(d.name) // for now  
+                    .style("left", (d.x + 2) + "px")     
+                    .style("top", (d.y - 20) + "px");    
+                })               
+
+            .on("mouseout", function() {       
+                starInfoDiv.transition()        
+                    .duration(500)      
+                    .style("opacity", 0);   
+            });
+        }
+        // END: adaptation from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 
     });
 

@@ -1,5 +1,6 @@
 """Starfield object and methods for calculating stars and constellation display"""
 
+import ephem
 from sidereal.sidereal import parseLon, parseLat, parseAngle, RADec, hoursToRadians
 import math
 import numpy as np
@@ -9,9 +10,17 @@ import requests
 
 from model import db, Star, Constellation
 from time_functions import to_utc
+from colors import PLANET_COLORS_BY_NAME
+
+# to determine which non-star objects to find
+NON_STARS = [ ephem.Sun, ephem.Moon, ephem.Mercury, ephem.Venus, ephem.Mars, 
+              ephem.Jupiter, ephem.Saturn, ephem.Neptune, ephem.Uranus ]
 
 # how datetime comes in from bootstrap. For example "2017-01-01T01:00"
 BOOTSTRAP_DTIME_FORMAT = '%Y-%m-%dT%H:%M'
+
+# how ephem expects / gives dates
+EPHEM_DTIME_FORMAT = '%Y/%-m/%-d %H:%M:%S'
 
 # for getting time zones
 GOOGLE_TZ_URL = 'https://maps.googleapis.com/maps/api/timezone/json'
@@ -28,7 +37,8 @@ class StarField(object):
 
         * lat is latitude in degrees (positive / negative)
         * lng is longitude in degrees (positive / negative)
-        * utctime, if provided is datetime. If not provided, will default to now
+        * localtime_string, if provided, is string in BOOTSTRAP_DTIME_FORMAT. 
+            If not provided, will default to now
         * display_radius is display radius. Specifiable for ease of testing. 
         * max_mag is the maximum magnitude to display for this starfield (to
           eliminate dim stars)
@@ -37,7 +47,7 @@ class StarField(object):
         self.display_radius = display_radius
         self.max_mag = max_mag
 
-        # change lat and lng to radians, but store the degrees for google tz
+        # change lat and lng to radians, but store the degrees for google tz and ephem
         self.lat_deg = lat
         self.lng_deg = lng
         self.update_latlng_rads()
@@ -153,6 +163,15 @@ class StarField(object):
         y = self.display_radius - y_from_center
 
         return (x, y)
+
+
+    def get_pixel_size_from_arcsec(self, size_in_arcsec):
+        """Return pixel size for a given measurement in arcseconds."""
+
+        size_in_degrees = size_in_arcsec / 3600
+        size_in_pixels = self.display_radius * size_in_degrees / 90
+
+        return size_in_pixels
 
 
     def get_display_coords(self, ra, dec, calculate_invisible=False):
@@ -371,3 +390,71 @@ class StarField(object):
 
 
         return visible_consts
+
+
+    def get_planet_data(self, eph, planet):
+        """Return a dict of planet data for the ephem object and planet object.
+
+        Returns None if planet is not visible for this starfield.
+
+        Example planet dict: 
+        {'name': 'Jupiter',
+         'x': 117.34,
+         'y': 489.13,
+         'magnitude': -2.21,
+         'color': '#ffffc8'
+         'size': 0.002 } # size is in pixels
+        """
+
+        # using the ephemeris way of getting data for a planet for this date
+        pla = planet(eph)
+
+        # if it's too dim, don't return it
+        if pla.mag > self.max_mag:
+            return None
+
+        # get coords for planet for this starfield
+        pt = self.get_display_coords(pla.ra, pla.dec)
+
+        if not pt['visible']: 
+            return None
+
+        # otherwise, gather data
+        planet_data = {}
+
+        planet_data['x'] = pt['x']
+        planet_data['y'] = pt['y']
+        planet_data['magnitude'] = pla.mag
+        planet_data['name'] = pla.name
+        planet_data['color'] = PLANET_COLORS_BY_NAME[pla.name]
+
+        # translate size to pixels
+        planet_data['size'] = self.get_pixel_size_from_arcsec(pla.size)
+
+        return planet_data
+
+
+    def get_planets(self):
+        """Return a list of planet data dicts, transformed for d3.
+
+        see get_planet_data docstring for description of planet data dict
+        """
+
+        # alert ephem of starfield properties
+        stf_ephem = ephem.Observer()
+        stf_ephem.lon = self.lng_deg
+        stf_ephem.lat = self.lat_deg
+
+        # the planets move little enough that I'm not going to worry whether
+        # ephem uses localtime or utctime. 
+        # TODO: look into this
+        stf_ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
+
+        planets = []
+
+        for planet in NON_STARS:
+            pdata = self.get_planet_data(stf_ephem, planet)
+            if pdata:
+                planets.append(pdata)
+
+        return planets

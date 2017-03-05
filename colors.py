@@ -34,3 +34,15 @@ for line in cfile:
 
         COLOR_BY_SPECTRAL_CLASS[sc_a][sc_b] = tokens[-1].rstrip()
 
+
+PLANET_COLORS_BY_NAME = {
+    'Mercury': '#f5f5f5',
+    'Venus': '#ffffee',
+    'Mars': '#ffca8a',
+    'Jupiter': '#ffffc8',
+    'Saturn': '#ffffc8',
+    'Uranus': '#f8f8ff',
+    'Neptune': '#f8f8ff',
+    'Sun': '#ffffc8',
+    'Moon': '#f5f5f5'
+}

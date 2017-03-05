@@ -13,14 +13,22 @@ text.const-name {
     fill: #fff;
 }
 
-/* star info divs */
-div.star-info {
-    background-color: #777;
-    color: #fff;
+/* info divs */
+div.info {
     position: absolute;
     pointer-events: none; /* let mouse events pass through */
     opacity:0;
-    padding: 2px;
+    padding: 2px;    
+}
+
+div.star-info {
+    background-color: #777;
+    color: #fff;
+}
+
+div.planet-info {
+    background-color: #668;
+    color: #fff;
 }
 
 .const-name {

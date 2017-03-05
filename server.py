@@ -40,10 +40,12 @@ def return_stars():
 
     stars = stf.get_stars()
     consts = stf.get_consts()
+    planets = stf.get_planets()
 
     return jsonify({'constellations': consts, 
                     'radius': stf.display_radius, 
-                    'stars': stars})
+                    'stars': stars,
+                    'planets': planets})
 
 
 if __name__ == '__main__':

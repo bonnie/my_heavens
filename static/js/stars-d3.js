@@ -26,6 +26,26 @@ var getStars = function(lat, lng, datetime) {
 
 }
 
+var showInfoWindow = function(d, windowDiv) {
+
+    // snazzy fading in
+    windowDiv.transition()        
+        .duration(200)      
+        .style("opacity", .9);   
+
+    // add text and reposition   
+    windowDiv.html(d.name) // for now  
+        .style("left", (d.x + 2) + "px")     
+        .style("top", (d.y - 20) + "px");    
+}
+
+var hideInfoWindow = function(windowDiv) {
+
+    windowDiv.transition()        
+        .duration(500)      
+        .style("opacity", 0);   
+
+}
 
 // to make a path from a list of xs and ys
 // this code adapted from https://www.dashingd3js.com/svg-paths-and-d3js
@@ -40,31 +60,51 @@ var getLine = d3.line()
 // d3 drawing //
 ////////////////
 
-function printSkyBackground(svgContainer, radius) {
-    // print the radial gradient for the sky background
+function printSkyBackground(svgContainer, radius, planets) {
 
-    // adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
-    var radialGradient = svgContainer.append("defs")
-        .append("radialGradient")
-        .attr("id", "radial-gradient");
+    // to be determined...
+    var skyFill;
 
-    radialGradient.append("stop")
-        .attr("offset", "85%")
-        .attr("stop-color", 'black');
+    var sunInSky = false;
 
-    radialGradient.append("stop")
-        .attr("offset", "95%")
-        .attr("stop-color", "#101035");
+    // check to see if the sun is in the sky
+    for (var i=0; i < planets.length; i++) {
+        if (planets[i].name == 'Sun') {
+            sunInSky = true;
+        }
+    }
 
-    radialGradient.append("stop")
-        .attr("offset", "100%")
-        .attr("stop-color", "#191970");
+    if (sunInSky) {
+        // If so, make background lighter blue
+        skyFill = '#4169E1'
+
+    } else {
+        // print the radial gradient for the sky background
+        // adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
+        var radialGradient = svgContainer.append("defs")
+            .append("radialGradient")
+            .attr("id", "radial-gradient");
+
+        radialGradient.append("stop")
+            .attr("offset", "85%")
+            .attr("stop-color", 'black');
+
+        radialGradient.append("stop")
+            .attr("offset", "95%")
+            .attr("stop-color", "#101035");
+
+        radialGradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "#191970");
+
+        skyFill = "url(#radial-gradient)";
+    }
 
     var background = svgContainer.append('circle')
                               .attr('cx', radius)
                               .attr('cy', radius)
                               .attr('r', radius)
-                              .style("fill", "url(#radial-gradient)");
+                              .style("fill", skyFill);
 }
 
 function printStarData(starData) {
@@ -82,7 +122,7 @@ function printStarData(starData) {
                                     .attr('height', 2 * starData.radius);
 
     // show the background
-    printSkyBackground(svgContainer, starData.radius);
+    printSkyBackground(svgContainer, starData.radius, starData.planets);
 
     // create constellations
     var constellations = svgContainer.selectAll('g.constellation-group')
@@ -173,7 +213,7 @@ function printStarData(starData) {
                   .attr('y', label_pos.y);
 
 
-    })
+    });
                 
 
     ///////////
@@ -182,7 +222,7 @@ function printStarData(starData) {
 
     // One div for every star info window
     var starInfoDiv = d3.select("body").append("div")   
-        .attr("class", "star-info")               
+        .attr("class", "star-info info")               
         .style("opacity", 0)
         .style('border-radius', '4px');            
 
@@ -208,43 +248,45 @@ function printStarData(starData) {
                              .attr('class', 'star')
                              .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
-        // info window for star
-        // var starInfo = thisStar.append('p')
-        //                      .attr('x', d.x)
-        //                      .attr('y', d.y)
-        //                      .attr('fill', '#444444')
-        //                      .attr('height', '100px')
-        //                      .attr('width', '100px')
-        //                      .attr('class', 'star-info')
-        //                      .attr('visibility', 'hidden');
-
-
         // update starInfoDiv position and text when star gets a mouseover
         // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
         // TODO: make dimensions relative to radius, rather than hard-coded
 
         if (d.name !== null) {
-            starCircle.on("mouseover", function() { 
-
-                // snazzy fading in
-                starInfoDiv.transition()        
-                    .duration(200)      
-                    .style("opacity", .9);   
-
-                // add text and reposition   
-                starInfoDiv.html(d.name) // for now  
-                    .style("left", (d.x + 2) + "px")     
-                    .style("top", (d.y - 20) + "px");    
-                })               
-
-            .on("mouseout", function() {       
-                starInfoDiv.transition()        
-                    .duration(500)      
-                    .style("opacity", 0);   
-            });
+            starCircle.on("mouseover", function(d) { showInfoWindow(d, starInfoDiv);})               
+                      .on("mouseout", function(d) { hideInfoWindow(starInfoDiv);});
         }
         // END: adaptation from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+    });
 
+        /////////////
+        // planets //
+        /////////////
+
+   // One div for every planet info window
+    var planetInfoDiv = d3.select("body").append("div")   
+        .attr("class", "planet-info info")               
+        .style("opacity", 0)
+        .style('border-radius', '4px');            
+
+    // create circle for planet
+    var planets = svgContainer.selectAll('circle.planet')
+                            .data(starData.planets)
+                            .enter()
+                            .append('circle')
+                            .attr('class', 'planet');
+
+    // add details
+    planets.each(function(d) {
+        
+        d3.select(this).attr('cx', d.x)
+                        .attr('cy', d.y)
+                        .attr('r', (5 - d.magnitude) * 0.5)
+                        .attr('fill', d.color)
+
+                        .on("mouseover", function(d) { showInfoWindow(d, planetInfoDiv);})               
+                        .on("mouseout", function(d) { hideInfoWindow(planetInfoDiv);});
+    
     });
 
 }

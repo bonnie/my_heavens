@@ -1,12 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Star Charts</title>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script type="text/javascript" src="/static/js/stars.js"></script>
-    <link rel="stylesheet" href="/static/css/stars.css">
+  <title>Star Charts</title>
+  <link rel="stylesheet"
+        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/stars.css">
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces"
+        async defer></script>
 </head>
 <body>
 
+  <div class="container-fluid">
+    <div class="row">
+      <div id="star-field" class="col-xs-12 col-md-6 col-lg-8">
+
+      </div>
+      <div id="location-params" class="col-xs-12 col-md-6 col-lg-4">
+        <h1>Where and when do you want to view the sky?</h1>
+        <div id="map"></div>
+        <div id="city-input-container">
+              City:  
+              <input id="city-input" type="text"
+                placeholder="Enter a location">
+        </div>
+      </div>
+
+
+
+
+      </div>
+
+  </div> <!-- end container-fluid -->
+
+  <script type="text/javascript" src="/static/js/geocode.js"></script>
+  <script type="text/javascript" src="/static/js/stars.js"></script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 """Flask web server for star charts app"""
 
+import os
 from flask import Flask, render_template, jsonify
 from datetime import datetime
 
@@ -8,6 +9,7 @@ from starfield import StarField
 
 # display radius
 STARFIELD_RADIUS = 400
+GOOGLE_KEY = os.environ.get('GOOGLE_KEY')
 
 app = Flask(__name__)
 
@@ -18,7 +20,7 @@ def display_chart():
 
     Stars will be filled in with js"""
 
-    return render_template("stars.html")
+    return render_template("stars.html", google_key=GOOGLE_KEY)
 
 
 @app.route('/stars.json')

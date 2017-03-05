@@ -4,8 +4,13 @@ from sidereal.sidereal import parseLon, parseLat, parseAngle, RADec, hoursToRadi
 import math
 import numpy as np
 from datetime import datetime
+import pytz
 
 from model import db, Star, Constellation
+from time_functions import to_utc
+
+# how datetime comes in from bootstrap. For example "2017-01-01T01:00"
+BOOTSTRAP_DTIME_FORMAT = '%Y-%m-%dT%H:%M'
 
 # optional debugging output
 DEBUG = False
@@ -14,7 +19,7 @@ DEBUG = False
 class StarField(object):
     """Class for calculating stars and constellation display"""
 
-    def __init__(self, lat, lng, display_radius, utctime=None, max_mag=5):
+    def __init__(self, lat, lng, display_radius, localtime_string=None, max_mag=5):
         """Initialize Starfield object. 
 
         * lat is latitude in degrees (positive / negative)
@@ -25,7 +30,6 @@ class StarField(object):
           eliminate dim stars)
         """
 
-        self.utctime = utctime or datetime.utcnow()
         self.display_radius = display_radius
         self.max_mag = max_mag
 
@@ -33,6 +37,12 @@ class StarField(object):
         self.lat = lat
         self.lng = lng
         self.update_latlng_rads()
+
+        # translate local time to utc if necessary
+        if localtime_string == None:
+            self.utctime = datetime.utcnow()
+        else:
+            self.set_utc_time(localtime_string)
 
 
     def __repr__(self):
@@ -65,8 +75,40 @@ class StarField(object):
         self.lng = parseLon(lng)
 
 
+    def set_utc_time(self, localtime_string):
+        """Sets self.utctime based on the local time and the lat/lng.
+
+        * localtime_string is, well, a string
+        """
+
+        if not localtime_string:
+            # no time like the present! 
+            self.utctime = datetime.utcnow()
+
+        else:
+            
+            # bury this here to avoid circular imports
+            from server import GOOGLE_KEY
+
+            # for now... 
+            # https://developers.google.com/maps/documentation/timezone/intro
+            local_tz = pytz.timezone('US/Pacific')
+
+            # translate dtime string into datetime object
+            # automatically in utc based on local server time
+
+            # get localtime with no timezone        
+            dtime_local = datetime.strptime(localtime_string, BOOTSTRAP_DTIME_FORMAT)
+
+            # give it a time zone
+            local_tz.localize(dtime_local)
+
+            # translate to utc
+            self.utctime = to_utc(local_tz, dtime_local)
+
+
     def pol2cart(self, rho, phi):
-        """translate between polar coords and svg-style cartesian coords
+        """Translate between polar coords and svg-style cartesian coords.
 
         in svg, the origin is in the upper left and y is positive going down
 

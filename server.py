@@ -2,7 +2,6 @@
 
 import os
 from flask import Flask, request, render_template, jsonify
-from datetime import datetime
 
 from model import connect_to_db, Constellation
 from starfield import StarField
@@ -28,15 +27,15 @@ def return_stars():
     """return a json of star and constellation info, plus star field radius
     """
 
-    print request.form
-
     lat = request.form.get('lat')
     lng = request.form.get('lng')
+    localtime_string = request.form.get('datetime')
     max_magnitude = 5 # dimmest stars to show
 
     stf = StarField(lat=lat,
                     lng=lng,
                     max_mag=max_magnitude,
+                    localtime_string=localtime_string,
                     display_radius=STARFIELD_RADIUS)
 
     stars = stf.get_stars()

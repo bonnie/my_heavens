@@ -43,6 +43,6 @@ PLANET_COLORS_BY_NAME = {
     'Saturn': '#ffffc8',
     'Uranus': '#f8f8ff',
     'Neptune': '#f8f8ff',
-    'Sun': '#ffffc8',
+    'Sun': '#f0e68c',
     'Moon': '#f5f5f5'
 }

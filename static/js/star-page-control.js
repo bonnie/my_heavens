@@ -3,7 +3,8 @@
 "use strict";
 
 // globals that will be initialized on document load
-var datetimeRadio, changetimeRadio, datetimeSelector, datetimeInput, errorDiv;
+var datetimeRadio, changetimeRadio, datetimeSelector, datetimeInput, errorDiv,
+    starfieldControlDiv;
 
 var displayError = function(error) {
 
@@ -18,6 +19,10 @@ var processFormInputs = function(latlng) {
 
     // clear previous errors
     errorDiv.empty().hide();
+
+    // hide starfield controls
+    starfieldControlDiv.hide();
+
 
     if (latlng === undefined) {
         // geolocation failed
@@ -48,6 +53,7 @@ $(document).ready(function() {
     datetimeSelector =  $('#datetime-selector')
     datetimeInput = $('#datetime-input')
     errorDiv = $('#error');
+    starfieldControlDiv = $('#starfield-controls')
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {

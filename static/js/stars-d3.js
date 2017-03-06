@@ -334,8 +334,11 @@ function printStarData(starData) {
     
     });
 
-    // show the reveal planets button and attach it to the revealPlanets function
-    $('#reveal-planets').show().on('click', revealPlanets);
+    // show the starfield controls 
+    $('#starfield-controls').show();
+
+    // attach 'reveal planets' button to the revealPlanets function
+    $('#reveal-planets').on('click', revealPlanets);
 
 }
 

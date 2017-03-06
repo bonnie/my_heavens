@@ -445,9 +445,7 @@ class StarField(object):
         stf_ephem.lon = self.lng_deg
         stf_ephem.lat = self.lat_deg
 
-        # the planets move little enough that I'm not going to worry whether
-        # ephem uses localtime or utctime. 
-        # TODO: look into this
+        # ephem uses utctime
         stf_ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
 
         planets = []

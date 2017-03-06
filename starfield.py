@@ -247,6 +247,11 @@ class StarField(object):
                 # skip stars that are too dim
                 continue
 
+            # names based on the constellation aren't interesting
+            name = star.name
+            if star.name and star.const_code and star.name[-3:].lower() == star.const_code.lower():
+                name = None
+
             # convert RA and dec into alt and az
             p = self.get_display_coords(star.ra, star.dec)
 
@@ -261,7 +266,7 @@ class StarField(object):
                                'y': p['y'], 
                                'magnitude': float(star.magnitude), 
                                'color': star.color,
-                               'name': star.name
+                               'name': name
                                })
 
         return star_field

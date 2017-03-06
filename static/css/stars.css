@@ -45,3 +45,8 @@ div.planet-info {
     display: none;
     margin-bottom: 10px;
 }
+
+#reveal-planets {
+    margin: 10px;
+    display: none;
+}

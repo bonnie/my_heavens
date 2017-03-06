@@ -113,6 +113,24 @@ function printSkyBackground(svgContainer, radius, planets) {
                               .style("fill", skyFill);
 }
 
+var revealPlanets = function() {
+
+    // select planets
+    var planets = d3.selectAll('circle.planet');
+
+    // do fun zoom transitions
+    planets.transition()        
+        .duration(1000)      
+        .attr('r', function(d) { return d3.select(this).attr('r') * 5 });
+
+    planets.transition()
+        .delay(1000)
+        .duration(1000)
+        .attr('r', function(d) { return d3.select(this).attr('r') });
+
+}
+
+
 function printStarData(starData) {
     // success function for d3 ajax call to get star data
 
@@ -260,7 +278,7 @@ function printStarData(starData) {
             var surroundingStarCircle = thisStar.append('circle')
                              .attr('cx', d.x)
                              .attr('cy', d.y)
-                             .attr('r', 5)
+                             .attr('r', 4)
                              .attr('class', 'star-surround')
                              .style('opacity', 0);
 
@@ -315,6 +333,9 @@ function printStarData(starData) {
 
     
     });
+
+    // show the reveal planets button and attach it to the revealPlanets function
+    $('#reveal-planets').show().on('click', revealPlanets);
 
 }
 

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+      <script src='https://d3js.org/d3.v4.min.js'></script>
+
+</head>
+<body>
+
+<script>
+
+var makeMoonPhasePath = function(d, svg) {
+    // d.phase is a decimal between 0 and 1 describing how full the moon is
+    // 0 is new moon, 
+
+    // sun.x, sun.y
+
+        // draw a blue moon background
+        // for testing purposes only ;-) 
+
+        svg.append('circle')
+            .attr('cx', d.x)
+            .attr('cy', d.y)
+            .attr('r', d.radius)
+            .attr('fill', blue);
+
+        // draw the moon crescent
+
+        var xTop = d.x + d.radius
+        var yTop = d.y - d.radius
+
+        var xBottom = xTop + 2 * d.radius
+        var yBottom = xBottom + 2 * d.radius
+
+        // The LargeArcFlag has a value of either 0 or 1, and determines whether 
+        // the smallest (0) or largest (1) arc possible is drawn.
+        var largeArc = 1
+        var smallArc = 0
+
+        // The SweepFlag is either 0 or 1, and determines if the arc should be swept in a clockwise (1) or anti-clockwise (0) direction.
+        var clockwise = 
+        
+
+        var pathString = 'M ' + xTop + ' ' + yTop; // starting point at the top
+        
+
+        p += 'A 100 100 0 1 1 150 250'; // curve around the outside to the bottom, clockwise
+        p += 'A 200 200 0 0 0 150 50'; // curve back to the top, anticlockwise
+
+        return pathString
+
+}
+
+
+    svg = d3.select('body').append('svg')
+            .attr('width', 4000)
+            .attr('height', 4000)
+
+        // background
+        svg.append("rect")
+        .attr("width", "100%")
+        .attr("height", "100%")
+        .attr("fill", "black");
+
+        radius = 100
+
+        c1 = {}
+        c1.x = 50
+        c1.y = 50
+
+        svg.append('circle')
+        .attr('cx', c1.x + radius)
+        .attr('cy', c1.y + radius)
+        .attr('r', radius)
+        .attr('fill', 'blue');
+
+        // Draws an elliptical arc from the current point to (x, y). The size and orientation of the ellipse are defined by two radii (rx, ry) and an x-axis-rotation, which indicate how the ellipse as a whole is rotated relative to the current SVG coordinate system. The center (cx, cy) of the ellipse is calculated automatically to satisfy the constraints imposed by the other parameters. large-arc-flag and sweep-flag contribute to the automatic calculations and help determine how the arc is drawn.
+
+
+// Sometimes it is easier to describe a path as an elliptical curve rather than a Bezier curve. To this end, Arcto commands are supported in paths. The center of the arc is calculated from the other variables. The declaration of an arcto is relatively complicated: "A rx,ry xAxisRotate LargeArcFlag,SweepFlag x,y". To deconstruct, rx and ry are the radius in the x and y directions respectively,  The LargeArcFlag has a value of either 0 or 1, and determines whether the smallest (0) or largest (1) arc possible is drawn. The SweepFlag is either 0 or 1, and determines if the arc should be swept in a clockwise (1) or anti-clockwise (0) direction. x and y are the destination coordinates. Although the xAxisRotate is supposed to change the x-axis relative to the current reference frame, it seems that this argument has no effect with Gecko 7.
+
+
+        // A ( a ) rx ry x-axis-rotation large-arc-flag sweep-flag x y
+
+//         <path d=" M 10 25
+// 3            L 10 75
+// 4            L 60 75
+// 5            L 10 25"
+// 6            stroke="red" stroke-width="2" fill="none" />
+
+
+
+        svg.append('path')
+            .attr('d', p)
+            .attr('fill', 'white');
+            // .attr('fill', 'white');
+
+
+        svg.append('path')
+            .attr('d', 'M 10 25 L 10 75 L 60 75 L 10 25')
+            .attr('stroke', 'red')
+            .attr('stroke-width', 2)
+            .attr('fill', 'orange');
+
+</script>
+
+
+</body>
+</html>

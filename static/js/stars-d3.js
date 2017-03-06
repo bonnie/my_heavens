@@ -272,11 +272,11 @@ function printStarData(starData) {
         }
     });
 
-        /////////////
-        // planets //
-        /////////////
+    /////////////
+    // planets //
+    /////////////
 
-   // One div for every planet info window
+    // One div for every planet info window
     var planetInfoDiv = d3.select("body").append("div")   
         .attr("class", "planet-info info")               
         .style("opacity", 0)
@@ -292,13 +292,27 @@ function printStarData(starData) {
     // add details
     planets.each(function(d) {
         
-        d3.select(this).attr('cx', d.x)
+        var planet = d3.select(this).attr('cx', d.x)
                         .attr('cy', d.y)
-                        .attr('r', (5 - d.magnitude) * 0.5)
                         .attr('fill', d.color)
-
                         .on("mouseover", function(d) { showInfoWindow(d, planetInfoDiv);})               
                         .on("mouseout", function(d) { hideInfoWindow(planetInfoDiv);});
+
+        if (d.name === 'Sun') {
+
+            planet.attr('class', 'sun')
+                  .attr('r', starData.radius / 42);
+            
+        } else if (d.name === 'Moon') {
+
+            planet.attr('class', 'moon')
+                  .attr('r', starData.radius / 42);
+
+        } else {
+            // let smaller planets be sized according to magnitude
+            planet.attr('r', (5 - d.magnitude) * 0.5);
+        }
+
     
     });
 

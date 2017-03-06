@@ -26,6 +26,10 @@ var getStars = function(lat, lng, datetime) {
 
 }
 
+// update starInfoDiv position and text when star gets a mouseover
+// adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+// TODO: make dimensions relative to radius, rather than hard-coded
+
 var showInfoWindow = function(d, windowDiv) {
 
     // snazzy fading in
@@ -46,6 +50,8 @@ var hideInfoWindow = function(windowDiv) {
         .style("opacity", 0);   
 
 }
+// END: adaptation from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+
 
 // to make a path from a list of xs and ys
 // this code adapted from https://www.dashingd3js.com/svg-paths-and-d3js
@@ -248,15 +254,22 @@ function printStarData(starData) {
                              .attr('class', 'star')
                              .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
-        // update starInfoDiv position and text when star gets a mouseover
-        // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
-        // TODO: make dimensions relative to radius, rather than hard-coded
-
         if (d.name !== null) {
-            starCircle.on("mouseover", function(d) { showInfoWindow(d, starInfoDiv);})               
-                      .on("mouseout", function(d) { hideInfoWindow(starInfoDiv);});
+            // make a surrounding circle for the mouseover, as some stars are too 
+            // small to mouse over effectively
+            var surroundingStarCircle = thisStar.append('circle')
+                             .attr('cx', d.x)
+                             .attr('cy', d.y)
+                             .attr('r', 5)
+                             .attr('class', 'star-surround')
+                             .style('opacity', 0);
+
+
+            surroundingStarCircle.on("mouseover", 
+                                        function(d) { showInfoWindow(d, starInfoDiv);})               
+                                 .on("mouseout", 
+                                        function(d) { hideInfoWindow(starInfoDiv);});
         }
-        // END: adaptation from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
     });
 
         /////////////

@@ -48,10 +48,16 @@ var getConstLabelCoords = function(bound_verts, radius, labelWidth, labelHeight)
     for (var i=0; i < bound_verts.length; i++) {
         var vert = bound_verts[i];
 
-        if (maxX === undefined || vert.x > maxX) { maxX = vert.x; }
-        if (maxY === undefined || vert.y > maxY) { maxY = vert.y; }
-        if (minX === undefined || vert.x < minX) { minX = vert.x; }
-        if (minY === undefined || vert.y < minY) { minY = vert.y; }
+        // ignore negatives and over 400s
+        var vertx = vert.x > 0 ? vert.x : 0;
+        var verty = vert.y > 0 ? vert.y : 0;
+        vertx = vertx < radius * 2 ? vertx : radius * 2;
+        verty = verty < radius * 2 ? verty : radius * 2;
+
+        if (maxX === undefined || vertx > maxX) { maxX = vertx; }
+        if (maxY === undefined || verty > maxY) { maxY = verty; }
+        if (minX === undefined || vertx < minX) { minX = vertx; }
+        if (minY === undefined || verty < minY) { minY = verty; }
     }
 
     // how much to offset the label from the boundary rectangle

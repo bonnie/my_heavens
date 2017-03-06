@@ -68,7 +68,7 @@ var getLine = d3.line()
 
 function printSkyBackground(svgContainer, radius, planets) {
 
-    // to be determined...
+    // will be gradient or light blue depending on whether it's daytime
     var skyFill;
 
     var sunInSky = false;
@@ -115,18 +115,30 @@ function printSkyBackground(svgContainer, radius, planets) {
 
 var revealPlanets = function() {
 
+    var trans1time = 1000
+    var trans2time = 1000
+
+    // disable the button
+    $('#reveal-planets').attr('disabled', 'disabled');
+
     // select planets
     var planets = d3.selectAll('circle.planet');
 
     // do fun zoom transitions
     planets.transition()        
-        .duration(1000)      
+        .duration(trans1time)      
         .attr('r', function(d) { return d3.select(this).attr('r') * 5 });
 
     planets.transition()
-        .delay(1000)
-        .duration(1000)
+        .delay(trans1time)
+        .duration(trans2time)
         .attr('r', function(d) { return d3.select(this).attr('r') });
+
+    // re-enable the button
+    setTimeout(function() {
+                    $('#reveal-planets').removeAttr('disabled')
+                }, 
+                trans1time + trans2time);
 
 }
 

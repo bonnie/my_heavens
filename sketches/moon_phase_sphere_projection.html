@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  background: #fcfcfa;
+}
+
+.stroke {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+}
+
+.fill {
+  fill: #000;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.land {
+  fill: #222;
+}
+
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+
+</style>
+<body>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script> -->
+<script src='https://d3js.org/d3.v4.min.js'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.min.js"></script>
+<script>
+
+var width = 960 / 2,
+    height = 960 / 2;
+
+
+var generateMoonPhase = function(d) {
+
+  var moonRadius = d.radius;
+
+  // create the projection
+  var projection = d3.geoOrthographic()
+      .scale(moonRadius) // this determines the size of the moon
+      .translate([d.x, d.y]) // moon coords here
+      .clipAngle(90)
+      .precision(.1);
+
+  // create a path generator
+  var path = d3.geoPath()
+      .projection(projection);
+
+  var svg = d3.select("body").append("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+  // create the moon sphere
+  svg.append("path")
+      .datum({type: "Sphere"})
+      .attr("id", "sphere")
+      .attr("d", path)
+      .attr('fill', 'black');
+
+  // create the lit hemisphere
+  litHemisphere = d3.geoCircle()
+          // sets the circle center to the specified point [longitude, latitude] in degrees
+          // 0 degrees is on the left side of the sphere
+          .center([90 - d.colong, 0]) 
+          .radius(90) // sets the circle radius to the specified angle in degrees
+
+
+  // project the lit hemisphere onto the moon sphere
+  svg.append('path')
+      .datum(litHemisphere)
+      .attr("d", path)
+      .attr('fill', 'white')
+      .attr('stroke', 'white')
+      .attr('stroke-width', 1);
+
+}
+
+generateMoonPhase({ x: 30,
+                    y: 30,
+                    radius: 10,
+                    colong: 17.67904065262542 // longitude of the terminus
+})
+
+// var graticule = d3.geoGraticule();
+
+
+// TODO: understand why I need to use this, instead of .attr('fill', 'black')
+// svg.append("use")
+//     .attr("class", "fill")
+//     .attr("xlink:href", "#sphere");
+
+
+
+// svg.append('path')
+//     .attr("d", path({type: 'Point', coordinates: [10, 0]}))
+//     .attr('fill', 'white')
+//     .attr('stroke', 'white')
+//     .attr('stroke-width', 2);
+
+
+// svg.append("path")
+//     .datum(graticule)
+//     .attr("class", "graticule")
+//     .attr("d", path);
+
+// d3.json("/mbostock/raw/4090846/world-50m.json", function(error, world) {
+//   if (error) throw error;
+
+//   svg.insert("path", ".graticule")
+//       .datum(topojson.feature(world, world.objects.land))
+//       .attr("class", "land")
+//       .attr("d", path);
+
+//   svg.insert("path", ".graticule")
+//       .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+//       .attr("class", "boundary")
+//       .attr("d", path);
+// });
+
+
+// d3.select(self.frameElement).style("height", height + "px");
+
+</script>

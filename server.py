@@ -24,7 +24,7 @@ def display_chart():
 
 @app.route('/stars.json', methods=['POST'])
 def return_stars():
-    """return a json of star and constellation info, plus star field radius
+    """return a json of star, planet and constellation info, plus star field radius
     """
 
     lat = request.form.get('lat')
@@ -38,14 +38,11 @@ def return_stars():
                     localtime_string=localtime_string,
                     display_radius=STARFIELD_RADIUS)
 
-    stars = stf.get_stars()
-    consts = stf.get_consts()
-    planets = stf.get_planets()
-
-    return jsonify({'constellations': consts, 
-                    'radius': stf.display_radius, 
-                    'stars': stars,
-                    'planets': planets})
+    return jsonify({'radius': stf.display_radius,
+                    'constellations': stf.get_consts(),
+                    'stars': stf.get_stars(),
+                    'planets': stf.get_planets(), 
+                    'moon': stf.get_moon()})
 
 
 if __name__ == '__main__':

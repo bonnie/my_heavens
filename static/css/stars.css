@@ -53,3 +53,7 @@ div.planet-info {
 #starfield-controls {
     display: none;
 }
+
+.lit-moon {
+    pointer-events: none;
+}

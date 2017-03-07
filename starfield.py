@@ -13,7 +13,7 @@ from time_functions import to_utc
 from colors import PLANET_COLORS_BY_NAME
 
 # to determine which non-star objects to find
-NON_STARS = [ ephem.Sun, ephem.Moon, ephem.Mercury, ephem.Venus, ephem.Mars, 
+NON_STARS = [ ephem.Sun, ephem.Mercury, ephem.Venus, ephem.Mars, 
               ephem.Jupiter, ephem.Saturn, ephem.Neptune, ephem.Uranus ]
 
 # how datetime comes in from bootstrap. For example "2017-01-01T01:00"
@@ -58,6 +58,9 @@ class StarField(object):
         else:
             self.set_utc_time(localtime_string)
 
+        # make an ephemeris for planetary data
+        self.make_ephem()
+
 
     def __repr__(self):
         """Helpful representation when printed."""
@@ -87,6 +90,18 @@ class StarField(object):
         # update degrees to radians
         self.lat = parseLat(lat)
         self.lng = parseLon(lng)
+
+
+    def make_ephem(self):
+        """Generate an ephemeris for pyEphem planet positions."""
+
+        # alert ephem of starfield properties
+        self.ephem = ephem.Observer()
+        self.ephem.lon = self.lng_deg
+        self.ephem.lat = self.lat_deg
+
+        # ephem uses utctime
+        self.ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
 
 
     def get_timezone(self, localtime):
@@ -397,7 +412,7 @@ class StarField(object):
         return visible_consts
 
 
-    def get_planet_data(self, eph, planet):
+    def get_planet_data(self, planet):
         """Return a dict of planet data for the ephem object and planet object.
 
         Returns None if planet is not visible for this starfield.
@@ -409,10 +424,14 @@ class StarField(object):
          'magnitude': -2.21,
          'color': '#ffffc8'
          'size': 0.002 } # size is in pixels
+
+
+         Note: Moon also has one more key: colong
+        (the angle of the terminus of the lit hemisphere, in degrees)
         """
 
         # using the ephemeris way of getting data for a planet for this date
-        pla = planet(eph)
+        pla = planet(self.ephem)
 
         # if it's too dim, don't return it
         if pla.mag > self.max_mag:
@@ -436,6 +455,13 @@ class StarField(object):
         # translate size to pixels
         planet_data['size'] = self.get_pixel_size_from_arcsec(pla.size)
 
+        # for the moon, include the angle of the terminus of the lit half, 
+        # for phase drawing purposes
+        if planet == ephem.Moon:
+            colong_in_rad = pla.colong
+            colong_in_deg = pla.colong / math.pi * 180
+            planet_data['colong'] = colong_in_deg
+
         return planet_data
 
 
@@ -445,19 +471,23 @@ class StarField(object):
         see get_planet_data docstring for description of planet data dict
         """
 
-        # alert ephem of starfield properties
-        stf_ephem = ephem.Observer()
-        stf_ephem.lon = self.lng_deg
-        stf_ephem.lat = self.lat_deg
-
-        # ephem uses utctime
-        stf_ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
-
         planets = []
 
         for planet in NON_STARS:
-            pdata = self.get_planet_data(stf_ephem, planet)
+            pdata = self.get_planet_data(planet)
             if pdata:
                 planets.append(pdata)
 
         return planets
+
+
+    def get_moon(self):
+        """return a dict of moon data, transformed for d3. 
+
+        Since the moon is drawn so differently from the other planets (rendering
+        phases), it doesn't make sense to keep it in the same list as the planets
+
+        See get_planet_data docstring for dict details. 
+        """
+
+        return self.get_planet_data(ephem.Moon)

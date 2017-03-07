@@ -4,6 +4,9 @@
 // globals and functions //
 ///////////////////////////
 
+// globals to use across functions
+var sunMoonRadius, svgContainer, planetInfoDiv
+
 // when form is submitted (code in geocode.js)
 var getStars = function(lat, lng, datetime) {
 
@@ -30,26 +33,26 @@ var getStars = function(lat, lng, datetime) {
 // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 // TODO: make dimensions relative to radius, rather than hard-coded
 
-var showInfoWindow = function(d, windowDiv) {
+var addInfoWindowMouseOver = function(obj, d, windowDiv) {
 
-    // snazzy fading in
-    windowDiv.transition()        
-        .duration(200)      
-        .style("opacity", .9);   
+    obj.on("mouseover", function() {     
+            // snazzy fading in
+            windowDiv.transition()        
+                .duration(200)      
+                .style("opacity", .9);   
 
-    // add text and reposition   
-    windowDiv.html(d.name) // for now  
-        .style("left", (d.x + 2) + "px")     
-        .style("top", (d.y - 20) + "px");    
-}
+            // add text and reposition   
+            windowDiv.html(d.name) // for now  
+                .style("left", (d.x + 2) + "px")     
+                .style("top", (d.y - 20) + "px");    
 
-var hideInfoWindow = function(windowDiv) {
-
-    windowDiv.transition()        
+    })               
+    .on("mouseout", function(d) { windowDiv.transition()        
         .duration(500)      
-        .style("opacity", 0);   
-
+        .style("opacity", 0);  
+    });
 }
+
 // END: adaptation from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 
 
@@ -66,7 +69,11 @@ var getLine = d3.line()
 // d3 drawing //
 ////////////////
 
-function printSkyBackground(svgContainer, radius, planets) {
+function printSkyBackground(radius, planets) {
+    // print the sky background as light blue or a dark gradient, depending on 
+    // whether the sun is in the sky 
+
+    // uses global svgContainer
 
     // will be gradient or light blue depending on whether it's daytime
     var skyFill;
@@ -142,23 +149,75 @@ var revealPlanets = function() {
 
 }
 
+var generateMoonPhase = function(d) {
+  // simluate the phase of the moon based on colong, using a half-lit sphere
+  // append moon to svg parameter
+
+  // uses globals sunMoonData, planetInfoDiv and svgContainer
+
+  // TODO: rotate the moon appropriately! 
+
+  // create the projection
+  var projection = d3.geoOrthographic()
+      .scale(sunMoonRadius) // this determines the size of the moon
+      .translate([d.x, d.y]) // moon coords here
+      .clipAngle(90)
+      .precision(.1);
+
+  // create a path generator
+  var path = d3.geoPath()
+      .projection(projection);
+
+  // create the moon sphere
+  var moon = svgContainer.append("path")
+      .datum({type: "Sphere"})
+      .attr("id", "sphere")
+      .attr("d", path)
+      .attr('fill', 'black');
+
+  // create the lit hemisphere
+  var litHemisphere = d3.geoCircle()
+          // sets the circle center to the specified point [longitude, latitude] in degrees
+          // 0 degrees is on the left side of the sphere
+          .center([90 - d.colong, 0]) 
+          .radius(90) // sets the circle radius to the specified angle in degrees
+
+  // project the lit hemisphere onto the moon sphere
+  svgContainer.append('path')
+      .datum(litHemisphere)
+      .attr("d", path)
+      .attr('fill', 'white')
+      .attr('stroke', 'white')
+      .attr('stroke-width', 1)
+      .attr('class', 'lit-moon');
+
+  addInfoWindowMouseOver(moon, d, planetInfoDiv)
+
+}
+
 
 function printStarData(starData) {
     // success function for d3 ajax call to get star data
 
     console.log(starData);
 
+    // the radius for the sun and the moon
+    // sunMoonRadius is globally scoped
+    sunMoonRadius = starData.radius / 42
+
+    // constellation info
     var constInfo = starData.constellations;
 
     var svgBodySelection = d3.select('#star-field');
 
     // make a place to draw the stars
-    var svgContainer = svgBodySelection.append('svg')
+    // svgContainer is globally scoped
+    svgContainer = svgBodySelection.append('svg')
                                     .attr('width', 2 * starData.radius)
                                     .attr('height', 2 * starData.radius);
 
     // show the background
-    printSkyBackground(svgContainer, starData.radius, starData.planets);
+    printSkyBackground(starData.radius, starData.planets);
 
     // create constellations
     var constellations = svgContainer.selectAll('g.constellation-group')
@@ -294,11 +353,7 @@ function printStarData(starData) {
                              .attr('class', 'star-surround')
                              .style('opacity', 0);
 
-
-            surroundingStarCircle.on("mouseover", 
-                                        function(d) { showInfoWindow(d, starInfoDiv);})               
-                                 .on("mouseout", 
-                                        function(d) { hideInfoWindow(starInfoDiv);});
+            addInfoWindowMouseOver(surroundingStarCircle, d, starInfoDiv);
         }
     });
 
@@ -307,7 +362,8 @@ function printStarData(starData) {
     /////////////
 
     // One div for every planet info window
-    var planetInfoDiv = d3.select("body").append("div")   
+    // planetInfoDiv is globally scoped
+    planetInfoDiv = d3.select("body").append("div")   
         .attr("class", "planet-info info")               
         .style("opacity", 0)
         .style('border-radius', '4px');            
@@ -325,19 +381,14 @@ function printStarData(starData) {
         var planet = d3.select(this).attr('cx', d.x)
                         .attr('cy', d.y)
                         .attr('fill', d.color)
-                        .on("mouseover", function(d) { showInfoWindow(d, planetInfoDiv);})               
-                        .on("mouseout", function(d) { hideInfoWindow(planetInfoDiv);});
+
+        addInfoWindowMouseOver(planet, d, planetInfoDiv)
 
         if (d.name === 'Sun') {
 
             planet.attr('class', 'sun')
-                  .attr('r', starData.radius / 42);
+                  .attr('r', sunMoonRadius);
             
-        } else if (d.name === 'Moon') {
-
-            planet.attr('class', 'moon')
-                  .attr('r', starData.radius / 42);
-
         } else {
             // let smaller planets be sized according to magnitude
             planet.attr('r', (5 - d.magnitude) * 0.5);
@@ -345,6 +396,17 @@ function printStarData(starData) {
 
     
     });
+
+    //////////
+    // Moon //
+    //////////
+
+    generateMoonPhase(starData.moon);
+
+
+    //////////////
+    // controls //
+    //////////////
 
     // show the starfield controls 
     $('#starfield-controls').show();

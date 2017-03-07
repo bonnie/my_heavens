@@ -40,6 +40,9 @@ var processFormInputs = function(latlng) {
         }
     }
 
+    // disable the button
+    $('#show-stars').attr('disabled', 'disabled');
+
     // getStars is defined in stars-d3.js
     getStars(latlng.lat, latlng.lng, datetime);
 

@@ -410,6 +410,9 @@ function printStarData(starData) {
     // controls //
     //////////////
 
+    // re-enable the "show stars" button
+    $('#show-stars').removeAttr('disabled')
+
     // show the starfield controls 
     $('#starfield-controls').show();
 

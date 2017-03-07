@@ -123,6 +123,10 @@ function printSkyBackground(radius, planets) {
 }
 
 var revealPlanets = function() {
+    // make planets grow and shrink to highlight their position(s)
+    // TODO: label planets during reveal
+    // TODO: post message (in error div?) if no planets are visible 
+    //        e.g.  berkeley 1/1/2017 1:00 AM
 
     var trans1time = 1000
     var trans2time = 1000
@@ -158,6 +162,11 @@ var generateMoonPhase = function(d) {
   // uses globals sunMoonData, planetInfoDiv, sunInSky, daySkyColor and svgContainer
 
   // TODO: rotate the moon appropriately! 
+
+  if (d === null) {
+    // the moon isn't out; nothing to draw
+    return;
+  }
 
   // create the projection
   var projection = d3.geoOrthographic()

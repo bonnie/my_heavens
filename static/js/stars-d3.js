@@ -370,31 +370,48 @@ function printStarData(starData) {
         .style("opacity", 0)
         .style('border-radius', '4px');            
 
-    // create circle for planet
-    var planets = svgContainer.selectAll('circle.planet')
+    // create group for planet
+    var planets = svgContainer.selectAll('g.planet')
                             .data(starData.planets)
                             .enter()
-                            .append('circle')
-                            .attr('class', 'planet');
+                            .append('g')
+                            .attr('class', 'planet-group');
 
     // add details
     planets.each(function(d) {
         
-        var planet = d3.select(this).attr('cx', d.x)
+        var thisPlanet = d3.select(this);
+
+        var planet = thisPlanet.append('circle')
+                        .attr('cx', d.x)
                         .attr('cy', d.y)
                         .attr('fill', d.color)
+                        .attr('class', 'planet');
 
-        addInfoWindowMouseOver(planet, d, planetInfoDiv)
-
+        var planetRadius
         if (d.name === 'Sun') {
 
+            planetRadius = sunMoonRadius
             planet.attr('class', 'sun')
-                  .attr('r', sunMoonRadius);
+                  .attr('r', planetRadius);
             
         } else {
             // let smaller planets be sized according to magnitude
-            planet.attr('r', (5 - d.magnitude) * 0.5);
+            planetRadius = (5 - d.magnitude) * 0.5
+            planet.attr('r', planetRadius);
         }
+
+        // make a surrounding circle for tiny planets
+        // (I'm looking at you, mercury)
+
+        var surroundingPlanetCircle = thisPlanet.append('circle')
+                        .attr('cx', d.x)
+                        .attr('cy', d.y)
+                        .attr('r', planetRadius < 4 ? 4 : planetRadius)
+                        .attr('opacity', 0);
+
+        addInfoWindowMouseOver(surroundingPlanetCircle, d, planetInfoDiv);
+
 
     
     });

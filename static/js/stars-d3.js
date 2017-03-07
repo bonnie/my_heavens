@@ -184,7 +184,8 @@ var generateMoonPhase = function(d) {
       .datum({type: "Sphere"})
       .attr("id", "sphere")
       .attr("d", path)
-      .attr('fill', sunInSky ? daySkyColor : 'black');
+      .attr('opacity', 0);
+
 
   // create the lit hemisphere
   var litHemisphere = d3.geoCircle()

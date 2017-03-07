@@ -26,11 +26,11 @@ var makeMoonPhasePath = function(d, svg) {
 
         // draw the moon crescent
 
-        var xTop = d.x + d.radius
-        var yTop = d.y - d.radius
+        var xStart = d.x
+        var yStart = d.y - d.radius
 
-        var xBottom = xTop + 2 * d.radius
-        var yBottom = xBottom + 2 * d.radius
+        var xEnd = xStart
+        var yEnd = yStart + 2 * d.radius
 
         // The LargeArcFlag has a value of either 0 or 1, and determines whether 
         // the smallest (0) or largest (1) arc possible is drawn.
@@ -38,13 +38,54 @@ var makeMoonPhasePath = function(d, svg) {
         var smallArc = 0
 
         // The SweepFlag is either 0 or 1, and determines if the arc should be swept in a clockwise (1) or anti-clockwise (0) direction.
-        var clockwise = 
-        
+        var clockwise = 1
+        var antiClockwise = 0
 
-        var pathString = 'M ' + xTop + ' ' + yTop; // starting point at the top
-        
+        // all my curves are circles, so the rotation doesn't matter
+        var rotation = 0
 
-        p += 'A 100 100 0 1 1 150 250'; // curve around the outside to the bottom, clockwise
+        var pathString = 'M ' + xStart + ' ' + yStart; // starting point at the top
+        
+        // curve around the outside to the bottom, clockwise
+        // path += 'A 100 100 0 1 1 150 250'; 
+        firstCurve = 'A';
+        firstCurve += ' ' + d.radius;
+        firstCurve += ' ' + d.radius;
+        firstCurve += ' ' + rotation;
+        firstCurve += ' ' + largeArc;
+        firstCurve += ' ' + clockwise;
+        firstCurve += ' ' + xEnd;
+        firstCurve += ' ' + yEnd;
+
+        path += firstCurve;
+
+        // curve back to the top, anticlockwise
+        if (d.phase === 0.5) {
+            // if it's exactly half, just draw a straight line
+
+            pathString += 'L ' + xStart + ' ' + yStart;
+
+        } else {
+
+            // is it crescent or gibbous? 
+            secondCurveSweep = d.phase > 0.5 ? antiClockwise : clockwise;
+
+            ellipseRadius = 
+
+            secondCurve = 'A';
+            secondCurve += ' ' + ellipseRadius;
+            secondCurve += ' ' + ellipseRadius;
+            secondCurve += ' ' + smallArc;
+            secondCurve += ' ' + secondCurveSweep;
+            secondCurve += ' ' + xStart;
+            secondCurve += ' ' + yStart;
+
+            pathString += secondCurve;
+
+        }
+
+
+
         p += 'A 200 200 0 0 0 150 50'; // curve back to the top, anticlockwise
 
         return pathString

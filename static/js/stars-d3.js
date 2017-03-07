@@ -5,7 +5,8 @@
 ///////////////////////////
 
 // globals to use across functions
-var sunMoonRadius, svgContainer, planetInfoDiv
+var sunMoonRadius, svgContainer, planetInfoDiv, sunInSky
+var daySkyColor = '#4169E1'
 
 // when form is submitted (code in geocode.js)
 var getStars = function(lat, lng, datetime) {
@@ -73,12 +74,13 @@ function printSkyBackground(radius, planets) {
     // print the sky background as light blue or a dark gradient, depending on 
     // whether the sun is in the sky 
 
-    // uses global svgContainer
+    // uses global svgContainer, daySkyColor
+    // sets global sunInSky
 
     // will be gradient or light blue depending on whether it's daytime
     var skyFill;
 
-    var sunInSky = false;
+    sunInSky = false;
 
     // check to see if the sun is in the sky
     for (var i=0; i < planets.length; i++) {
@@ -89,7 +91,7 @@ function printSkyBackground(radius, planets) {
 
     if (sunInSky) {
         // If so, make background lighter blue
-        skyFill = '#4169E1'
+        skyFill = daySkyColor
 
     } else {
         // print the radial gradient for the sky background
@@ -153,7 +155,7 @@ var generateMoonPhase = function(d) {
   // simluate the phase of the moon based on colong, using a half-lit sphere
   // append moon to svg parameter
 
-  // uses globals sunMoonData, planetInfoDiv and svgContainer
+  // uses globals sunMoonData, planetInfoDiv, sunInSky, daySkyColor and svgContainer
 
   // TODO: rotate the moon appropriately! 
 
@@ -173,7 +175,7 @@ var generateMoonPhase = function(d) {
       .datum({type: "Sphere"})
       .attr("id", "sphere")
       .attr("d", path)
-      .attr('fill', 'black');
+      .attr('fill', sunInSky ? daySkyColor : 'black');
 
   // create the lit hemisphere
   var litHemisphere = d3.geoCircle()

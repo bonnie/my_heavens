@@ -24,7 +24,6 @@ pyparsing==2.1.10
 pytz==2016.10
 requests==2.13.0
 scandir==1.4
-Shapely==1.5.17.post1
 simplegeneric==0.8.1
 six==1.10.0
 SQLAlchemy==1.1.5

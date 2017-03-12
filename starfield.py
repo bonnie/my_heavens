@@ -117,7 +117,8 @@ class StarField(object):
         Use python tzwhere library api to get timezone."""
 
         # if lat/lng don't have known time zone, return UTC
-        # TODO: inform user of this error
+        # TODO: make guesses based on longitude: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+        # TODO: inform user if error
         timezone_str = TZW.tzNameAt(self.lat_deg, self.lng_deg) or 'Etc/UTC'
 
         return pytz.timezone(timezone_str)
@@ -371,16 +372,21 @@ class StarField(object):
         # otherwise, gather data
         planet_data = {}
 
-        planet_data['alt'] = pla.alt
-        planet_data['az'] = pla.az
+        # sidereal and ephem don't always agree on translating ra and dec to
+        # alt and az. At this point, I trust sidereal more, which is why I'm
+        # not just using pla.alt and pla.az (get_display_coords uses sidereal)
+        altaz = self.get_display_coords(pla.ra, pla.dec)
+
+        planet_data['alt'] = altaz['alt']
+        planet_data['az'] = altaz['az']
         planet_data['magnitude'] = pla.mag
         planet_data['name'] = pla.name
         planet_data['color'] = PLANET_COLORS_BY_NAME[pla.name]
         planet_data['size'] = pla.size
 
 
-        # for the moon, include the angle of the terminus of the lit half, 
-        # for phase drawing purposes
+        # for the moon, include the longitude of the terminus of the lit half, 
+        # for phase drawing purposes, plus calculate the rotation
         if planet == ephem.Moon:
 
             # translate colong into degrees

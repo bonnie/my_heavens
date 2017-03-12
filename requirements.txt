@@ -11,7 +11,6 @@ ipython-genutils==0.1.0
 itsdangerous==0.24
 Jinja2==2.9.5
 MarkupSafe==0.23
-numpy==1.12.0
 packaging==16.8
 pathlib2==2.2.1
 pexpect==4.2.1
@@ -25,6 +24,7 @@ pyparsing==2.1.10
 pytz==2016.10
 requests==2.13.0
 scandir==1.4
+Shapely==1.5.17.post1
 simplegeneric==0.8.1
 six==1.10.0
 SQLAlchemy==1.1.5

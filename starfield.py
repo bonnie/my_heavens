@@ -166,7 +166,11 @@ class StarField(object):
         ha = coords.hourAngle(self.utctime, self.lng)
         altaz = coords.altAz(ha, self.lat)
 
-        return {'alt': altaz.alt, 'az': altaz.az}
+        # translate raidans to degrees
+        alt_deg = rad_to_deg(altaz.alt)
+        az_deg = rad_to_deg(altaz.az)
+
+        return {'alt': alt_deg, 'az': az_deg}
 
 
     def get_stars(self):

@@ -5,8 +5,10 @@
 ///////////////////////////
 
 // globals to use across functions
-var sunMoonRadius, svgContainer, planetInfoDiv, sunInSky
+var sunMoonRadius, planetInfoDiv, sunInSky, svgContainer
+var skySphere, skyProjection, skyPath, skyObjects, skyTransform
 var daySkyColor = '#4169E1'
+var skyRadius = 300
 
 // when form is submitted (code in geocode.js)
 var getStars = function(lat, lng, datetime) {
@@ -26,7 +28,7 @@ var getStars = function(lat, lng, datetime) {
         .response(function(xhr) { return JSON.parse(xhr.responseText); })
         .header("Content-Type","application/x-www-form-urlencoded")
         // .on('progress', function()) // TODO: show progress bar!
-        .post(data, printStarData);
+        .post(data, drawSkyData);
 
 }
 
@@ -70,11 +72,11 @@ var getLine = d3.line()
 // d3 drawing //
 ////////////////
 
-function printSkyBackground(radius, planets) {
+function printSkyBackground(planets) {
     // print the sky background as light blue or a dark gradient, depending on 
     // whether the sun is in the sky 
 
-    // uses global svgContainer, daySkyColor
+    // uses global svgContainer, daySkyColor, skyRadius
     // sets global sunInSky
 
     // will be gradient or light blue depending on whether it's daytime
@@ -116,9 +118,9 @@ function printSkyBackground(radius, planets) {
     }
 
     var background = svgContainer.append('circle')
-                              .attr('cx', radius)
-                              .attr('cy', radius)
-                              .attr('r', radius)
+                              .attr('cx', skyRadius)
+                              .attr('cy', skyRadius)
+                              .attr('r', skyRadius)
                               .style("fill", skyFill);
 }
 
@@ -155,85 +157,61 @@ var revealPlanets = function() {
 
 }
 
-var generateMoonPhase = function(d) {
-  // simluate the phase of the moon based on colong, using a half-lit sphere
-  // append moon to svg parameter
-
-  // uses globals sunMoonData, planetInfoDiv, sunInSky, daySkyColor and svgContainer
-
-  // TODO: rotate the moon appropriately! 
-
-  if (d === null) {
-    // the moon isn't out; nothing to draw
-    return;
-  }
-
-  // create the projection
-  var projection = d3.geoOrthographic()
-      .scale(sunMoonRadius) // this determines the size of the moon
-      .translate([d.x, d.y]) // moon coords here
-      .clipAngle(90)
-      .precision(.1);
-
-  // create a path generator
-  var path = d3.geoPath()
-      .projection(projection);
-
-  // create the moon sphere
-  var moon = svgContainer.append("path")
-      .datum({type: "Sphere"})
-      .attr("id", "sphere")
-      .attr("d", path)
-      .attr('opacity', 0);
+///////////////////////////////////
+// functions to draw sky objects //
+///////////////////////////////////
 
 
-  // create the lit hemisphere
-  var litHemisphere = d3.geoCircle()
-          // sets the circle center to the specified point [longitude, latitude] in degrees
-          // 0 degrees is on the left side of the sphere
-          .center([90 - d.colong, 0]) 
-          .radius(90) // sets the circle radius to the specified angle in degrees
+var drawConstellations = function(constData) {
+    // draw constellation lines and boundaries
+    // uses global skyObjects
 
-  // project the lit hemisphere onto the moon sphere
-  svgContainer.append('path')
-      .datum(litHemisphere)
-      .attr("d", path)
-      .attr('fill', 'white')
-      .attr('stroke', 'white')
-      .attr('stroke-width', 1)
-      .attr('class', 'lit-moon');
-
-  addInfoWindowMouseOver(moon, d, planetInfoDiv)
-
-}
+// -- const bounds should be returned in skyData as a LineString, and 
+// -- const lines should be returned as a MultiLineString
 
 
-function printStarData(starData) {
-    // success function for d3 ajax call to get star data
+// var geoLineString = {
+//         "type": "LineString",
+//         "coordinates": [
+//             [ -101.744384765625,   39.32155002466662  ],
+//             [ -101.5521240234375,  39.330048552942415 ],
+//             [ -101.40380859375,    39.330048552942415 ],
+//             [ -101.33239746093749, 39.364032338047984 ],
+//             [ -101.041259765625,   39.36827914916011  ],
+//             [ -100.975341796875,   39.30454987014581  ],
+//             [ -100.9149169921875,  39.24501680713314  ],
+//             [ -100.843505859375,   39.16414104768742  ],
+//             [ -100.8050537109375,  39.104488809440475 ],
+//             [ -100.491943359375,   39.10022600175347  ],
+//             [ -100.43701171875,    39.095962936305476 ],
+//             [ -100.338134765625,   39.095962936305476 ],
+//             [ -100.1953125,        39.027718840211605 ],
+//             [ -100.008544921875,   39.01064750994083  ],
+//             [ -99.86572265625,     39.00211029922512  ],
+//             [ -99.6844482421875,   38.97222194853654  ],
+//             [ -99.51416015625,     38.929502416386605 ],
+//             [ -99.38232421875,     38.92095542046727  ],
+//             [ -99.3218994140625,   38.89530825492018  ],
+//             [ -99.1131591796875,   38.86965182408357  ],
+//             [ -99.0802001953125,   38.85682013474361  ],
+//             [ -98.82202148437499,  38.85682013474361  ],
+//             [ -98.44848632812499,  38.84826438869913  ],
+//             [ -98.20678710937499,  38.84826438869913  ],
+//             [ -98.02001953125,     38.8782049970615   ],
+//             [ -97.635498046875,    38.87392853923629  ]
+//         ]
+//     };
 
-    console.log(starData);
+// // GeoJSON LineString Example Path Data
+// geoPath(geoLineString);
 
-    // the radius for the sun and the moon
-    // sunMoonRadius is globally scoped
-    sunMoonRadius = starData.radius / 42
+// var lineStringPath = svgContainer
+//   .append("path")
+//     .attr("d", geoPath(geoLineString))
+//     .style("stroke", "#FF00FF");
 
-    // constellation info
-    var constInfo = starData.constellations;
-
-    var svgBodySelection = d3.select('#star-field');
-
-    // make a place to draw the stars
-    // svgContainer is globally scoped
-    svgContainer = svgBodySelection.append('svg')
-                                    .attr('width', 2 * starData.radius)
-                                    .attr('height', 2 * starData.radius);
-
-    // show the background
-    printSkyBackground(starData.radius, starData.planets);
-
-    // create constellations
-    var constellations = svgContainer.selectAll('g.constellation-group')
-        .data(constInfo)
+    var constellations = skyObjects.selectAll('g.constellation-group')
+        .data(constData)
         .enter()
         .append('g')
         .attr('class', 'constellation-group')
@@ -261,6 +239,14 @@ function printStarData(starData) {
         //////////////////////////
         // constellation bounds //
         //////////////////////////
+
+
+        // create constellation boundaries
+        var constBounds = d3.geoPath()
+          // sets the circle center to the specified point [longitude, latitude] in degrees
+          // 0 degrees is on the left side of the sphere
+          .center([90 - d.colong, 0]) 
+          .radius(90) // sets the circle radius to the specified angle in degrees
 
 
         // create constellation boundaries
@@ -311,7 +297,7 @@ function printStarData(starData) {
             .attr('class', 'const-name');
 
         // position for label text
-        var label_pos = getConstLabelCoords(d.bound_verts, starData.radius, 
+        var label_pos = getConstLabelCoords(d.bound_verts, skyRadius, 
                                 getFloatFromPixels(constLabel.style('width')),
                                 getFloatFromPixels(constLabel.style('height')));
 
@@ -321,11 +307,11 @@ function printStarData(starData) {
 
 
     });
-                
+}
 
-    ///////////
-    // stars //
-    ///////////
+var drawStars = function(starData) {
+    // draw the stars on the sphere of the sky
+    // uses globals skyObjects, skyProjection
 
     // One div for every star info window
     var starInfoDiv = d3.select("body").append("div")   
@@ -335,8 +321,8 @@ function printStarData(starData) {
 
 
     // add the star groups
-    var stars = svgContainer.selectAll('g.star-group')
-                            .data(starData.stars)
+    var stars = skyObjects.selectAll('g.star-group')
+                            .data(starData)
                             .enter()
                             .append('g')
                             .attr('class', 'star-group');
@@ -346,32 +332,44 @@ function printStarData(starData) {
 
         var thisStar = d3.select(this);
 
+    // svg.selectAll("circle")
+    //     .data([aa,bb]).enter()
+    //     .append("circle")
+    //     .attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+    //     .attr("cy", function (d) { return projection(d)[1]; })
+    //     .attr("r", "8px")
+    //     .attr("fill", "red")
+
         // circle to represent star
         var starCircle = thisStar.append('circle')
-                             .attr('cx', d.x)
-                             .attr('cy', d.y)
                              .attr('r', (5 - d.magnitude) * 0.5)
+                             .attr('transform', skyTransform(d.alt, d.az))
                              .attr('fill', d.color)
                              .attr('class', 'star')
                              .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
-        if (d.name !== null) {
-            // make a surrounding circle for the mouseover, as some stars are too 
-            // small to mouse over effectively
-            var surroundingStarCircle = thisStar.append('circle')
-                             .attr('cx', d.x)
-                             .attr('cy', d.y)
-                             .attr('r', 4)
-                             .attr('class', 'star-surround')
-                             .style('opacity', 0);
+        // if (d.name !== null) {
+        //     // make a surrounding circle for the mouseover, as some stars are too 
+        //     // small to mouse over effectively
+        //     var surroundingStarCircle = thisStar.append('circle')
+        //                      .attr('cx', d.x)
+        //                      .attr('cy', d.y)
+        //                      .attr('r', 4)
+        //                      .attr('class', 'star-surround')
+        //                      .style('opacity', 0);
 
-            addInfoWindowMouseOver(surroundingStarCircle, d, starInfoDiv);
-        }
+            // addInfoWindowMouseOver(surroundingStarCircle, d, starInfoDiv);
+        // }
     });
+}
 
-    /////////////
-    // planets //
-    /////////////
+var drawPlanets = function(planetData) {
+    // draw planets on sky sphere
+    // uses globals skySphere, skyProjection, sunMoonRadius
+
+    // the radius for the sun and the moon
+    // sunMoonRadius is globally scoped
+    sunMoonRadius = skyRadius / 42;
 
     // One div for every planet info window
     // planetInfoDiv is globally scoped
@@ -382,7 +380,7 @@ function printStarData(starData) {
 
     // create group for planet
     var planets = svgContainer.selectAll('g.planet')
-                            .data(starData.planets)
+                            .data(skyData.planets)
                             .enter()
                             .append('g')
                             .attr('class', 'planet-group');
@@ -425,12 +423,186 @@ function printStarData(starData) {
 
     
     });
+}
+
+
+var drawMoon = function(moonData) {
+  // simluate the phase of the moon based on colong, using a half-lit sphere
+  // append moon to svg parameter
+
+  // uses globals sunMoonData, planetInfoDiv, sunInSky, daySkyColor and svgContainer
+
+  // TODO: rotate the moon appropriately! 
+
+  if (moonData === null) {
+    // the moon isn't out; nothing to draw
+    return;
+  }
+
+  // create the projection
+  var moonProjection = d3.geoOrthographic()
+      .scale(sunMoonRadius) // this determines the size of the moon
+      .translate([d.x, d.y]) // moon coords here
+      .clipAngle(90)
+      .precision(.1)
+      .rotate([0, 0, d.rotation]); // rotate the moon so the lit part points to the sun
+
+  // create a path generator
+  var moonPath = d3.geoPath()
+      .projection(moonProjection);
+
+  // create the moon sphere
+  var moon = svgContainer.append("path")
+      .datum({type: "Sphere"})
+      .attr("id", "moon-sphere")
+      .attr("d", moonPath)
+      .attr('opacity', 0);
+
+
+  // create the lit hemisphere
+  var litHemisphere = d3.geoCircle()
+          // sets the circle center to the specified point [longitude, latitude] in degrees
+          // 0 degrees is on the left side of the sphere
+          .center([90 - d.colong, 0]) 
+          .radius(90) // sets the circle radius to the specified angle in degrees
+
+  // project the lit hemisphere onto the moon sphere
+  svgContainer.append('path')
+      .datum(litHemisphere)
+      .attr("d", moonPath)
+      .attr('fill', 'white')
+      .attr('stroke', 'white')
+      .attr('stroke-width', 1)
+      .attr('class', 'lit-moon');
+
+  addInfoWindowMouseOver(moon, d, planetInfoDiv)
+
+}
+
+
+////////////////////////////
+// main printing function //
+////////////////////////////
+
+function drawSkyData(error, skyData) {
+    // success function for d3 ajax call to get star data
+
+    // clear previous errors and warnings
+    // errorDiv and warnDiv defined in star-page-control.js
+    errorDiv.empty().hide();
+    warnDiv.empty().hide();
+
+    //////////////////
+    // handle error //
+    //////////////////
+
+    if (error) {
+
+        // display error
+        var errorTxt = error.srcElement.statusText;
+        if (errorTxt === 'INTERNAL SERVER ERROR') {
+            errorTxt = 'The server could not complete this request.';
+            errorTxt += ' Please contact the system administrator.';
+        }
+
+        errorDiv.show();
+        errorDiv.html(errorTxt);
+        console.log(error);
+
+        // re-enable the "show stars" button
+        $('#show-stars').removeAttr('disabled');
+        return;
+    } 
+
+    console.log(skyData);
+
+    /////////////////////
+    // handle warnings //
+    /////////////////////
+
+    // TODO: send warnings with star data
+
+
+    ////////////////
+    // create svg //
+    ////////////////
+
+    var svgBodySelection = d3.select('#star-field');
+
+    // make a place to draw the stars
+    // svgContainer is globally scoped
+    svgContainer = svgBodySelection.append('svg')
+                                    .attr('width', 2 * skyRadius)
+                                    .attr('height', 2 * skyRadius);
+
+    ////////////////////////
+    // sphere for the sky //
+    ////////////////////////
+
+    // all of these are global, since they will be used in lots of functions
+
+    /////// new idea: just send ra and dec (in degrees), plot, and rotate sphere
+    /////// load in background while the person is choosing city and time
+    /////// genius!!
+
+    // create the projection for the sphere of the sky
+    skyProjection = d3.geoOrthographic()
+        .scale(skyRadius) 
+        .translate([skyRadius, skyRadius]) 
+        .clipAngle(90)
+        .precision(.1)
+        // point north up instead of to the right
+        .rotate([0, 0, 90]);
+
+    // create a path generator for the sphere of the sky
+    skyPath = d3.geoPath()
+        .projection(skyProjection);
+
+    // for transforming alt/az coords onto sky sphere
+    skyTransform = function(alt, az) {       
+         return 'translate(' + skyProjection([alt, az]) + ')';
+    };
+
+    skySphere = svgContainer.append("path")
+      .datum({type: "Sphere"})
+      .attr("id", "sky-sphere")
+      .attr("d", skyPath)
+      // .attr('opacity', 0);
+      .attr('fill', 'black');
+
+
+    // for zooming, make a group for all the contents of the skySphere
+    skyObjects = svgContainer.append('g')
+        .attr('id', 'all-sky-objects')
+
+    // show the background
+    // printSkyBackground(skyData.planets);
+
+
+    ////////////////////
+    // constellations //
+    ////////////////////
+
+    // drawConstellations(skyData.constellations);
+
+
+    ///////////
+    // stars //
+    ///////////
+
+    drawStars(skyData.stars);
+
+    /////////////
+    // planets //
+    /////////////
+
+    // drawPlanets(SkyData.planets);
 
     //////////
     // Moon //
     //////////
 
-    generateMoonPhase(starData.moon);
+    // drawMoon(skyData.moon);
 
 
     //////////////

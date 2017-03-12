@@ -53,7 +53,8 @@ var generateMoonPhase = function(d) {
       .scale(moonRadius) // this determines the size of the moon
       .translate([d.x, d.y]) // moon coords here
       .clipAngle(90)
-      .precision(.1);
+      .precision(.1)
+      .rotate([0, 0, 90]);
 
   // create a path generator
   var path = d3.geoPath()
@@ -88,9 +89,9 @@ var generateMoonPhase = function(d) {
 
 }
 
-generateMoonPhase({ x: 30,
-                    y: 30,
-                    radius: 10,
+generateMoonPhase({ x: 150,
+                    y: 150,
+                    radius: 100,
                     colong: 17.67904065262542 // longitude of the terminus
 })
 

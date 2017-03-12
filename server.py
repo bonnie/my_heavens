@@ -32,14 +32,12 @@ def return_stars():
     localtime_string = request.form.get('datetime')
     max_magnitude = 5 # dimmest stars to show
 
-    stf = StarField(lat=lat,
-                    lng=lng,
+    stf = StarField(lat=float(lat),
+                    lng=float(lng),
                     max_mag=max_magnitude,
-                    localtime_string=localtime_string,
-                    display_radius=STARFIELD_RADIUS)
+                    localtime_string=localtime_string)
 
-    return jsonify({'radius': stf.display_radius,
-                    'constellations': stf.get_consts(),
+    return jsonify({'constellations': stf.get_consts(),
                     'stars': stf.get_stars(),
                     'planets': stf.get_planets(), 
                     'moon': stf.get_moon()})

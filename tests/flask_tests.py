@@ -10,6 +10,9 @@ sys.path.append('..')
 from server import app
 from run_tests import DbTestCase
 
+# for posting to stars.json
+TEST_DATETIME_STRING = '2017-03-01T21:00'
+
 
 class FlaskTests(TestCase):
     """Test Flask functionality."""
@@ -28,6 +31,8 @@ class FlaskTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('<title>Star Charts</title>', response.data)
 
+
+    # TODO: add lots more tests here
 
 class FlaskTestsWithDb(DbTestCase):
     """Test Flask routes requiring db.
@@ -53,10 +58,13 @@ class FlaskTestsWithDb(DbTestCase):
     def test_star_data_json(self):
         """Test json returned for stars and constellations."""
 
-        response = self.client.get('/stars.json')
+        # lat, lng and datetime don't matter for this test
+        data = {'lat': 0, 'lng': 0}
+
+        response = self.client.post('/stars.json', data=data)
         json_dict = json.loads(response.data)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.content_type, 'application/json')
         self.assertEqual(set(json_dict.keys()), 
-                         set(['constellations', 'radius', 'stars']))
+                         set(['constellations', 'stars', 'planets', 'moon']))

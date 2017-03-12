@@ -3,36 +3,50 @@
 from unittest import TestCase
 import math
 from datetime import datetime
+import pytz
+import ephem
 
 # be able to import from parent dir
 import sys
 sys.path.append('..')
 
 from model import Constellation
-from starfield import StarField
-from run_tests import DbTestCase
+from starfield import rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
+from run_tests import MarginTestCase, DbTestCase
 
-TEST_RADIUS = 100
 MAX_MAG = 5
 
-# 9pm PST on March 1, 2017 (which is 5am on March 2 in utc)
-TEST_DATETIME = datetime(2017, 3, 2, 5, 0, 0)
+# acceptable margin when comparing floats
+MARGIN = 0.005
+
+# 9pm on March 1, 2017 (local time)
+TEST_DATETIME = datetime(2017, 3, 1, 21, 0, 0)
+TEST_DATETIME_STRING = datetime.strftime(TEST_DATETIME, BOOTSTRAP_DTIME_FORMAT)
+
+# expected data sets
+CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium'])
+COORDS_KEY_SET = set(['alt', 'az'])
+SKYOBJECT_KEY_SET = COORDS_KEY_SET | set(['color', 'magnitude', 'name'])
+PLANET_KEY_SET = SKYOBJECT_KEY_SET | set(['size'])
+
+# expected planets for star field settings 
+BRIGHT_PLANET_NAMES_SET = set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Sun'])
 
 # test lat/lngs: johannesburg
 J_LAT = -26.2041
 J_LNG = 28.0473
 J_LAT_RAD = -0.45734782252184614
 J_LNG_RAD = 0.4895177312946056
-J_STF = StarField(lat=J_LAT, lng=J_LNG, utctime=TEST_DATETIME, 
-                    display_radius=TEST_RADIUS, max_mag=MAX_MAG)
+J_STF = StarField(lat=J_LAT, lng=J_LNG, max_mag=MAX_MAG, 
+                  localtime_string=TEST_DATETIME_STRING)
 
 # test lat/lngs: sf
 SF_LAT = 37.7749
 SF_LNG = -122.4194
 SF_LAT_RAD = 0.659296379611606
 SF_LNG_RAD = 4.14656370886364
-SF_STF = StarField(lat=SF_LAT, lng=SF_LNG, utctime=TEST_DATETIME,
-                     display_radius=TEST_RADIUS, max_mag=MAX_MAG)
+SF_STF = StarField(lat=SF_LAT, lng=SF_LNG, max_mag=MAX_MAG, 
+                    localtime_string=TEST_DATETIME_STRING)
 
 # Rigel
 R_RA = 1.372
@@ -43,11 +57,36 @@ AT_RA = 4.851
 AT_DEC = -0.801
 
 
-class StarFieldTestsWithoutDb(TestCase):  
+class StarFieldTestsWithoutDb(MarginTestCase):  
     """Test calculations to retrieve star and constellation data.
 
     This class is for tests that do not require the database.
     """
+
+    #########################################################
+    # radians -> degrees utility function
+    #########################################################
+
+    def test_radians_to_degrees_positive(self):
+        """Test a positive radians -> degrees conversion."""
+
+        rads = rad_to_deg(math.pi / 8)
+        self.assertEqual(rads, 22.5)
+
+
+    def test_radians_to_degrees_negative(self):
+        """Test a negative radians -> degrees conversion."""
+
+        rads = rad_to_deg(-math.pi)
+        self.assertEqual(rads, -180)
+
+
+    def test_radians_to_degrees_zero(self):
+        """Test a zero radians -> degrees conversion."""
+
+        rads = rad_to_deg(0)
+        self.assertEqual(rads, 0)
+
 
     #########################################################
     # Lat/Lng from degrees to radians 
@@ -58,9 +97,9 @@ class StarFieldTestsWithoutDb(TestCase):
 
         # this is a little artificial, to set the lat and lng directly, but it's
         # the only way to separate out this method from __init__
-        stf = StarField(lat=0, lng=0, display_radius=TEST_RADIUS)
-        stf.lat = lat
-        stf.lng = lng
+        stf = StarField(lat=0, lng=0)
+        stf.lat_deg = lat
+        stf.lng_deg = lng
 
         stf.update_latlng_rads()
 
@@ -85,135 +124,279 @@ class StarFieldTestsWithoutDb(TestCase):
 
 
     #########################################################
-    # Polar to Cartesian Tests 
+    # starfield time zones
     #########################################################
 
-    def pol2cart_test(self, rho, phi, expected_x, expected_y):
-        """generalized pol2cart test to avoid repeated code"""
+    def test_sf_timezone(self):
+        """Test getting time zone for san francisco."""
 
-        # dummy stfield to use for the radius
-        stf = StarField(lat=0, lng=0, display_radius=TEST_RADIUS)
-        x, y = stf.pol2cart(rho, phi)
-
-        self.assertEqual(x, expected_x)
-        self.assertEqual(y, expected_y)
+        tz = SF_STF.get_timezone()
+        self.assertEqual(tz.zone, 'America/Los_Angeles')
 
 
-    def test_pol2cart_north_horizon(self):
-        """Test polar to cartesian coordinates, for a point on northern horizon.
-        """
+    def test_johannesburg_timezone(self):
+        """Test getting time zone for san francisco."""
 
-        self.pol2cart_test(rho=TEST_RADIUS,
-                           phi=0,
-                           expected_x=TEST_RADIUS,
-                           expected_y=0)
+        tz = J_STF.get_timezone()
+        self.assertEqual(tz.zone, 'Africa/Johannesburg')
 
 
-    def test_pol2cart_overhead(self):
-        """Test polar to cartesian coordinates, for a point straight overhead.
+    def test_zero_zero_timezone(self):
+        """Test getting time zone for lat/lng that has no time zone.
 
-        phi is negative for this test.
-        """
+        In this case, we return utc."""
 
-        self.pol2cart_test(rho=0,
-                           phi=0,
-                           expected_x=TEST_RADIUS,
-                           expected_y=TEST_RADIUS)
+        stf = StarField(lat=0, lng=0)
+        tz = stf.get_timezone()
+        self.assertEqual(tz.zone, 'Etc/UTC')
+
+    #########################################################
+    # starfield with no time provided
+    #########################################################
+
+    def test_no_time_provided(self):
+        """Test that a starfield gets the time of "now" if no time is provided"""
+
+        stf = StarField(lat=SF_LAT, lng=SF_LNG)
+        now = datetime.utcnow()
+
+        # make sure the time assigned is no more than one second off current time
+        self.assertTrue(abs(stf.utctime - now).seconds < 1)
 
 
-    def test_pol2cart_neg_phi(self): 
-        """Test polar to cartesian coordinates for negative phi.
-        """
+    #########################################################
+    # local time to utc
+    #########################################################
 
-        self.pol2cart_test(rho=TEST_RADIUS / 2,
-                           phi=-math.pi / 2,
-                           expected_x=TEST_RADIUS * 3/2,
-                           expected_y=TEST_RADIUS)
+    def local_to_utc_time_test(self, lat, lng, expected_offset):
+        """A generic function to test the starfield set_utc_time method
+
+        expected_offset is a time difference from UTC, in hours"""
+
+        # make a starfield instance with an arbitrary time
+        now_string = datetime.strftime(datetime.now(), BOOTSTRAP_DTIME_FORMAT)
+        stf = StarField(lat=lat, lng=lng, localtime_string=now_string)
+
+        stf.set_utc_time(TEST_DATETIME_STRING)
+        time_diff = stf.utctime - pytz.utc.localize(TEST_DATETIME)
+        self.assertEqual(time_diff.seconds, expected_offset * 3600)
+
+
+    def test_sf_localtime_to_utc(self):
+        """Test translating sf localtime to utc."""
+
+        self.local_to_utc_time_test(SF_LAT, SF_LNG, 8)
+
+
+    def test_johannesburg_localtime_to_utc(self):
+        """Test translating johannesburg localtime to utc.
+
+        Note: it won't be a day ahead because of the way I'm testing 
+        (hence the 22 instead of -2 for the offset)"""
+
+        self.local_to_utc_time_test(J_LAT, J_LNG, 22)
 
 
     #########################################################
     # Star coords based on location, time, ra, dec
     #########################################################
 
-    def star_coords_test(self, stf, ra, dec, 
-                         expected_x, expected_y, expected_visible,
-                         calculate_invisible):
+    def star_coords_test(self, stf, ra, dec, expected_alt, expected_az):
 
-        out = stf.get_display_coords(ra, dec, calculate_invisible)
+        altaz = stf.get_display_coords(ra, dec)
 
-        self.assertEqual(out['x'], expected_x)
-        self.assertEqual(out['y'], expected_y)
-        self.assertEqual(out['visible'], expected_visible)
+        self.assertEqual(altaz['alt'], expected_alt)
+        self.assertEqual(altaz['az'], expected_az)
 
 
-    def test_altel_sf_position_calculate_invisible(self):
-        """Test calculation of x, y, visible for Alpha Tel in SF at TEST_DATETIME.
-
-        Calculate coords even though it's invisible."""
-
-        stf = SF_STF
+    def test_rigel_sf_position(self):
+        """Test calculation of alt/az for Rigel in SF at TEST_DATETIME."""
 
         # expected outcomes
-        x = -39.225014668891333
-        y = 221.53911897280611
-        vis = False
+        alt = 0.5945513722730493
+        az = 3.8768423769051004
 
-        self.star_coords_test(SF_STF, AT_RA, AT_DEC, x, y, vis,
-                              calculate_invisible=True)
+        self.star_coords_test(SF_STF, R_RA, R_DEC, alt, az)
 
 
-    def test_altel_sf_position_skip_invisible_calculation(self):
-        """Test calculation of x, y, visible for Alpha Tel in SF at TEST_DATETIME.
-
-        Only calculate coords if visible."""
+    def test_altel_sf_position(self):
+        """Test calculation of alt/az for Alpha Tel in SF at TEST_DATETIME."""
 
         # expected outcomes
-        x = None
-        y = None
-        vis = False
+        alt = -1.33221897026607
+        az = 2.28847485543228
 
-        self.star_coords_test(SF_STF, AT_RA, AT_DEC, x, y, vis,
-                              calculate_invisible=False)
+        self.star_coords_test(SF_STF, AT_RA, AT_DEC, alt, az)
 
 
     def test_altel_johannesburg_position(self):
-        """Test calculation of x, y, visible for Alpha Tel in Johannesburg at TEST_DATETIME."""
+        """Test calculation of alt/az for Alpha Tel in Johannesburg at TEST_DATETIME."""
 
         # expected outcomes
-        x = 88.44111905561941
-        y = 122.69134380242504
-        vis = True
+        alt = -0.29052825967453816
+        az = 2.953992076759778
 
-        self.star_coords_test(J_STF, AT_RA, AT_DEC, x, y, vis,
-                              calculate_invisible=True)
+        self.star_coords_test(J_STF, AT_RA, AT_DEC, alt, az)
 
 
-    def test_rigel_johannesburg_position_calculate_invisible(self):
-        """Test calculation of x, y, visible for Rigel in Johannesburg at TEST_DATETIME.
-
-        Calculate coords even though it's invisible."""
+    def test_rigel_johannesburg_position(self):
+        """Test calculation of alt/az for Rigel in Johannesburg at TEST_DATETIME."""
 
         # expected outcomes
-        x = 77.386186324330623
-        y = 259.86531235645788
-        vis = False
+        alt = 0.9229068038241716
+        az = 5.109812449003042 
 
-        self.star_coords_test(J_STF, R_RA, R_DEC, x, y, vis,
-                              calculate_invisible=True)
+        self.star_coords_test(J_STF, R_RA, R_DEC, alt, az)
 
 
-    def test_rigel_johannesburg_position_skip_invisible_calculation(self):
-        """Test calculation of x, y, visible for Rigel in Johannesburg at TEST_DATETIME.
 
-        Only calculate coords if visible."""
+    #########################################################
+    # making pyEphem ephemeris
+    #########################################################
 
-        # expected outcomes
-        x = None
-        y = None
-        vis = False
+    def make_ephem_test(self, stf):
+        """Generic test for making a pyEphem ephemeris."""
 
-        self.star_coords_test(J_STF, R_RA, R_DEC, x, y, vis,
-                              calculate_invisible=False)
+        stf.make_ephem()
+        self.assertIsInstance(stf.ephem, ephem.Observer)
+
+
+    def test_sf_ephem(self):
+        """Test making ephemeris for SF."""
+
+        self.make_ephem_test(SF_STF)
+
+
+    def test_johannesburg_ephem(self):
+        """Test making ephemeris for Johannesburg."""
+
+        self.make_ephem_test(J_STF)
+
+
+    #########################################################
+    # individual planet data tests
+    #########################################################
+
+    def test_planet_data_format(self):
+        """Test the format of data returned from get_planet_data."""
+
+        # actual stf and planet are inconsequential here
+        pdata = SF_STF.get_planet_data(ephem.Mars)
+
+        self.assertIsInstance(pdata, dict)
+        self.assertEqual(set(pdata.keys()), PLANET_KEY_SET)
+        self.assertIsInstance(pdata['alt'], float)
+        self.assertIsInstance(pdata['az'], float)
+        self.assertIsInstance(pdata['magnitude'], float)
+        self.assertIsInstance(pdata['name'], str)
+        self.assertEqual(pdata['color'][0], '#') # color should be a hex color string
+        self.assertIsInstance(pdata['size'], float)
+
+
+    def get_planet_data_test(self, stf, planet, expected_alt, expected_az):
+        """Generic test for getting planet data."""
+
+        pdata = stf.get_planet_data(planet)
+
+        self.assertEqual(pdata['alt'], expected_alt)
+        self.assertEqual(pdata['az'], expected_az)
+
+        # as a sanity check, check to see that the ephem translated the 
+        # ra/dec to alt/az simliarly to my display function
+        ephem_data = planet(stf.ephem)
+        altaz = stf.get_display_coords(ephem_data.ra, ephem_data.dec)
+        self.assertWithinMargin(altaz['alt'], expected_alt, MARGIN)
+        self.assertWithinMargin(altaz['az'], expected_az, MARGIN)
+
+
+    def test_sf_mars_data(self):
+        """Test position of mars for SF, visible at test datetime."""
+
+        # expected data
+        alt = 0.10010554641485214
+        az = 4.845986366271973
+
+        self.get_planet_data_test(SF_STF, ephem.Mars, alt, az)
+
+
+    def test_sf_saturn_data(self):
+        """Test position of saturn for SF, not visible at test datetime."""
+
+        # expected data
+        alt = -1.0916913747787476
+        az = 1.0930352210998535
+
+        self.get_planet_data_test(SF_STF, ephem.Saturn, alt, az)
+
+
+    def test_johannesburg_mars_data(self):
+        """Test position of mars for johannesburg, not visible at test datetime."""
+
+        # expected data
+        alt = -0.058369215577840805
+        az = 4.854694843292236
+
+        self.get_planet_data_test(J_STF, ephem.Mars, alt, az)
+
+
+    def test_johannesburg_jupiter_data(self):
+        """Test position of jupiter for johannesburg, visible at test datetime."""
+
+        # expected data
+        alt = 0.08431725949048996
+        az = 1.672192931175232
+
+        self.get_planet_data_test(J_STF, ephem.Jupiter, alt, az)
+
+
+    #########################################################
+    # collective planet data tests
+    #########################################################
+
+    def get_planets_test(self, stf):
+        """Generic test to get planets."""
+
+        planets = stf.get_planets()
+
+        # get a set of the planet names
+        planet_names = set(p['name'] for p in planets)
+
+        self.assertEqual(planet_names, BRIGHT_PLANET_NAMES_SET)
+
+
+    #########################################################
+    # moon data tests
+    #########################################################
+
+    # TODO: add moon data tests once I've settled on moon data
+    def test_moon_data_format(self):
+        """Test format of returned moon data."""
+
+
+    def moon_data_test(self, stf, expected_alt, expected_az, expected_phase):
+        """Generic test for moon data."""
+
+
+    def test_sf_moon_data(self):
+        """Test moon data for San Francisco."""
+
+        # expected data
+        alt = 0
+        az = 0
+        phase = 0
+
+        self.moon_data_test(SF_STF, alt, az, phase)
+
+
+    def test_johannesburg_moon_data(self):
+        """Test moon data for Johannesburg"""
+
+        # expected data
+        alt = 0
+        az = 0
+        phase = 0
+
+        self.moon_data_test(J_STF, alt, az, phase)
 
 
 class StarFieldStarDataTests(DbTestCase):
@@ -236,8 +419,8 @@ class StarFieldStarDataTests(DbTestCase):
     def test_star_count(self):
         """Test the star count for the star field."""
 
-        # we expect 48 stars for the test data set, San Francisco, TEST_DATETIME
-        self.assertEqual(len(self.stars), 48)
+        # we expect 55 stars for the test data set, San Francisco, TEST_DATETIME
+        self.assertEqual(len(self.stars), 55)
 
 
     def test_star_data_type(self):
@@ -250,7 +433,7 @@ class StarFieldStarDataTests(DbTestCase):
         """Test the keys of the star dict of the first item in self.stars."""
 
         star_keys = set(self.example_star.keys())
-        expected_keys = set(['x', 'y', 'magnitude', 'color', 'name'])
+        expected_keys = SKYOBJECT_KEY_SET
         self.assertEqual(star_keys, expected_keys)
 
 
@@ -287,62 +470,49 @@ class StarFieldConstellationDataTests(DbTestCase):
     def test_get_const_line_groups_types(self):
         """Make sure the function is returning data in the expected formats"""
 
-        visible, line_groups = SF_STF.get_const_line_groups(self.ori)
+        line_groups = SF_STF.get_const_line_groups(self.ori)
 
         example_group = line_groups[0]
         example_vertex = example_group[0]
 
-        self.assertIsInstance(visible, bool)
         self.assertIsInstance(line_groups, list) 
         self.assertIsInstance(example_group, list) 
         self.assertIsInstance(example_vertex, dict) 
-        self.assertEqual(set(example_vertex.keys()), set(['x', 'y']))
+        self.assertEqual(set(example_vertex.keys()), COORDS_KEY_SET)
 
 
-    def const_line_groups_test(self, stf, const, expected_count, expected_vis):
+    def const_line_groups_test(self, stf, const, expected_count):
         """Test constellation line groups for various inputs"
         """
 
-        visible, line_groups = stf.get_const_line_groups(const)
-
-        self.assertEqual(visible, expected_vis)
-        if visible: 
-            self.assertEqual(len(line_groups), expected_count)
+        line_groups = stf.get_const_line_groups(const)
+        self.assertEqual(len(line_groups), expected_count)
 
 
     def test_const_line_groups_sf_ori(self):
         """Test constellation line groups for multi-group, visible"""
 
-        self.const_line_groups_test(SF_STF, self.ori, 
-                                    expected_count=4, 
-                                    expected_vis=True)
+        self.const_line_groups_test(SF_STF, self.ori, expected_count=4)
 
 
     def test_const_line_groups_sf_tel(self):
         """Test constellation line groups for single-group, not visible"""
 
-        self.const_line_groups_test(SF_STF, self.tel, 
-                                    expected_count=0, 
-                                    expected_vis=False)
+        self.const_line_groups_test(SF_STF, self.tel, expected_count=1)
 
 
     def test_const_line_groups_jo_ori(self):
         """Test constellation line groups for multi-group, not visible"""
 
-        self.const_line_groups_test(J_STF, self.ori, 
-                                    expected_count=0, 
-                                    expected_vis=False)
+        self.const_line_groups_test(J_STF, self.ori, expected_count=4)
 
 
     def test_const_line_groups_jo_ori(self):
         """Test constellation line groups for single-group, visible"""
 
-        self.const_line_groups_test(J_STF, self.tel, 
-                                    expected_count=1, 
-                                    expected_vis=True)
+        self.const_line_groups_test(J_STF, self.tel, expected_count=1)
 
         
-#### TODO: test constellation that's half on / half off
 
     #########################################################
     # Constellation Boundaries
@@ -357,7 +527,7 @@ class StarFieldConstellationDataTests(DbTestCase):
 
         self.assertIsInstance(bound_verts, list)
         self.assertIsInstance(example_vertex, dict) 
-        self.assertEqual(set(example_vertex.keys()), set(['x', 'y']))
+        self.assertEqual(set(example_vertex.keys()), COORDS_KEY_SET)
 
 
     def const_bound_verts_test(self, stf, const, expected_count):
@@ -404,12 +574,12 @@ class StarFieldConstellationDataTests(DbTestCase):
 
         self.assertIsInstance(example_bound_verts, list) 
         self.assertIsInstance(example_bound_vertex, dict) 
-        self.assertEqual(set(example_bound_vertex.keys()), set(['x', 'y']))
+        self.assertEqual(set(example_bound_vertex.keys()), COORDS_KEY_SET)
 
         self.assertIsInstance(example_line_groups, list) 
         self.assertIsInstance(example_line_group, list) 
         self.assertIsInstance(example_line_vertex, dict) 
-        self.assertEqual(set(example_line_vertex.keys()), set(['x', 'y']))
+        self.assertEqual(set(example_line_vertex.keys()), COORDS_KEY_SET)
 
 
     def get_const_data_test(self, stf, const, expected_type, expected_name):
@@ -430,19 +600,19 @@ class StarFieldConstellationDataTests(DbTestCase):
 
 
     def test_get_const_sf_tel(self):
-        """Test data returned for orion in sf."""
+        """Test data returned for telescopium in sf."""
 
-        self.get_const_data_test(SF_STF, self.tel, type(None), None)
+        self.get_const_data_test(SF_STF, self.tel, dict, 'Telescopium')
 
 
     def test_get_const_johannesburg_ori(self):
-        """Test data returned for orion in sf."""
+        """Test data returned for orion in johannesburg."""
 
-        self.get_const_data_test(J_STF, self.ori, type(None), None)
+        self.get_const_data_test(J_STF, self.ori, dict, 'Orion')
 
 
     def test_get_const_johannesburg_tel(self):
-        """Test data returned for orion in sf."""
+        """Test data returned for telescopium in johannesburg."""
 
         self.get_const_data_test(J_STF, self.tel, dict, 'Telescopium')
 
@@ -462,19 +632,28 @@ class StarFieldConstellationDataTests(DbTestCase):
         self.assertEqual(set(example_const.keys()), self.expected_const_keys)
 
 
+    def const_list_test(self, stf):
+        """Generic test for returning constellation list. 
+
+        Output should be the same regardless of starfield constraints."""
+
+        consts = stf.get_consts()
+
+        # get the list of names with a set comprehension
+        const_names = set(const['name'] for const in consts)
+
+        self.assertEqual(len(consts), 3)
+        self.assertEqual(const_names, CONST_LIST_SET)
+
+
     def test_sf_consts(self):
         """Test data returned for constellations in SF."""
 
-        consts = SF_STF.get_consts()
-
-        self.assertEqual(len(consts), 1)
-        self.assertEqual(consts[0]['name'], 'Orion')
+        self.const_list_test(SF_STF)
 
 
     def test_johannesburg_consts(self):
         """Test data returned for constellations in Johannesburg."""
 
-        consts = J_STF.get_consts()
+        self.const_list_test(J_STF)
 
-        self.assertEqual(len(consts), 1)
-        self.assertEqual(consts[0]['name'], 'Telescopium')

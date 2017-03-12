@@ -12,8 +12,20 @@ from seed import load_seed_data
 TESTDB_URI = 'postgresql:///star_tests'
 TESTDATA_DIR = 'tests/test_data'
 
+class MarginTestCase(unittest.TestCase):
+    """Parent class for tests that need a margin assertion"""
 
-class DbTestCase(unittest.TestCase):
+    def assertWithinMargin(self, actual, expected, allowed_margin):
+        """Test whether two values are within an acceptable margin
+
+        TODO: make custom exception here."""
+
+        margin = abs(actual - expected)
+
+        self.assertTrue(margin < allowed_margin)
+
+
+class DbTestCase(MarginTestCase):
     """Parent class for tests that need db setup"""
 
     @classmethod

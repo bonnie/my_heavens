@@ -4,7 +4,7 @@
 
 // globals that will be initialized on document load
 var datetimeRadio, changetimeRadio, datetimeSelector, datetimeInput, errorDiv,
-    starfieldControlDiv;
+    starfieldControlDiv, warnDiv;
 
 var displayError = function(error) {
 
@@ -52,11 +52,12 @@ $(document).ready(function() {
 
     // define some globals based on html ids
     datetimeRadio = $('input[name=datetime]:radio');
-    changetimeRadio = $('#change-time')
-    datetimeSelector =  $('#datetime-selector')
-    datetimeInput = $('#datetime-input')
+    changetimeRadio = $('#change-time');
+    datetimeSelector =  $('#datetime-selector');
+    datetimeInput = $('#datetime-input');
     errorDiv = $('#error');
-    starfieldControlDiv = $('#starfield-controls')
+    starfieldControlDiv = $('#starfield-controls');
+    warnDiv = $('#warn');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {
@@ -69,5 +70,5 @@ $(document).ready(function() {
             datetimeSelector.hide();
         }
     });
-
+    
 });

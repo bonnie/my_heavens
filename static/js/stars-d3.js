@@ -10,11 +10,31 @@ var skySphere, skyProjection, skyPath, skyObjects, skyTransform
 var daySkyColor = '#4169E1'
 var skyRadius = 300
 
-// when form is submitted (code in geocode.js)
-var getStars = function(lat, lng, datetime) {
 
-    // clear previous starfield
-    $('#star-field').empty();
+var showAjaxError = function(error) {
+    // display error from ajax call
+
+    // define error
+    var errorTxt = error.srcElement.statusText;
+    if (errorTxt === 'INTERNAL SERVER ERROR') {
+        errorTxt = 'The server could not complete this request.';
+        errorTxt += ' Please contact the system administrator.';
+    }
+
+    // show the div and add the error
+    errorDiv.show();
+    errorDiv.html(errorTxt);
+
+    // console.log(error);  // debugging
+
+
+}
+
+// when form is submitted (code in geocode.js)
+var getPlanets = function(lat, lng, datetime) {
+
+    // clear previous planets
+    // $('#star-field').empty();
 
     // d3.request needs data in a query string format
     var data = 'lat=' + lat;
@@ -23,12 +43,13 @@ var getStars = function(lat, lng, datetime) {
         data += '&datetime=' + datetime;
     }
 
-    d3.request('/stars.json')
+    // can't do simple d3.json because we need to post data
+    d3.request('/planets.json')
         .mimeType("application/json")
         .response(function(xhr) { return JSON.parse(xhr.responseText); })
         .header("Content-Type","application/x-www-form-urlencoded")
         // .on('progress', function()) // TODO: show progress bar!
-        .post(data, drawSkyData);
+        .post(data, drawSolarSystem);
 
 }
 
@@ -157,10 +178,63 @@ var revealPlanets = function() {
 
 }
 
-///////////////////////////////////
-// functions to draw sky objects //
-///////////////////////////////////
+/////////////////////////////
+// functions to draw stars //
+/////////////////////////////
 
+var drawStars = function(starData) {
+    // draw the stars on the sphere of the sky
+    // uses globals skyObjects, skyProjection
+
+    // One div for every star info window
+    var starInfoDiv = d3.select("body").append("div")   
+        .attr("class", "star-info info")               
+        .style("opacity", 0)
+        .style('border-radius', '4px');            
+
+
+    // add the star groups
+    var stars = skyObjects.selectAll('g.star-group')
+                            .data(starData)
+                            .enter()
+                            .append('g')
+                            .attr('class', 'star-group');
+
+    // add sub-elements for each star
+    stars.each(function(d) {
+
+        var thisStar = d3.select(this);
+
+    // svg.selectAll("circle")
+    //     .data([aa,bb]).enter()
+    //     .append("circle")
+    //     .attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
+    //     .attr("cy", function (d) { return projection(d)[1]; })
+    //     .attr("r", "8px")
+    //     .attr("fill", "red")
+
+        // circle to represent star
+        var starCircle = thisStar.append('circle')
+                             .attr('r', (5 - d.magnitude) * 0.5)
+                             .attr('transform', skyTransform(d.ra, d.dec))
+                             .attr('fill', d.color)
+                             .attr('class', 'star')
+                             .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
+
+        // if (d.name !== null) {
+        //     // make a surrounding circle for the mouseover, as some stars are too 
+        //     // small to mouse over effectively
+        //     var surroundingStarCircle = thisStar.append('circle')
+        //                      .attr('cx', d.x)
+        //                      .attr('cy', d.y)
+        //                      .attr('r', 4)
+        //                      .attr('class', 'star-surround')
+        //                      .style('opacity', 0);
+
+            // addInfoWindowMouseOver(surroundingStarCircle, d, starInfoDiv);
+        // }
+    });
+}
 
 var drawConstellations = function(constData) {
     // draw constellation lines and boundaries
@@ -309,59 +383,110 @@ var drawConstellations = function(constData) {
     });
 }
 
-var drawStars = function(starData) {
-    // draw the stars on the sphere of the sky
-    // uses globals skyObjects, skyProjection
-
-    // One div for every star info window
-    var starInfoDiv = d3.select("body").append("div")   
-        .attr("class", "star-info info")               
-        .style("opacity", 0)
-        .style('border-radius', '4px');            
+////////////////////////////
+// main printing function //
+////////////////////////////
 
 
-    // add the star groups
-    var stars = skyObjects.selectAll('g.star-group')
-                            .data(starData)
-                            .enter()
-                            .append('g')
-                            .attr('class', 'star-group');
+function drawStarData(error, starData) {
+    // success function for d3 ajax call to get star data
 
-    // add sub-elements for each star
-    stars.each(function(d) {
+    // clear previous errors and warnings
+    // errorDiv and warnDiv defined in star-page-control.js
+    errorDiv.empty().hide();
+    warnDiv.empty().hide();
 
-        var thisStar = d3.select(this);
+    //////////////////
+    // handle error //
+    //////////////////
 
-    // svg.selectAll("circle")
-    //     .data([aa,bb]).enter()
-    //     .append("circle")
-    //     .attr("cx", function (d) { console.log(projection(d)); return projection(d)[0]; })
-    //     .attr("cy", function (d) { return projection(d)[1]; })
-    //     .attr("r", "8px")
-    //     .attr("fill", "red")
+    if (error) {
+        showAjaxError(error);
+        return;
+    } 
 
-        // circle to represent star
-        var starCircle = thisStar.append('circle')
-                             .attr('r', (5 - d.magnitude) * 0.5)
-                             .attr('transform', skyTransform(d.alt, d.az))
-                             .attr('fill', d.color)
-                             .attr('class', 'star')
-                             .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
+    console.log(starData);
 
-        // if (d.name !== null) {
-        //     // make a surrounding circle for the mouseover, as some stars are too 
-        //     // small to mouse over effectively
-        //     var surroundingStarCircle = thisStar.append('circle')
-        //                      .attr('cx', d.x)
-        //                      .attr('cy', d.y)
-        //                      .attr('r', 4)
-        //                      .attr('class', 'star-surround')
-        //                      .style('opacity', 0);
+    /////////////////////
+    // handle warnings //
+    /////////////////////
 
-            // addInfoWindowMouseOver(surroundingStarCircle, d, starInfoDiv);
-        // }
-    });
+    // TODO: send warnings with star data
+
+
+    ////////////////
+    // create svg //
+    ////////////////
+
+    var svgBodySelection = d3.select('#star-field');
+
+    // make a place to draw the stars
+    // svgContainer is globally scoped
+    svgContainer = svgBodySelection.append('svg')
+                                    .attr('width', 2 * skyRadius)
+                                    .attr('height', 2 * skyRadius);
+
+    ////////////////////////
+    // sphere for the sky //
+    ////////////////////////
+
+    // all of these are global, since they will be used in lots of functions
+
+    /////// new idea: just send ra and dec (in degrees), plot, and rotate sphere
+    /////// load in background while the person is choosing city and time
+    /////// genius!!
+
+    // create the projection for the sphere of the sky
+    skyProjection = d3.geoOrthographic()
+        .scale(skyRadius) 
+        .translate([skyRadius, skyRadius]) 
+        .clipAngle(90)
+        .precision(.1);
+
+    // create a path generator for the sphere of the sky
+    skyPath = d3.geoPath()
+        .projection(skyProjection);
+
+    // for transforming ra/dec coords onto sky sphere
+    skyTransform = function(ra, dec) {       
+         return 'translate(' + skyProjection([ra, dec]) + ')';
+    };
+
+    skySphere = svgContainer.append("path")
+      .datum({type: "Sphere"})
+      .attr("id", "sky-sphere")
+      .attr("d", skyPath)
+      // .attr('opacity', 0);
+      .attr('fill', 'black');
+
+
+    // for zooming, make a group for all the contents of the skySphere
+    skyObjects = svgContainer.append('g')
+        .attr('id', 'all-sky-objects')
+
+    // show the background
+    // printSkyBackground(skyData.planets);
+
+
+    ////////////////////
+    // constellations //
+    ////////////////////
+
+    // drawConstellations(starData.constellations);
+
+
+    ///////////
+    // stars //
+    ///////////
+
+    drawStars(starData.stars);
+
 }
+
+//////////////////////////////////////////
+// functions to draw planets, moon, sun //
+//////////////////////////////////////////
+
 
 var drawPlanets = function(planetData) {
     // draw planets on sky sphere
@@ -479,13 +604,8 @@ var drawMoon = function(moonData) {
 
 }
 
-
-////////////////////////////
-// main printing function //
-////////////////////////////
-
-function drawSkyData(error, skyData) {
-    // success function for d3 ajax call to get star data
+var drawSolarSystem = function(error, ssData) {
+    // success function for planet data from planets.json
 
     // clear previous errors and warnings
     // errorDiv and warnDiv defined in star-page-control.js
@@ -497,112 +617,21 @@ function drawSkyData(error, skyData) {
     //////////////////
 
     if (error) {
-
-        // display error
-        var errorTxt = error.srcElement.statusText;
-        if (errorTxt === 'INTERNAL SERVER ERROR') {
-            errorTxt = 'The server could not complete this request.';
-            errorTxt += ' Please contact the system administrator.';
-        }
-
-        errorDiv.show();
-        errorDiv.html(errorTxt);
-        console.log(error);
-
-        // re-enable the "show stars" button
-        $('#show-stars').removeAttr('disabled');
+        showAjaxError(error);
         return;
     } 
-
-    console.log(skyData);
-
-    /////////////////////
-    // handle warnings //
-    /////////////////////
-
-    // TODO: send warnings with star data
-
-
-    ////////////////
-    // create svg //
-    ////////////////
-
-    var svgBodySelection = d3.select('#star-field');
-
-    // make a place to draw the stars
-    // svgContainer is globally scoped
-    svgContainer = svgBodySelection.append('svg')
-                                    .attr('width', 2 * skyRadius)
-                                    .attr('height', 2 * skyRadius);
-
-    ////////////////////////
-    // sphere for the sky //
-    ////////////////////////
-
-    // all of these are global, since they will be used in lots of functions
-
-    /////// new idea: just send ra and dec (in degrees), plot, and rotate sphere
-    /////// load in background while the person is choosing city and time
-    /////// genius!!
-
-    // create the projection for the sphere of the sky
-    skyProjection = d3.geoOrthographic()
-        .scale(skyRadius) 
-        .translate([skyRadius, skyRadius]) 
-        .clipAngle(90)
-        .precision(.1)
-        // point north up instead of to the right
-        .rotate([0, 0, 90]);
-
-    // create a path generator for the sphere of the sky
-    skyPath = d3.geoPath()
-        .projection(skyProjection);
-
-    // for transforming alt/az coords onto sky sphere
-    skyTransform = function(alt, az) {       
-         return 'translate(' + skyProjection([alt, az]) + ')';
-    };
-
-    skySphere = svgContainer.append("path")
-      .datum({type: "Sphere"})
-      .attr("id", "sky-sphere")
-      .attr("d", skyPath)
-      // .attr('opacity', 0);
-      .attr('fill', 'black');
-
-
-    // for zooming, make a group for all the contents of the skySphere
-    skyObjects = svgContainer.append('g')
-        .attr('id', 'all-sky-objects')
-
-    // show the background
-    // printSkyBackground(skyData.planets);
-
-
-    ////////////////////
-    // constellations //
-    ////////////////////
-
-    // drawConstellations(skyData.constellations);
-
-
-    ///////////
-    // stars //
-    ///////////
-
-    drawStars(skyData.stars);
 
     /////////////
     // planets //
     /////////////
 
-    // drawPlanets(SkyData.planets);
+    // drawPlanets(ssData.planets);
 
     //////////
     // Moon //
     //////////
 
-    // drawMoon(skyData.moon);
+    // drawMoon(ssData.moon);
 
 
     //////////////
@@ -618,5 +647,7 @@ function drawSkyData(error, skyData) {
     // attach 'reveal planets' button to the revealPlanets function
     $('#reveal-planets').on('click', revealPlanets);
 
+
 }
+
 

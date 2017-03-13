@@ -70,5 +70,8 @@ $(document).ready(function() {
             datetimeSelector.hide();
         }
     });
+
+    // load them stars
+    d3.json('/stars.json', drawStarData);
     
 });

@@ -44,8 +44,8 @@ class Star(db.Model):
     star_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     const_code = db.Column(db.String(3), db.ForeignKey("constellations.const_code"))
     name = db.Column(db.String(128), nullable=True)
-    ra = db.Column(db.Numeric(5, 3), nullable=False) # in radians
-    dec = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+    ra = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
+    dec = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
     distance = db.Column(db.Numeric(12, 2), nullable=True)
     magnitude = db.Column(db.Numeric(4, 2), nullable=False)
     absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
@@ -118,8 +118,8 @@ class BoundVertex(db.Model):
     __tablename__ = "bound_vertices"
 
     vertex_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    ra = db.Column(db.Numeric(5, 3), nullable=False) # in radians
-    dec = db.Column(db.Numeric(5, 3), nullable=False) # in radians
+    ra = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
+    dec = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
 
     def __repr__(self):
         """Provide helpful representation when printed."""

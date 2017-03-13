@@ -5,6 +5,7 @@ from flask import Flask, request, render_template, jsonify
 
 from model import connect_to_db, Constellation
 from starfield import StarField
+from stars import get_stars, get_constellations
 
 # display radius
 STARFIELD_RADIUS = 400
@@ -22,9 +23,21 @@ def display_chart():
     return render_template("stars.html", google_key=GOOGLE_KEY)
 
 
-@app.route('/stars.json', methods=['POST'])
+@app.route('/stars.json')
 def return_stars():
-    """return a json of star, planet and constellation info, plus star field radius
+    """return a json of star and constellation info
+    """
+
+    max_magnitude = 5 # dimmest stars to show
+
+    return jsonify({
+                    # 'constellations': get_constellations(),
+                    'stars': get_stars(max_magnitude)})
+
+
+@app.route('/planets.json', methods=['POST'])
+def return_planets():
+    """return a json of planet, sun and moon info, based on location and time
     """
 
     lat = request.form.get('lat')
@@ -37,9 +50,7 @@ def return_stars():
                     max_mag=max_magnitude,
                     localtime_string=localtime_string)
 
-    return jsonify({'constellations': stf.get_consts(),
-                    'stars': stf.get_stars(),
-                    'planets': stf.get_planets(), 
+    return jsonify({'planets': stf.get_planets(), 
                     'moon': stf.get_moon()})
 
 

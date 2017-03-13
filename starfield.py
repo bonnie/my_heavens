@@ -1,7 +1,6 @@
 """Starfield object and methods for calculating stars and constellation display"""
 
 import ephem
-from sidereal.sidereal import parseLon, parseLat, parseAngle, RADec, hoursToRadians
 import math
 from datetime import datetime
 import pytz

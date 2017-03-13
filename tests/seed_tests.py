@@ -1,7 +1,6 @@
 """Tests for the seeding code."""
 
 from unittest import TestCase
-import math
 
 # be able to import from parent dir
 import sys
@@ -13,17 +12,22 @@ from model import db, Constellation, Star, BoundVertex, \
 from run_tests import TESTDATA_DIR, DbTestCase
 
 
-def is_within_tolerance(num, target):
-    """Check to see whether a num is within a reasonable tolerance of target. 
-
-    This is used to account for float discrepancies based on storage vagaries.
-    """
-    tolerance = 0.0001
-    return abs(num - target) <= tolerance
-
-
 class SeedTestsWithoutDb(TestCase):
     """Test the 'helper' functions that don't need the database."""
+
+    def test_hrs_to_degrees_pos(self):
+        """Test translation of RA in hours to degrees for positive RA"""
+
+        deg = seed.get_degrees_from_hours(3)
+        self.assertEqual(deg, 90)
+
+
+    def test_hrs_to_degrees_pos(self):
+        """Test translation of RA in hours to degrees for zero RA"""
+
+        deg = seed.get_degrees_from_hours(0)
+        self.assertEqual(deg, 0)
+
 
     def test_open_datafile(self):
         """Test the function that locates and opens the file."""
@@ -33,33 +37,6 @@ class SeedTestsWithoutDb(TestCase):
 
         # check that it's a csv with the appropriate number of columns
         self.assertEqual(len(first_line_tokens), 14)
-
-
-    def test_get_radian_coords_N(self):
-        """Test getting radian coords from ra in hours and dec in degrees N."""
-
-        # betelgeuse
-        ra_in_hours = "5.91952477"
-        dec_in_degrees = "+07.40703634"
-        # dec_in_degrees = str(07 + 24/60.0 + 25.4304/3600) + 'dN'
-
-        ra_in_rad, dec_in_rad = seed.get_radian_coords(ra_in_hours, dec_in_degrees)
-        self.assertTrue(is_within_tolerance(ra_in_rad, 1.5497291380724814))
-        self.assertTrue(is_within_tolerance(dec_in_rad, 0.12927765470594127))
-
-
-    def test_get_radian_coords_S(self):
-        """Test getting radian coords from ra in hours and dec in degrees S."""
-
-        # antares
-        ra_in_hours = "16.49012986"
-        dec_in_degrees = "-26.43194608"
-
-        # dec_in_degrees = str(26 + 25/60.0 + 55.2094/3600) + 'dS'
-
-        ra_in_rad, dec_in_rad = seed.get_radian_coords(ra_in_hours, dec_in_degrees)
-        self.assertTrue(is_within_tolerance(ra_in_rad, 4.317105335135356))
-        self.assertTrue(is_within_tolerance(dec_in_rad, -0.46132547345962727))
 
 
     def test_get_color_fullyknown(self):
@@ -136,7 +113,6 @@ class SeedTestsWithDb(DbTestCase):
     setUpClass and tearDownClass methods inherited without change from 
     dbTestCase
     """
-
 
     def test_get_bounds_vertex_not_exists(self):
         """Test code to detect an existing constellation bounds vertex."""
@@ -227,11 +203,11 @@ class SeedStarTests(DbTestCase):
         self.assertEqual(rigel.color, '#b6ceff')
 
 
-    def test_radian_range(self):
-        """Make sure all the ra and decs in the db are in radian range."""
+    def test_degree_range(self):
+        """Make sure all the ra and decs in the db are in degree range."""
 
-        ra_outofrange_count = Star.query.filter(db.not_(db.between(Star.ra, 0, 2 * math.pi))).count()
-        dec_outofrange_count = Star.query.filter(db.not_(db.between(Star.dec, -2 * math.pi, 2 * math.pi))).count()
+        ra_outofrange_count = Star.query.filter(db.not_(db.between(Star.ra, 0, 360))).count()
+        dec_outofrange_count = Star.query.filter(db.not_(db.between(Star.dec, -90, 90))).count()
 
         self.assertEqual(ra_outofrange_count, 0)
         self.assertEqual(dec_outofrange_count, 0)
@@ -244,8 +220,8 @@ class SeedStarTests(DbTestCase):
         code.
         """
 
-        ra_in_rad, dec_in_rad = seed.get_radian_coords(ra, dec)
-        star = seed.get_matching_star(ra_in_rad, dec_in_rad, mag)
+        ra_in_deg = seed.get_degrees_from_hours(ra)
+        star = seed.get_matching_star(ra_in_deg, dec, mag)
 
         self.assertIsInstance(star, Star)
         self.assertEqual(star.name, name)

@@ -59,15 +59,12 @@ def announce(action):
         print '*'*20
 
 
-def get_radian_coords(ra_in_hrs, dec_in_degs):
-    """return a tuple of radian equivalents of input (input in string or Decimal format) 
+def get_degrees_from_hours(ra_in_hrs):
+    """Return a degree equivalent of input RA in hours
 
-    right ascension input in hours, declination input in degrees"""
+    (input in string or Decimal format)"""
 
-    ra_in_rad = float(ra_in_hrs) * math.pi / 12
-    dec_in_rad = float(dec_in_degs) * math.pi / 180
-
-    return ra_in_rad, dec_in_rad
+    return float(ra_in_hrs) * 360 / 24
 
 
 def get_color(spectral_class):
@@ -138,10 +135,10 @@ def load_constellations(datadir):
     db.session.commit()
 
 
-def get_bounds_vertex(ra_in_rad, dec_in_rad):
+def get_bounds_vertex(ra_in_deg, dec_in_deg):
     """Search for the bounds vertex matching the input. Create a new one if needed.
 
-    ra_in_rad and dec_in_rad are floats.
+    ra_in_deg and dec_in_deg are floats.
 
     returns BoundsVertex object.
 
@@ -149,15 +146,15 @@ def get_bounds_vertex(ra_in_rad, dec_in_rad):
 
     # account for the fact that the input file has greater precision than
     # what's stored in the db
-    rounded_ra = int(ra_in_rad * 1000) / 1000.0
-    rounded_dec = int(dec_in_rad * 1000) / 1000.0
+    rounded_ra = int(ra_in_deg * 1000) / 1000.0
+    rounded_dec = int(dec_in_deg * 1000) / 1000.0
 
     # create the vertex, if it doesn't already exist
     try:
         vertex = BoundVertex.query.filter_by(ra=rounded_ra, dec=rounded_dec).one()
 
     except NoResultFound:
-        vertex = BoundVertex(ra=ra_in_rad, dec=dec_in_rad)
+        vertex = BoundVertex(ra=ra_in_deg, dec=dec_in_deg)
         db.session.add(vertex)
 
         # to get an id, and make available for future iterations
@@ -179,21 +176,22 @@ def load_const_boundaries(datadir):
 
     for boundline in boundfile:
         try: 
-            ra, dec, const = boundline.strip().split()
+            ra_in_hrs, dec, const = boundline.strip().split()
         except: 
             if DEBUG: 
                 print "bad line in boundfile: [{}]".format(boundline) 
             continue
 
-        # translate ra and dec into radians
-        ra_in_rad, dec_in_rad = get_radian_coords(ra, dec)
+        # translate ra into degrees
+        ra_in_deg = get_degrees_from_hours(ra_in_hrs)
+        dec_in_deg = float(dec)
 
         # reset the index if necessary
         if const != last_const:
             index = 0
             last_const = const
 
-        vertex = get_bounds_vertex(ra_in_rad, dec_in_rad)
+        vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
 
         # add the vertex to the constellation boundary
         const_bound_vertex = ConstBoundVertex(const_code=const,
@@ -229,8 +227,9 @@ def load_stars(datadir):
             if magnitude > 7:
                 continue
 
-            # translate ra and dec into radians, for easier sidereal module use
-            ra_in_rad, dec_in_rad = get_radian_coords(starline['RA'], starline['Dec'])
+            # translate ra into degrees
+            ra_in_deg = get_degrees_from_hours(starline['RA'])
+            dec_in_deg = float(starline['Dec'])
 
             # sometimes color_index is a bunch of space characters
             if re.match(r"\S", starline['ColorIndex']):
@@ -248,8 +247,8 @@ def load_stars(datadir):
             star = Star(
                 name=name,
                 const_code=const,
-                ra=ra_in_rad,
-                dec=dec_in_rad,
+                ra=ra_in_deg,
+                dec=dec_in_deg,
                 distance=starline['Distance'],
                 magnitude=magnitude,
                 absolute_magnitude=starline['AbsMag'],
@@ -262,7 +261,7 @@ def load_stars(datadir):
     db.session.commit()
 
 
-def get_matching_star(ra_in_rad, dec_in_rad, mag, const=None, name=None):
+def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
     """Get the closest star matching the input values.
 
     const and name are strings used only for debugging. 
@@ -270,8 +269,8 @@ def get_matching_star(ra_in_rad, dec_in_rad, mag, const=None, name=None):
     Returns a Star object"""
 
    # find the star matching this constellation line point
-    query = Star.query.filter(db.func.abs(Star.ra - ra_in_rad) < 0.005, 
-                         db.func.abs(Star.dec - dec_in_rad) < 0.005)
+    query = Star.query.filter(db.func.abs(Star.ra - ra_in_deg) < 0.02, 
+                         db.func.abs(Star.dec - dec_in_deg) < 0.02)
 
     query_with_magnitude = query.filter(db.func.abs(db.func.abs(Star.magnitude) - db.func.abs(mag)) < 0.5)
                                  
@@ -290,7 +289,7 @@ def get_matching_star(ra_in_rad, dec_in_rad, mag, const=None, name=None):
             except NoResultFound:
 
                 error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
-                print error.format(const, name, ra_in_rad, dec_in_rad, mag)
+                print error.format(const, name, ra_in_deg, dec_in_deg, mag)
                 print "exiting..."
                 exit()
 
@@ -327,11 +326,12 @@ def load_constellation_lines(datadir):
                 continue
 
             # get data into proper format
-            ra_in_rad, dec_in_rad = get_radian_coords(constpoint['RA'], constpoint['DEC'])
+            ra_in_deg = get_degrees_from_hours(constpoint['RA'])
+            dec_in_deg = float(constpoint['DEC'])
             mag = float(constpoint['MAG'])
 
             # find the matching star in the db
-            star = get_matching_star(ra_in_rad, dec_in_rad, mag, constpoint['CON'], constpoint['NAME'])
+            star = get_matching_star(ra_in_deg, dec_in_deg, mag, constpoint['CON'], constpoint['NAME'])
 
             # make a new group if necessary
             if group_break: 

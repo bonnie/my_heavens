@@ -7,7 +7,6 @@ from datetime import datetime
 import pytz
 from tzwhere import tzwhere
 
-from model import db, Star, Constellation
 from time_functions import to_utc
 from colors import PLANET_COLORS_BY_NAME
 
@@ -30,10 +29,10 @@ GOOGLE_TZ_URL = 'https://maps.googleapis.com/maps/api/timezone/json'
 # optional debugging output
 DEBUG = False
 
-def rad_to_deg(angle):
-    """Return angle (in radians) translated into degrees"""
+def deg_to_rad(angle):
+    """Return angle (in degrees) translated into radians"""
 
-    return angle / math.pi * 180
+    return angle / 180 * math.pi
 
 
 class StarField(object):
@@ -75,35 +74,15 @@ class StarField(object):
                                                                  self.utctime)
 
 
-    def update_latlng_rads(self):
-        """given lat and long in degrees, return in radians
-
-        * self.lat is latitude in degrees (positive / negative)
-        * self.lng is longitude in degrees (positive / negative)
-        """
-
-        # update lat/lng to this format to make sidereal happy
-        # '37.7749dN'  (d for degrees, N for north)
-        # '122.4194dW' (d for degrees, W for west)
-
-        lat = str(self.lat_deg)
-        lng = str(self.lng_deg)
-
-        lat = lat[1:] + 'dS' if lat[0] == '-' else lat + 'dN'
-        lng = lng[1:] + 'dW' if lng[0] == '-' else lng + 'dE'
-
-        # update degrees to radians
-        self.lat = parseLat(lat)
-        self.lng = parseLon(lng)
-
-
     def make_ephem(self):
         """Generate an ephemeris for pyEphem planet positions."""
 
         # alert ephem of starfield properties
         self.ephem = ephem.Observer()
-        self.ephem.lon = self.lng
-        self.ephem.lat = self.lat
+
+        # ephem wants lat/lng in radians
+        self.ephem.lon = deg_to_rad(self.lng)
+        self.ephem.lat = deg_to_rad(self.lat)
 
         # ephem uses utctime
         self.ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
@@ -119,7 +98,7 @@ class StarField(object):
         # if lat/lng don't have known time zone, return UTC
         # TODO: make guesses based on longitude: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
         # TODO: inform user if error
-        timezone_str = TZW.tzNameAt(self.lat_deg, self.lng_deg) or 'Etc/UTC'
+        timezone_str = TZW.tzNameAt(self.lat, self.lng) or 'Etc/UTC'
 
         return pytz.timezone(timezone_str)
 
@@ -147,203 +126,6 @@ class StarField(object):
 
             # translate to utc
             self.utctime = to_utc(local_tz, dtime_local)
-
-
-    def get_display_coords(self, ra, dec):
-        """Return alt and az (for this starfield) for a particular ra and dec
-
-        * ra and dec are Decimal objects (in radians)
-
-        return value: dictionary, with these keys / values
-
-            'alt': altitude (in radians)
-            'az': azimuth (in radians)
-        """
-
-        # assume ra and dec come in as Decimal objects
-        coords = RADec(float(ra), float(dec))
-
-        ha = coords.hourAngle(self.utctime, self.lng)
-        altaz = coords.altAz(ha, self.lat)
-
-        # translate raidans to degrees
-        alt_deg = rad_to_deg(altaz.alt)
-        az_deg = rad_to_deg(altaz.az)
-
-        return {'alt': alt_deg, 'az': az_deg}
-
-
-    def get_stars(self):
-        """Return list of star dicts in for the starfield.
-
-        Returns all stars, even if they're not visible, for smooth celestial
-        sphere rotation. 
-
-        star dict keys: 
-            "alt": altitude for star, in radians
-            "az": azimuth for star, in radians
-            "magnitude": magnitude of star
-            "color": color corresponding to star's spectral class
-            "name": star's name
-
-        sample output: 
-
-        [ {"alt": 1.334, "az": 0.1355, "magnitude": 1.7, "color": "#ffffff", "name": "alpha Ori"}
-            ...
-        ]
-        """
-
-        # get list of stars
-        db_stars = Star.query.all()
-
-        star_field = []
-
-        if DEBUG: 
-            print 'lat', lat
-            print 'lng', lng
-            print 'utctime = strptime("{}", "%Y-%m-%d %H-%M-%S.%f'.format(utctime)
-
-        for star in db_stars:
-
-            if star.magnitude > self.max_mag: 
-                # skip stars that are too dim
-                continue
-
-            # names based on the constellation aren't interesting (and often 
-            # obscure the traditional names); don't include them
-            name = star.name
-            if star.name and star.const_code and star.name[-3:].lower() == star.const_code.lower():
-                name = None
-
-            # convert RA and dec into alt and az
-            altaz = self.get_display_coords(star.ra, star.dec)
-
-            # add it to the list in a neat little package
-            #
-            # cast magnitude to float, as it comes back as a Decimal obj: bad json
-            star_field.append({'alt': altaz['alt'], 
-                               'az': altaz['az'], 
-                               'magnitude': float(star.magnitude), 
-                               'color': star.color,
-                               'name': name
-                               })
-
-        return star_field
-
-
-    def get_const_line_groups(self, const):
-        """Return a list of constellation line group data for input constellation
-
-        * const is a Constellation instance
-
-        Returns a tuple with two items: 
-
-        * boolean of whether there were any visible lines at all
-        * list of lists; each sublist contains dicts with 'alt' and 'az' keys, 
-        representing an independent line for this constellation. Coordinates are
-        in radians format based on the starfield's lat, lng, and the time
-
-        """
-
-        line_groups = []
-        for grp in const.line_groups:
-            grp_verts = []
-            for vert in grp.constline_vertices:
-                altaz = self.get_display_coords(vert.star.ra, vert.star.dec)
-                grp_verts.append(altaz)
-
-            line_groups.append(grp_verts)
-
-        return line_groups
-
-
-    def get_const_bound_verts(self, const):
-        """Return a dictionary of constellation data, transformed for d3
-
-        * const is a Constellation instance
-
-        returned list has this format: 
-
-        * each element is a dict with 'x' and 'y' keys
-        * Coordinates for boundary vertices are in x and y format based on the 
-        starfield's lat, lng, and the time.
-        """
-
-        # collect the boundaries
-        bound_verts = []
-        for vert in const.bound_vertices:
-            altaz = self.get_display_coords(vert.ra, vert.dec)
-            bound_verts.append(altaz)
-
-        # add the final boundary point to close the boundary loop
-        if bound_verts:
-            bound_verts.append(bound_verts[0])
-
-        return bound_verts
-
-
-    def get_const_data(self, const):
-        """Return a dictionary of constellation data, transformed for d3
-
-        * const is a Constellation instance
-
-        Coordinates for boundary vertices and constellation lines are in 
-        x and y format based on the user's lat, lng, and the time
-
-        returned dict has this format: 
-
-        'code': <string>
-        'name': <string>
-        'bound_verts': <list of dicts with 'x' and 'y' keys>
-        'line_groups': <list of lists of dicts with 'x' and 'y' keys>
-
-        for the line_groups list, each sub-list represents an independent line
-        for this constellation (see get_const_line_groups).
-        """
-
-        # temporary dict to store data for this constellation
-        c = {}
-
-        c['code'] = const.const_code
-        c['name'] = const.name
-
-        # get the constellation lines
-        line_groups = self.get_const_line_groups(const)
-
-        c['line_groups'] = line_groups
-        c['bound_verts'] = self.get_const_bound_verts(const)
-
-        return c    
-
-
-    def get_consts(self):
-        """Return a list of constellation data dicts, transformed for d3.
-
-        Returns a list of dicts of constellation data.
-        See docstring for get_const_data for details on constellation dicts.
-        """
-
-        visible_consts = []
-
-        # do joinedloads to make the data collection faster
-        query = db.session.query(Constellation)
-        const_joins = query.options(
-                            db.joinedload("bound_vertices"),
-                            db.joinedload("line_groups"))
-
-        consts = const_joins.all()
-
-        for const in consts:
-
-            if DEBUG:
-                print "\nlooking at constellation {}".format(const.name)
-
-            const_data = self.get_const_data(const)
-            if const_data: 
-                visible_consts.append(const_data)
-
-
-        return visible_consts
 
 
     def get_planet_data(self, planet):
@@ -376,13 +158,8 @@ class StarField(object):
         # otherwise, gather data
         planet_data = {}
 
-        # sidereal and ephem don't always agree on translating ra and dec to
-        # alt and az. At this point, I trust sidereal more, which is why I'm
-        # not just using pla.alt and pla.az (get_display_coords uses sidereal)
-        altaz = self.get_display_coords(pla.ra, pla.dec)
-
-        planet_data['alt'] = altaz['alt']
-        planet_data['az'] = altaz['az']
+        planet_data['ra'] = pla.ra
+        planet_data['dec'] = pla.dec
         planet_data['magnitude'] = pla.mag
         planet_data['name'] = pla.name
         planet_data['color'] = PLANET_COLORS_BY_NAME[pla.name]
@@ -398,7 +175,7 @@ class StarField(object):
 
             # get the angle rotate the lit moon (in degrees)
             # planet_data['rotation'] = -23.5 * math.cos(pla.hlong)
-            planet_data['rotation'] = -23.5 * math.cos(ephem.Ecliptic(pla).lon)
+            # planet_data['rotation'] = -23.5 * math.cos(ephem.Ecliptic(pla).lon)
 
             planet_data['hlong'] = rad_to_deg(pla.hlong)
 

@@ -1,5 +1,10 @@
 'use strict';
 
+////////
+// rotation reference: https://www.jasondavies.com/maps/rotate/
+//                      https://bl.ocks.org/mbostock/4282586
+
+
 ///////////////////////////
 // globals and functions //
 ///////////////////////////
@@ -57,7 +62,7 @@ var getPlanets = function(lat, lng, datetime) {
 // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 // TODO: make dimensions relative to radius, rather than hard-coded
 
-var addInfoWindowMouseOver = function(obj, d, windowDiv) {
+var addInfoWindowMouseOver = function(obj, transform, d, windowDiv) {
 
     obj.on("mouseover", function() {     
             // snazzy fading in
@@ -66,12 +71,11 @@ var addInfoWindowMouseOver = function(obj, d, windowDiv) {
                 .style("opacity", .9);   
 
             // add text and reposition   
-            windowDiv.html(d.name) // for now  
-                .style("left", (d.x + 2) + "px")     
-                .style("top", (d.y - 20) + "px");    
+            windowDiv.html(d.name + ': ' + d.ra + ', ' + d.dec) // for now  
+                .attr('transform', transform)
 
     })               
-    .on("mouseout", function(d) { windowDiv.transition()        
+    .on("mouseout", function() { windowDiv.transition()        
         .duration(500)      
         .style("opacity", 0);  
     });
@@ -213,26 +217,29 @@ var drawStars = function(starData) {
     //     .attr("r", "8px")
     //     .attr("fill", "red")
 
+
+        // the transformation on the sphere for this star
+        var starTransform = skyTransform(d.ra, d.dec);
+
         // circle to represent star
         var starCircle = thisStar.append('circle')
-                             .attr('r', (5 - d.magnitude) * 0.5)
-                             .attr('transform', skyTransform(d.ra, d.dec))
+                             .attr('r', d.name === 'Polaris' ? 8 : (5 - d.magnitude) * 0.5)
+                             .attr('transform', starTransform)
                              .attr('fill', d.color)
                              .attr('class', 'star')
                              .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
-        // if (d.name !== null) {
-        //     // make a surrounding circle for the mouseover, as some stars are too 
-        //     // small to mouse over effectively
-        //     var surroundingStarCircle = thisStar.append('circle')
-        //                      .attr('cx', d.x)
-        //                      .attr('cy', d.y)
-        //                      .attr('r', 4)
-        //                      .attr('class', 'star-surround')
-        //                      .style('opacity', 0);
+        if (d.name !== null) {
+            // make a surrounding circle for the mouseover, as some stars are too 
+            // small to mouse over effectively
+            var surroundingStarCircle = thisStar.append('circle')
+                             .attr('r', 4)
+                             .attr('transform', starTransform)
+                             .attr('class', 'star-surround')
+                             .style('opacity', 0);
 
-            // addInfoWindowMouseOver(surroundingStarCircle, d, starInfoDiv);
-        // }
+            addInfoWindowMouseOver(surroundingStarCircle, starTransform, d, starInfoDiv);
+        }
     });
 }
 
@@ -365,6 +372,13 @@ var drawConstellations = function(constData) {
         // constellation label //
         /////////////////////////
 
+
+// # d3.geoBounds(object) <>
+
+// Returns the spherical bounding box for the specified GeoJSON object. The bounding box is represented by a two-dimensional array: [[left, bottom], [right, top]], where left is the minimum longitude, bottom is the minimum latitude, right is maximum longitude, and top is the maximum latitude. All coordinates are given in degrees. (Note that in projected planar coordinates, the minimum latitude is typically the maximum y-value, and the maximum latitude is typically the minimum y-value.) This is the spherical equivalent of path.bounds.
+
+
+
         // text for constellation name label
         var constLabel = thisConst.append('text')
             .text(d.name)
@@ -441,7 +455,8 @@ function drawStarData(error, starData) {
         .scale(skyRadius) 
         .translate([skyRadius, skyRadius]) 
         .clipAngle(90)
-        .precision(.1);
+        .precision(.1)
+        .rotate(([0, 360 - 37, 0]));
 
     // create a path generator for the sphere of the sky
     skyPath = d3.geoPath()
@@ -456,7 +471,7 @@ function drawStarData(error, starData) {
       .datum({type: "Sphere"})
       .attr("id", "sky-sphere")
       .attr("d", skyPath)
-      // .attr('opacity', 0);
+      .attr('opacity', 1)
       .attr('fill', 'black');
 
 
@@ -543,7 +558,7 @@ var drawPlanets = function(planetData) {
                         .attr('r', planetRadius < 4 ? 4 : planetRadius)
                         .attr('opacity', 0);
 
-        addInfoWindowMouseOver(surroundingPlanetCircle, d, planetInfoDiv);
+        addInfoWindowMouseOver(surroundingPlanetCircle, d, d.name, planetInfoDiv);
 
 
     

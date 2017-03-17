@@ -5,6 +5,7 @@
 ///
 /// http://marcneuwirth.com/blog/2012/06/24/creating-the-earth-with-d3-js/  --earth with star background
 /// https://github.com/d3/d3/blob/master/API.md#geographies-d3-geo  --d3-geo documentation
+/// https://bost.ocks.org/mike/map/ --text labels
 
 ////////
 // rotation reference: https://www.jasondavies.com/maps/rotate/
@@ -17,7 +18,7 @@
 
 // globals to use across functions
 var sunMoonRadius, planetInfoDiv, sunInSky, svgContainer
-var skySphere, skyProjection, skyPath, skyObjects, skyTransform
+var skySphere, skyProjection, skyPath, skyObjects, skyTransform, labelDatum
 var daySkyColor = '#4169E1'
 var skyRadius = 300
 
@@ -67,20 +68,24 @@ var getPlanets = function(lat, lng, datetime) {
 // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
 // TODO: make dimensions relative to radius, rather than hard-coded
 
-var addInfoWindowMouseOver = function(obj, transform, d, windowDiv) {
+var addInfoWindowMouseOver = function(obj, d, infoLabel) {
 
-    obj.on("mouseover", function() {     
+    obj.on("mouseover", function() {   
             // snazzy fading in
-            windowDiv.transition()        
+            infoLabel.transition()        
                 .duration(200)      
                 .style("opacity", .9);   
 
             // add text and reposition   
-            windowDiv.html(d.name + ': ' + d.ra + ', ' + d.dec) // for now  
-                .attr('transform', transform)
+            // with help from https://bost.ocks.org/mike/map/
+            var translationString = "translate(" + skyProjection([d.ra, d.dec]) + ")";
+            infoLabel.attr('dy', '-0.35em')
+                .attr('dx', '0.35em')
+                .attr('transform', translationString)
+                .text(d.name);
 
     })               
-    .on("mouseout", function() { windowDiv.transition()        
+    .on("mouseout", function() { infoLabel.transition()        
         .duration(500)      
         .style("opacity", 0);  
     });
@@ -193,53 +198,24 @@ var revealPlanets = function() {
 
 var drawStars = function(starData) {
     // draw the stars on the sphere of the sky
-    // uses globals skyObjects, skyProjection
+    // uses globals skyObjects, skyProjection, labelDatum
 
 
-        //Create a list of random stars and add them to outerspace
-    //     var starList = createStars(300);
-                
-    //     var stars = svg.append("g")
-    //         .selectAll("g")
-    //         .data(starList)
-    //         .enter()
-    //         .append("path")
-    //             .attr("class", "star")
-    //             .attr("d", function(d){
-    //                 spacePath.pointRadius(d.properties.radius);
-    //                 return spacePath(d);
-    //             });
+    // One label that just gets repurposed depending on moused-over star,
+    // since we're never going to be showing more than one star label at once
+    // labelDatum is globally scoped, defined in drawStarData
+    // var starInfoLabel = skyObjects.append("path")
+    //     .datum(labelDatum)   
+    //     .attr("class", "star-info info")               
+    //     .style("opacity", 0) // to start anyway
+    //     .style('border-radius', '4px');            
 
 
-    //     function createStars(number){
-    //         var data = [];
-    //         for(var i = 0; i < number; i++){
-    //             data.push({
-    //                 geometry: {
-    //                     type: 'Point',
-    //                     coordinates: randomLonLat()
-    //                 },
-    //                 type: 'Feature',
-    //                 properties: {
-    //                     radius: Math.random() * 1.5
-    //                 }
-    //             });
-    //         }
-    //         return data;
-    //     }
-
-    //     function randomLonLat(){
-    //         return [Math.random() * 360 - 180, Math.random() * 180 - 90];
-    //     }
-    // }
-
-
-    // One div for every star info window
-    var starInfoDiv = d3.select("body").append("div")   
-        .attr("class", "star-info info")               
-        .style("opacity", 0)
-        .style('border-radius', '4px');            
-
+    // One label that just gets repurposed depending on moused-over star,
+    // since we're never going to be showing more than one star label at once
+    // with help from https://bost.ocks.org/mike/map/
+    var starLabel = skyObjects.append('text')
+        .attr('class', 'star-label sky-label')
 
     // add the star groups
     var stars = skyObjects.selectAll('g.star-group')
@@ -252,25 +228,23 @@ var drawStars = function(starData) {
     stars.each(function(d) {
 
         var thisStar = d3.select(this);
-
-        // the transformation on the sphere for this star
-        // skyTransform is global and defined in drawStarData
-        var starTransform = skyTransform(d.ra, d.dec);
+        var starPoint = { 
+            geometry: {
+                type: 'Point',
+                coordinates: [d.ra, d.dec]
+            },
+            type: 'Feature', 
+            properties: {
+                radius: d.name === 'Polaris' ? 8 : (5 - d.magnitude) * 0.5
+            }
+        }
 
         // circle to represent star
-        // since we're in d3 geo world, this needs to be a path, not an svg circle
-        // TODO: understand better why this is so
+        // since we're in d3 geo world, this needs to be a path with a point
+        // geometry, not an svg circle
+        // TODO: understand better what's going on here
         var starCircle = thisStar.append('path')
-                            .datum({
-                                        geometry: {
-                                            type: 'Point',
-                                            coordinates: [d.ra, d.dec]
-                                        },
-                                        type: 'Feature',
-                                        properties: {
-                                            radius: d.name === 'Polaris' ? 8 : (5 - d.magnitude) * 0.5
-                                        }
-                                    })
+                            .datum(starPoint)
                             .attr('class', 'star')
                             .attr('d', function(d){
                                 skyPath.pointRadius(d.properties.radius);
@@ -278,16 +252,19 @@ var drawStars = function(starData) {
                             .attr('fill', d.color)
                             .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
-        if (d.name !== null) {
-            // make a surrounding circle for the mouseover, as some stars are too 
-            // small to mouse over effectively
-            var surroundingStarCircle = thisStar.append('circle')
-                             .attr('r', 4)
-                             .attr('transform', starTransform)
-                             .attr('class', 'star-surround')
-                             .style('opacity', 0);
 
-            addInfoWindowMouseOver(surroundingStarCircle, starTransform, d, starInfoDiv);
+        if (d.name !== null) {
+            // make a fixed-width, larger surrounding circle for the mouseover, as some stars are too 
+            // small to mouse over effectively
+            var surroundingStarCircle = thisStar.append('path')
+                            .datum(starPoint)
+                            .attr('d', function(d){
+                                skyPath.pointRadius(4);
+                                return skyPath(d); })
+                            .attr('class', 'star-surround')
+                            .style('opacity', 0);
+
+            addInfoWindowMouseOver(surroundingStarCircle, d, starLabel);
         }
     });
 }
@@ -495,10 +472,6 @@ function drawStarData(error, starData) {
 
     // all of these are global, since they will be used in lots of functions
 
-    /////// new idea: just send ra and dec (in degrees), plot, and rotate sphere
-    /////// load in background while the person is choosing city and time
-    /////// genius!!
-
     // create the projection for the sphere of the sky
     skyProjection = d3.geoOrthographic()
         .scale(skyRadius) 
@@ -518,6 +491,7 @@ function drawStarData(error, starData) {
          return 'translate(' + skyProjection([ra, dec]) + ')';
     };
 
+
     // the background sphere of the sky
     // globally scoped. TODO: does this need to be global? should it get its own function? 
     skySphere = svgContainer.append("path")
@@ -533,8 +507,29 @@ function drawStarData(error, starData) {
     skyObjects = svgContainer.append('g')
         .attr('id', 'all-sky-objects')
 
+
     // show the background
     // printSkyBackground(skyData.planets);
+
+
+    /////////////////
+    // label setup //
+    /////////////////
+
+    // globally scoped rectangle for any label on the sphere
+    // Since this will be transformed and scaled along with the rest of the 
+    // globe, there's no reason to make these relative to the globe radius
+    labelDatum = { 
+        geometry: {
+            type: 'LineString',
+            coordinates: [[0   ,0]
+                          [0   ,50],
+                          [200 ,50],
+                          [200 ,0],
+                          [0   ,0]]
+        },
+        type: 'Feature'
+    }
 
 
     ////////////////////

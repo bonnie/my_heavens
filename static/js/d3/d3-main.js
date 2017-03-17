@@ -6,7 +6,8 @@
 /// http://marcneuwirth.com/blog/2012/06/24/creating-the-earth-with-d3-js/  --earth with star background
 /// https://github.com/d3/d3/blob/master/API.md#geographies-d3-geo  --d3-geo documentation
 /// https://bost.ocks.org/mike/map/ --text labels
-/// http://bl.ocks.org/d3noob/a22c42db65eb00d4e369 -- transitions to show text on mouseover
+/// http://bl.ocks.org/d3noob/a22c42db65eb00d4e369 --transitions to show text on mouseover
+/// https://www.dashingd3js.com/lessons/d3-geo-path --example usage of d3 path objects
 
 ////////
 // rotation reference: https://www.jasondavies.com/maps/rotate/

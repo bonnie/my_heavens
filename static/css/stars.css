@@ -35,10 +35,16 @@ text.planet-label {
     /*stroke: #228;*/
 }
 
-.const-name {
+text.constellation-label {
+    opacity: 1;
+
+}
+
+/*.const-name {
     pointer-events: none;
     text-anchor: middle;
 }
+*/
 
 #error {
     margin-top: 10px;

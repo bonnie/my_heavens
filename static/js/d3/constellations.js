@@ -109,24 +109,24 @@ var drawConstellations = function(constData) {
         // constellation lines //
         /////////////////////////
 
-        // console.log(d);
+        console.log(d);
 
-        // // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
-        // if (d.line_groups.length > 0) {
+        // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
+        if (d.line_groups.length > 0) {
 
-        //     var constLineMultiLine = { 
-        //         geometry: {
-        //             type: 'MultiLineString',
-        //             coordinates: d.line_groups
-        //         },
-        //         type: 'Feature'
-        //     }
+            var constLineMultiLine = { 
+                geometry: {
+                    type: 'MultiLineString',
+                    coordinates: d.line_groups
+                },
+                type: 'Feature'
+            }
 
-        //     var constLines = thisConst.append('path')
-        //                         .datum(constLineMultiLine)
-        //                         .attr('class', 'constellation-line')
-        //                         .attr('d', function(d) { return skyPath(d); })
-        // }
+            var constLines = thisConst.append('path')
+                                .datum(constLineMultiLine)
+                                .attr('class', 'constellation-line')
+                                .attr('d', function(d) { return skyPath(d); })
+        }
 
 
         /////////////////////////

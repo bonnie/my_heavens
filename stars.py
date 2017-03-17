@@ -66,7 +66,7 @@ def get_const_line_groups(const):
     for grp in const.line_groups:
         grp_verts = []
         for vert in grp.constline_vertices:
-            grp_verts.append([float(vert.ra), float(vert.dec)])
+            grp_verts.append([float(vert.star.ra), float(vert.star.dec)])
 
         line_groups.append(grp_verts)
 

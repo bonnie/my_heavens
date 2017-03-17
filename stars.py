@@ -66,8 +66,7 @@ def get_const_line_groups(const):
     for grp in const.line_groups:
         grp_verts = []
         for vert in grp.constline_vertices:
-            altaz = get_display_coords(vert.star.ra, vert.star.dec)
-            grp_verts.append(altaz)
+            grp_verts.append([float(vert.ra), float(vert.dec)])
 
         line_groups.append(grp_verts)
 
@@ -79,26 +78,20 @@ def get_const_bound_verts(const):
 
     * const is a Constellation instance
 
-    returned dict has this format: 
-
-    * 'type': 'LineString'
-    * 'coordinates': list of coordinates in the form of [ra, dec])
+    returns a list of coordinates in the form of [ra, dec])
     """
 
     # collect the boundaries
-    bound_verts = {'type': 'LineString'}
     coord_list = []
 
     for vert in const.bound_vertices:
-        coord_list.append([vert.ra, vert.dec])
+        coord_list.append([float(vert.ra), float(vert.dec)])
 
     # add the final boundary point to close the boundary loop
     if coord_list:
         coord_list.append(coord_list[0])
 
-    bound_verts['coordinates'] = coord_list
-
-    return bound_verts
+    return coord_list
 
 
 def get_const_data(const):
@@ -148,11 +141,11 @@ def get_constellations():
                         db.joinedload("bound_vertices"),
                         db.joinedload("line_groups"))
 
-    consts = const_joins.all()
+    consts_raw = const_joins.all()
 
-    for const in consts:
-
-        const_data = get_const_data(const)
+    for const_raw in consts_raw:   
+     
+        const_data = get_const_data(const_raw)
         consts.append(const_data)
 
     return consts

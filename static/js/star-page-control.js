@@ -72,6 +72,6 @@ $(document).ready(function() {
     });
 
     // load them stars
-    d3.json('/stars.json', drawStarData);
+    d3.json('/stars.json', drawSkyAndStars);
     
 });

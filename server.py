@@ -31,7 +31,7 @@ def return_stars():
     max_magnitude = 5 # dimmest stars to show
 
     return jsonify({
-                    # 'constellations': get_constellations(),
+                    'constellations': get_constellations(),
                     'stars': get_stars(max_magnitude)})
 
 

@@ -11,7 +11,7 @@ import sys
 sys.path.append('..')
 
 from model import Constellation
-from starfield import rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
+from starfield import deg_to_rad, StarField, BOOTSTRAP_DTIME_FORMAT
 from run_tests import MarginTestCase, DbTestCase
 
 MAX_MAG = 5
@@ -25,7 +25,7 @@ TEST_DATETIME_STRING = datetime.strftime(TEST_DATETIME, BOOTSTRAP_DTIME_FORMAT)
 
 # expected data sets
 CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium'])
-COORDS_KEY_SET = set(['alt', 'az'])
+COORDS_KEY_SET = set(['ra', 'dec'])
 SKYOBJECT_KEY_SET = COORDS_KEY_SET | set(['color', 'magnitude', 'name'])
 PLANET_KEY_SET = SKYOBJECT_KEY_SET | set(['size'])
 
@@ -64,63 +64,28 @@ class StarFieldTestsWithoutDb(MarginTestCase):
     """
 
     #########################################################
-    # radians -> degrees utility function
+    # degrees -> radians utility function
     #########################################################
 
-    def test_radians_to_degrees_positive(self):
-        """Test a positive radians -> degrees conversion."""
+    def test_deg_to_rad_positive(self):
+        """Test a positive degrees -> radians conversion."""
 
-        rads = rad_to_deg(math.pi / 8)
-        self.assertEqual(rads, 22.5)
-
-
-    def test_radians_to_degrees_negative(self):
-        """Test a negative radians -> degrees conversion."""
-
-        rads = rad_to_deg(-math.pi)
-        self.assertEqual(rads, -180)
+        rads = deg_to_rad(2.5)
+        self.assertEqual(rads, math.pi / 82)
 
 
-    def test_radians_to_degrees_zero(self):
-        """Test a zero radians -> degrees conversion."""
+    def test_deg_to_rad_negative(self):
+        """Test a negative degrees -> radians conversion."""
+
+        rads = rad_to_deg(-180)
+        self.assertEqual(rads, -math.pi)
+
+
+    def test_deg_to_rad_zero(self):
+        """Test a zero degrees -> radians conversion."""
 
         rads = rad_to_deg(0)
         self.assertEqual(rads, 0)
-
-
-    #########################################################
-    # Lat/Lng from degrees to radians 
-    #########################################################
-
-    def update_latlng_rads_test(self, lat, lng, expected_lat_rad, expected_lng_rad):
-        """generalized test for translating lat and lng to radians"""
-
-        # this is a little artificial, to set the lat and lng directly, but it's
-        # the only way to separate out this method from __init__
-        stf = StarField(lat=0, lng=0)
-        stf.lat_deg = lat
-        stf.lng_deg = lng
-
-        stf.update_latlng_rads()
-
-        self.assertEqual(stf.lat, expected_lat_rad)
-        self.assertEqual(stf.lng, expected_lng_rad)
-
-
-    def test_latlng_rad_SF(self):
-        """Test translating latitude (north) and longitude (west) to radians.
-        """
-
-        # san francisco
-        self.update_latlng_rads_test(SF_LAT, SF_LNG, SF_LAT_RAD, SF_LNG_RAD)
-
-
-    def test_latlng_rad_Johannesburg(self):
-        """Test translating latitude (south) and longitude (east) to radians.
-        """
-
-        # johannesburg
-        self.update_latlng_rads_test(J_LAT, J_LNG, J_LAT_RAD, J_LNG_RAD)
 
 
     #########################################################

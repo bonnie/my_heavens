@@ -40,7 +40,7 @@ var drawStars = function(starData) {
             },
             type: 'Feature', 
             properties: {
-                radius: d.name === 'Polaris' ? 8 : (5 - d.magnitude) * 0.5
+                radius: (5 - d.magnitude) * 0.5
             }
         }
 

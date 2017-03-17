@@ -365,13 +365,21 @@ def load_seed_data(ddir):
 
 if __name__ == '__main__':
 
-    from server import app
+    
+    # don't import app from server; we don't want to have to wait for the 
+    # the tzwhere instance
+    from flask import Flask
+    app = Flask(__name__)
+
     connect_to_db(app)
 
     # if we're running it directly, we probably want to see debug
     DEBUG = True
 
+    print 'dropping tables...'
     db.drop_all()
+
+    print 'creating tables...'
     db.create_all()
 
     load_seed_data(DATADIR)

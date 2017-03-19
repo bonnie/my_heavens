@@ -1,0 +1,18 @@
+ISSUE: for some rotations of the sky sphere (e.g. .rotate([90, 331, 0]), far
+southern constellations like octans and pavo  took up the whole sky circle,
+covering most of the other constellations and making it impossible to mouse over
+them.
+
+EXPLANATION: the pologon for those rectangles was inverted, making the interior
+of the polygon everything BUT the constellation, instead of the constellation
+itself.
+
+From https://github.com/d3/d3/issues/2051:
+
+d3.geo requires polygons to wind clockwise around their interior (right-hand
+/right-foot winding rule). Your polygon looked like it might be degenerate
+(self-intersecting) at first glance (I removed the coincident point for
+clarity):
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+

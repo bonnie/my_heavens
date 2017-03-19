@@ -144,8 +144,8 @@ var rotateSky = function(lambda, phi) {
           // setSunInSky();
           // printSkyBackground();
 
-          // draw stars without labels (for faster transition)
-          drawStars('noLabels');
+          // draw stars without labels and only bright stars (for faster transition)
+          drawStars('transition');
 
           // drawPlanets();
 

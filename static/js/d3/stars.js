@@ -16,7 +16,7 @@ var drawStars = function(mode) {
 
     // uses globals skyObjects, skyProjection, labelDatum
 
-    // starData global was set by setGlobalStarDataAndDraw
+    // starData global was set by drawSkyAndStars
 
     // One label that just gets repurposed depending on moused-over star,
     // since we're never going to be showing more than one star label at once
@@ -48,31 +48,39 @@ var drawStars = function(mode) {
                 }
             };
 
-            // circle to represent star
-            // since we're in d3 geo world, this needs to be a path with a point
-            // geometry, not an svg circle
-            var starCircle = thisStar.append('path')
-                                .datum(starPoint)
-                                .attr('class', 'star')
-                                .attr('d', function(d){
-                                    skyPath.pointRadius(d.properties.radius);
-                                    return skyPath(d); })
-                                .attr('fill', d.color)
-                                .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
+            if (mode !== 'transition' && !isVisible(starPoint)) {
+                // remove the star if it's not visible and don't bother going on
+                // skip this step if the mode is transition, as it slows things down a tad
+                thisStar.remove();
+
+            } else {
+
+                // circle to represent star
+                // since we're in d3 geo world, this needs to be a path with a point
+                // geometry, not an svg circle
+                var starCircle = thisStar.append('path')
+                                    .datum(starPoint)
+                                    .attr('class', 'star')
+                                    .attr('d', function(d){
+                                        skyPath.pointRadius(d.properties.radius);
+                                        return skyPath(d); })
+                                    .attr('fill', d.color)
+                                    .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
 
-            if (mode !== 'transition' && d.name !== null) {
-                // make a fixed-width, larger surrounding circle for the mouseover, as some stars are too 
-                // small to mouse over effectively
-                var surroundingStarCircle = thisStar.append('path')
-                                .datum(starPoint)
-                                .attr('d', function(d){
-                                    skyPath.pointRadius(4);
-                                    return skyPath(d); })
-                                .attr('class', 'star-surround')
-                                .style('opacity', 0);
+                if (mode !== 'transition' && d.name !== null) {
+                    // make a fixed-width, larger surrounding circle for the mouseover, as some stars are too 
+                    // small to mouse over effectively
+                    var surroundingStarCircle = thisStar.append('path')
+                                    .datum(starPoint)
+                                    .attr('d', function(d){
+                                        skyPath.pointRadius(4);
+                                        return skyPath(d); })
+                                    .attr('class', 'star-surround')
+                                    .style('opacity', 0);
 
-                addInfoWindowMouseOver(surroundingStarCircle, d, starLabel);
+                    addInfoWindowMouseOver(surroundingStarCircle, d, starLabel);
+                }
             }
         }
     });

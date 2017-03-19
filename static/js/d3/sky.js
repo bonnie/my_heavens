@@ -160,3 +160,31 @@ var rotateSky = function(lambda, phi) {
         });
 
 };
+
+var isVisible = function(obj) {
+    // given an object, determine whether it's visible in the current sky projection
+
+    var corners = skyPath.bounds(obj);
+
+    for (var i=0;i<=1;i++) {
+        for (var j=0;j<=1;j++) {
+
+        // if this corner is on the sky, return true
+        var pt = corners[i][j];
+        if (pt !== Infinity &&
+            pt !== -Infinity &&
+            !isNaN(pt)) {
+
+                return true;
+        }
+
+    }
+
+    // if we haven't yet returned true, return false
+    return false;
+    
+}
+
+
+
+}

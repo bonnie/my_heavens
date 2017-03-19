@@ -48,81 +48,64 @@ var drawConstellations = function() {
         // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
         if (d.bound_verts.length > 0) {
 
-            var constBoundsPolygon = { 
+            var constBoundsPolygon = {
                 geometry: {
                     type: 'Polygon',
                     coordinates: [d.bound_verts] // because of potential holes, this needs to be an array of arrays of arrays of points
                 },
                 type: 'Feature'
-            }
+            };
 
-            var constBounds = thisConst.append('path')
-                                .datum(constBoundsPolygon)
-                                .attr('class', 'constellation-bounds')
-                                .attr('d', function(d) { return skyPath(d); })
+            // don't bother drawing constellation if it's not visible
+            // isVisible is defined in sky.js
+            var boundsViz = isVisible(constBoundsPolygon);
+            if (boundsViz) {
+
+                var constBounds = thisConst.append('path')
+                                    .datum(constBoundsPolygon)
+                                    .attr('class', 'constellation-bounds')
+                                    .attr('d', function(d) { return skyPath(d); });
+            } else {
+                // this constellation isn't showing; remove it
+                thisConst.remove();
+            }
         }
 
-        /////////////////////////
-        // constellation lines //
-        /////////////////////////
+        if (boundsViz) {
 
-        // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
-        if (d.line_groups.length > 0) {
+            /////////////////////////
+            // constellation lines //
+            /////////////////////////
 
-            var constLineMultiLine = { 
-                geometry: {
-                    type: 'MultiLineString',
-                    coordinates: d.line_groups
-                },
-                type: 'Feature'
+            // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
+            if (d.line_groups.length > 0) {
+
+                var constLineMultiLine = { 
+                    geometry: {
+                        type: 'MultiLineString',
+                        coordinates: d.line_groups
+                    },
+                    type: 'Feature'
+                }
+
+                var constLines = thisConst.append('path')
+                                    .datum(constLineMultiLine)
+                                    .attr('class', 'constellation-line')
+                                    .attr('d', function(d) { return skyPath(d); })
             }
 
-            var constLines = thisConst.append('path')
-                                .datum(constLineMultiLine)
-                                .attr('class', 'constellation-line')
-                                .attr('d', function(d) { return skyPath(d); })
-        }
 
+            /////////////////////////
+            // constellation label //
+            /////////////////////////
 
-        /////////////////////////
-        // constellation label //
-        /////////////////////////
-
-        // TODO: position this better
-
-
-
-// # d3.geoBounds(object) <>
-
-// Returns the spherical bounding box for the specified GeoJSON object. The bounding box is represented by a two-dimensional array: [[left, bottom], [right, top]], where left is the minimum longitude, bottom is the minimum latitude, right is maximum longitude, and top is the maximum latitude. All coordinates are given in degrees. (Note that in projected planar coordinates, the minimum latitude is typically the maximum y-value, and the maximum latitude is typically the minimum y-value.) This is the spherical equivalent of path.bounds.
-
-
-        // perhaps go back to what I do with stars and planets, one text box to rule them all, that gets transformed? 
-
-        // I feel like I should be able to use centroid or bounding box here, but when
-        // I do the debugger below, both of these return [NaN, NaN]: 
-
-        // skyPath.centroid(constBounds)
-        // skyPath.centroid(constLines)
-
-        // the equivalent bounds functions return arrays whose items are Infinity or -Infinity
-
-        // if (d.name === 'Cassiopeia') {
-        //     debugger;
-        // }
-
-        // get the centroid of the constellation lines
-        var constCent = skyPath.centroid(constLineMultiLine);
-
-        // TODO: what to do about labels when constellation positions rotate 
-        // must calculate dynamically somehow
-        if (!isNaN(constCent[0])) {
+            var boundsObj = isVisible(constLineMultiLine) ? constLineMultiLine : constBoundsPolygon;
 
             // get better positioning for the constellation labels along the edges
             // TODO: do a better job of positioning, esp for constellation off the middle right 
             // TODO: separate out into a function.
             var textAnchor;
-            var bounds = skyPath.bounds(constLineMultiLine);
+            var bounds = skyPath.bounds(boundsObj);
             var minX = bounds[0][0];
             var minY = bounds[0][1];
             var maxX = bounds[1][0];
@@ -139,7 +122,13 @@ var drawConstellations = function() {
                 .attr('class', 'constellation-label sky-label')
                 .attr('x', x)
                 .attr('y', y);
+
         }
+
+        if (d.name === 'Octans') {
+            debugger;
+        }
+
 
     });
 };

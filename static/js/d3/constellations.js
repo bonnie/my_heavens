@@ -22,13 +22,13 @@ var drawConstellations = function(constData) {
 
         // reveal boundaries and lines on mouseover
         .on('mouseover', function() { 
-                  d3.select(this).transition()        
-                    .duration(200)      
+                  d3.select(this).transition()
+                    .duration(200)
                     .style("opacity", 1);})
 
-        .on('mouseout', function() { 
-                  d3.select(this).transition()        
-                    .duration(500)      
+        .on('mouseout', function() {
+                  d3.select(this).transition()
+                    .duration(500)
                     .style("opacity", 0);});
 
 
@@ -37,7 +37,7 @@ var drawConstellations = function(constData) {
     //////////////////
 
     // add sub-elements for each constellation
-    constellations.each(function(d) {        
+    constellations.each(function(d) {
 
         var thisConst = d3.select(this);
 
@@ -118,13 +118,28 @@ var drawConstellations = function(constData) {
         // must calculate dynamically somehow
         if (!isNaN(constCent[0])) {
 
+            // get better positioning for the constellation labels along the edges
+            // TODO: do a better job of positioning, esp for constellation off the middle right 
+            // TODO: separate out into a function.
+            var textAnchor;
+            var bounds = skyPath.bounds(constLineMultiLine);
+            var minX = bounds[0][0];
+            var minY = bounds[0][1];
+            var maxX = bounds[1][0];
+            var maxY = bounds[1][1];
+            var padding = 20;
+
+            var y = (minY < skyRadius) ? maxY + padding : minY - padding;
+            var x = (maxX > 3 * skyRadius / 4) ? minX : (minX + maxX) / 2;
+            var textAnchor = (maxX < skyRadius) ? 'start' : 'end';
+
             // text for constellation name label
             var constLabel = thisConst.append('text')
                 .text(d.name)
                 .attr('class', 'constellation-label sky-label')
-                .attr('x', constCent[0])
-                .attr('y', constCent[1]);
+                .attr('x', x)
+                .attr('y', y);
         }
 
     });
-}
+};

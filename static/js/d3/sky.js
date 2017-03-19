@@ -119,15 +119,18 @@ var rotateSky = function(lambda, phi) {
 
     // uses global skyProjection, 
 
-    // get old rotation parameters for transition
-    // var oldLambda = skyProjection.rotate()[0];
-    // var oldPhi = skyProjection.rotate()[1];
+    // calculate duration based on distance to go
+    var oldRotation = skyProjection.rotate();
+    var oldLambda = oldRotation[0];
+    var oldPhi = oldRotation[1];
+    var durTime = Math.sqrt(Math.pow((oldLambda - lambda), 2) + Math.pow((oldPhi - phi), 2)) * 15;
+    console.log(durTime);
+
 
     // adapted from http://bl.ocks.org/KoGor/5994960
-    // TODO: not sure why it's wrapped in an iife
-    (function transition() {
-      d3.transition()
-      .duration(1000)
+    // TODO: make less choppy -- maybe don't redraw everything, just transform it...?
+    d3.transition()
+      .duration(durTime)
       .ease(d3.easeLinear)
       .tween("rotate", function() {
         var rotation = d3.interpolate(skyProjection.rotate(), [lambda, phi]);
@@ -140,16 +143,22 @@ var rotateSky = function(lambda, phi) {
           // draw all the objects
           // setSunInSky();
           // printSkyBackground();
-          drawConstellations();
-          drawStars();
-          
+
+          // draw stars without labels (for faster transition)
+          drawStars('noLabels');
+
           // drawPlanets();
 
           // skyProjection.rotate([lambda, phi]);
             };
-          })     
+          })
       // .transition().duration(30).ease(d3.easeLinear)
-      // .each("end", transition);
-    })();
+      .on('end', function() {
+
+            // finally, draw constellations and redraw the stars with labels on top of them
+            $('#all-sky-objects').empty();
+            drawConstellations();
+            drawStars();
+        });
 
 };

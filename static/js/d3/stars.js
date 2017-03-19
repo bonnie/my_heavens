@@ -9,8 +9,11 @@ var setGlobalStarDataAndDraw = function(starDataResult) {
 };
 
 
-var drawStars = function() {
+var drawStars = function(mode) {
     // draw the stars on the sphere of the sky
+    // mode is a string that can either be omitted or set to 'noLabels'
+    // It will be 'noLabels' when animating, to make animations faster
+
     // uses globals skyObjects, skyProjection, labelDatum
 
     // starData global was set by setGlobalStarDataAndDraw
@@ -56,7 +59,7 @@ var drawStars = function() {
                             .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 
 
-        if (d.name !== null) {
+        if (mode !== 'noLabels' && d.name !== null) {
             // make a fixed-width, larger surrounding circle for the mouseover, as some stars are too 
             // small to mouse over effectively
             var surroundingStarCircle = thisStar.append('path')

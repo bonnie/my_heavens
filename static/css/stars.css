@@ -67,3 +67,7 @@ text.constellation-label {
 .lit-moon {
     pointer-events: none;
 }
+
+.star {
+    pointer-events: none;
+}

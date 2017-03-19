@@ -33,16 +33,16 @@ var drawStars = function(starData) {
     stars.each(function(d) {
 
         var thisStar = d3.select(this);
-        var starPoint = { 
+        var starPoint = {
             geometry: {
                 type: 'Point',
                 coordinates: [d.ra, d.dec]
             },
-            type: 'Feature', 
+            type: 'Feature',
             properties: {
                 radius: (5 - d.magnitude) * 0.5
             }
-        }
+        };
 
         // circle to represent star
         // since we're in d3 geo world, this needs to be a path with a point

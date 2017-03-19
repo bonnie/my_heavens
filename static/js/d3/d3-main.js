@@ -80,8 +80,6 @@ var addInfoWindowMouseOver = function(obj, d, infoLabel) {
             var x = coords[0];
             var y = coords[1];
 
-            console.log(x, y);
-
             if (x < skyRadius) {
                 textAnchor = 'start';
                 dxMultiplier = 1;

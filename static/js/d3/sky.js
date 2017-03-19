@@ -1,7 +1,9 @@
 // d3 for drawing the sphere of the sky 
 // pulls globals xxxx from main-d3.js
 
-var daySkyColor = '#4169E1'
+'use strict';
+
+var daySkyColor = '#4169E1';
 
 
 function printSkyBackground(planets) {
@@ -25,7 +27,7 @@ function printSkyBackground(planets) {
 
     if (sunInSky) {
         // If so, make background lighter blue
-        skyFill = daySkyColor
+        skyFill = daySkyColor;
 
     } else {
         // print the radial gradient for the sky background
@@ -73,10 +75,10 @@ var drawSky = function(skyData) {
 
     // create the projection for the sphere of the sky
     skyProjection = d3.geoOrthographic()
-        .scale(skyRadius) 
-        .translate([skyRadius, skyRadius]) 
+        .scale(skyRadius)
+        .translate([skyRadius, skyRadius])
         .clipAngle(90)
-        .precision(.1)
+        .precision(0.1)
         .rotate(([0, 360 - 37, 0]));
 
     // create a path generator for the sphere of the sky
@@ -86,7 +88,7 @@ var drawSky = function(skyData) {
 
     // for transforming ra/dec coords onto sky sphere
     // globally scoped
-    skyTransform = function(ra, dec) {       
+    skyTransform = function(ra, dec) {      
          return 'translate(' + skyProjection([ra, dec]) + ')';
     };
 
@@ -104,10 +106,50 @@ var drawSky = function(skyData) {
     // for zooming, make a group for all the contents of the skySphere
     // globally scoped
     skyObjects = svgContainer.append('g')
-        .attr('id', 'all-sky-objects')
+        .attr('id', 'all-sky-objects');
 
     // show the background
     // printSkyBackground(skyData.planets);
 
+};
 
-}
+var rotateSky = function(lambda, phi) {
+    // rotate the sky for the lambda (based on latitude) and 
+    // phi (based on longitude / time)
+
+    // uses global skyProjection, 
+
+    // get old rotation parameters for transition
+    // var oldLambda = skyProjection.rotate()[0];
+    // var oldPhi = skyProjection.rotate()[1];
+
+    // adapted from http://bl.ocks.org/KoGor/5994960
+    // TODO: not sure why it's wrapped in an iife
+    (function transition() {
+      d3.transition()
+      .duration(1000)
+      .ease(d3.easeLinear)
+      .tween("rotate", function() {
+        var rotation = d3.interpolate(skyProjection.rotate(), [lambda, phi]);
+        return function(t) {
+          skyProjection.rotate(rotation(t));
+
+          // at every stage, clear the sky and start over
+          $('#all-sky-objects').empty();
+
+          // draw all the objects
+          // setSunInSky();
+          // printSkyBackground();
+          drawConstellations();
+          drawStars();
+          
+          // drawPlanets();
+
+          // skyProjection.rotate([lambda, phi]);
+            };
+          })     
+      // .transition().duration(30).ease(d3.easeLinear)
+      // .each("end", transition);
+    })();
+
+};

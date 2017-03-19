@@ -1,26 +1,25 @@
 // d3 for drawing stars
 // pulls globals xxxx from main-d3.js
 
-var drawStars = function(starData) {
+var setGlobalStarDataAndDraw = function(starDataResult) {
+    // a callback function to set global starData from ajax and call drawStars
+
+    starData = starDataResult;
+    drawStars();
+};
+
+
+var drawStars = function() {
     // draw the stars on the sphere of the sky
     // uses globals skyObjects, skyProjection, labelDatum
 
-
-    // One label that just gets repurposed depending on moused-over star,
-    // since we're never going to be showing more than one star label at once
-    // labelDatum is globally scoped, defined in drawStarData
-    // var starInfoLabel = skyObjects.append("path")
-    //     .datum(labelDatum)   
-    //     .attr("class", "star-info info")               
-    //     .style("opacity", 0) // to start anyway
-    //     .style('border-radius', '4px');            
-
+    // starData global was set by setGlobalStarDataAndDraw
 
     // One label that just gets repurposed depending on moused-over star,
     // since we're never going to be showing more than one star label at once
     // with help from https://bost.ocks.org/mike/map/
     var starLabel = skyObjects.append('text')
-        .attr('class', 'star-label sky-label')
+        .attr('class', 'star-label sky-label');
 
     // add the star groups
     var stars = skyObjects.selectAll('g.star-group')

@@ -2,16 +2,16 @@
 // pulls globals xxxx from main-d3.js
 
 // when form is submitted (event listener code in geocode.js)
-var getPlanets = function(lat, lng, datetime) {
+var getPlanets = function(locTime) {
 
     // clear previous planets
     // $('#star-field').empty();
 
     // d3.request needs data in a query string format
-    var data = 'lat=' + lat;
-    data += '&lng=' + lng;
+    var data = 'lat=' + locTime.lat;
+    data += '&lng=' + locTime.lng;
     if (datetime !== undefined) {
-        data += '&datetime=' + datetime;
+        data += '&datetime=' + locTime.datetime;
     }
 
     // can't do simple d3.json because we need to post data

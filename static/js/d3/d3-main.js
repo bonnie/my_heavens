@@ -8,6 +8,9 @@
 /// https://bost.ocks.org/mike/map/ --text labels
 /// http://bl.ocks.org/d3noob/a22c42db65eb00d4e369 --transitions to show text on mouseover
 /// https://www.dashingd3js.com/lessons/d3-geo-path --example usage of d3 path objects
+/// https://bl.ocks.org/wwymak/dcdd12937bd4643cd9b3 --animated drag d3 sphere
+/// http://bl.ocks.org/KoGor/5994960 --sphere rotation animation
+/// https://github.com/d3/d3-transition --transitions documentation
 
 ////////
 // rotation reference: https://www.jasondavies.com/maps/rotate/
@@ -21,6 +24,7 @@
 // globals to use across functions
 var sunMoonRadius, planetInfoDiv, sunInSky, svgContainer;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, labelDatum;
+var starData, constData, ssData;
 var skyRadius = 300;  // for now
 
 
@@ -118,7 +122,7 @@ var addInfoWindowMouseOver = function(obj, d, infoLabel) {
 ////////////////////////////
 
 
-function drawSkyAndStars(error, starData) {
+function drawSkyAndStars(error, starDataResult) {
     // success function for d3 ajax call to get star data
 
     // clear previous errors and warnings
@@ -135,7 +139,7 @@ function drawSkyAndStars(error, starData) {
         return;
     }
 
-    console.log(starData);
+    console.log(starDataResult);
 
     /////////////////////
     // handle warnings //
@@ -144,14 +148,22 @@ function drawSkyAndStars(error, starData) {
     // TODO: send warnings with star data
 
 
+    /////////////////
+    // set globals //
+    /////////////////
+
+    // these need to be global for redrawing sky when sphere animates
+    constData = starDataResult.constellations;
+    starData = starDataResult.stars;
+
     // defined in sky.js
     drawSky();
 
     // defined in constellations.js
-    drawConstellations(starData.constellations);
+    drawConstellations();
 
     // defined in stars.js
-    drawStars(starData.stars);
+    drawStars();
 
 }
 

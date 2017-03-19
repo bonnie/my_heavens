@@ -3,7 +3,7 @@
 
 'use strict';
 
-var drawConstellations = function(constData) {
+var drawConstellations = function() {
     // draw constellation lines and boundaries
     // uses global skyObjects
 

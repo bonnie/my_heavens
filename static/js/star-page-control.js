@@ -43,8 +43,18 @@ var processFormInputs = function(latlng) {
     // disable the button
     $('#show-stars').attr('disabled', 'disabled');
 
-    // getStars is defined in stars-d3.js
-    getStars(latlng.lat, latlng.lng, datetime);
+    // put the data into an obj
+    var locTime = {
+        lat: latlng.lat,
+        lng: latlng.lng,
+        datetime: datetime
+    }
+
+    // rotate the star field; rotateSky defined in sky.js
+    rotateSky(locTime);
+
+    // getPlanets is defined in solarsystem.js
+    getPlanets(locTime);
 
 };
 

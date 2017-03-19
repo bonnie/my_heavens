@@ -79,7 +79,8 @@ var drawSky = function(skyData) {
         .translate([skyRadius, skyRadius])
         .clipAngle(90)
         .precision(0.1)
-        .rotate(([0, 360 - 37, 0]));
+        // .rotate(([0, 360 - 37, 0]));
+        .rotate(([90, 331, 0]));
 
     // create a path generator for the sphere of the sky
     // globally scoped
@@ -147,18 +148,15 @@ var rotateSky = function(lambda, phi) {
           // draw stars without labels and only bright stars (for faster transition)
           drawStars('transition');
 
-          // drawPlanets();
-
-          // skyProjection.rotate([lambda, phi]);
             };
           })
-      // .transition().duration(30).ease(d3.easeLinear)
       .on('end', function() {
 
             // finally, draw constellations and redraw the stars with labels on top of them
             $('#all-sky-objects').empty();
-            drawConstellations();
-            drawStars();
+
+            // defined in d3-main.js
+            drawSkyObjects();
         });
 
 };

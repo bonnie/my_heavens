@@ -122,7 +122,7 @@ var addInfoWindowMouseOver = function(obj, d, infoLabel) {
 ////////////////////////////
 
 
-function drawSkyAndStars(error, starDataResult) {
+var drawSkyAndStars = function(error, starDataResult) {
     // success function for d3 ajax call to get star data
 
     // clear previous errors and warnings
@@ -159,11 +159,25 @@ function drawSkyAndStars(error, starDataResult) {
     // defined in sky.js
     drawSky();
 
+    drawSkyObjects();
+
+};
+
+var drawSkyObjects = function() {
+    // draw sky objects either at beginning of page load or after change in data
+
     // defined in constellations.js
     drawConstellations();
 
     // defined in stars.js
     drawStars();
 
-}
+    // on intial page load, there will be no planet data
+    // TODO: use html5 geolocation and current date/time to set initial sky
+    //      conditions 
+    if (ssData) {
+        drawPlanets();
+    }
+
+};
 

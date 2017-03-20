@@ -3,6 +3,26 @@
 
 'use strict';
 
+var isInverted = function(poly) {
+    // determine if a polygon is inverted on the sky sphere
+
+
+    // I tried doing this using d3.geoArea(poly) and skyPath.area(poly) --
+    // neither of them worked consistently across all constellations. 
+    //
+    // This way -- using the screen area of the constellation and comparing it
+    // to the total screen area -- seems somewhat hacky, but it works in all
+    // cases.
+
+    var bounds = skyPath.bounds(poly);
+    var screenArea = (bounds[1][0] - bounds[0][0]) * (bounds[1][1] - bounds[0][1]);
+    var totalScreenArea = Math.pow(2 * skyRadius, 2);
+
+    return Math.abs(totalScreenArea - screenArea) < skyRadius * 20;
+
+
+};
+
 var drawConstellations = function() {
     // draw constellation lines and boundaries
     // uses global skyObjects
@@ -21,7 +41,7 @@ var drawConstellations = function() {
         ///////////////
 
         // reveal boundaries and lines on mouseover
-        .on('mouseover', function() { 
+        .on('mouseover', function() {
                   d3.select(this).transition()
                     .duration(200)
                     .style("opacity", 1);})
@@ -48,12 +68,6 @@ var drawConstellations = function() {
         // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
         if (d.bound_verts.length > 0) {
 
-
-            // reverse the bounds polygons if we're in the southern hemisphere
-            // so d3 understands we want the constellations, not their inverse
-            
-
-
             var constBoundsPolygon = {
                 geometry: {
                     type: 'Polygon',
@@ -61,6 +75,26 @@ var drawConstellations = function() {
                 },
                 type: 'Feature'
             };
+
+            // if (d.name === 'Aquarius') {
+            //     debugger;
+            // }
+
+
+            // make sure we're getting the actual bounds polygon, and not the inverse
+            if (isInverted(constBoundsPolygon)) {
+
+                // TODO: make this into a function to avoid so much repeated code
+
+                constBoundsPolygon = {
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [d.bound_verts.slice().reverse()] // because of potential holes, this needs to be an array of arrays of arrays of points
+                    },
+                    type: 'Feature'
+                };
+     
+            }
 
             // don't bother drawing constellation if it's not visible
             // isVisible is defined in sky.js
@@ -97,7 +131,7 @@ var drawConstellations = function() {
                 var constLines = thisConst.append('path')
                                     .datum(constLineMultiLine)
                                     .attr('class', 'constellation-line')
-                                    .attr('d', function(d) { return skyPath(d); })
+                                    .attr('d', function(d) { return skyPath(d); });
             }
 
 

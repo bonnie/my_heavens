@@ -80,7 +80,7 @@ var drawSky = function(skyData) {
         .clipAngle(90)
         .precision(0.1)
         // .rotate(([0, 360 - 37, 0]));
-        // .rotate(([92, 331, 0])); -- this is a bad one for inverted constellation bounds
+        .rotate([92, 331, 0]); // this is a bad one for inverted constellation bounds
 
 
     // create a path generator for the sphere of the sky

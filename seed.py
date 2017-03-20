@@ -93,6 +93,45 @@ def get_color(spectral_class):
         return DEFAULT_COLOR
 
 
+def is_d3_compatible(bounds_list):
+    """Determine if a bounds list is compatible with d3 geoPaths.
+
+    Southern and clockwise constellations need to be reversed for proper d3
+    display."""
+
+    # from http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+
+    # keep a running sum
+    point_sum = 0
+
+
+    # compare up to the second-to-last point
+    for i in range(len(bounds_list) - 1):
+        pt = bounds_list[1]
+        next_pt = bounds_list[i + 1]
+
+        # point_sum += pt[0] * next_pt[1] - next_pt[0] * pt[1]
+        point_sum += (next_pt[0] - pt[0]) * (next_pt[1] + pt[1])
+
+
+    # then close the loop
+    pt = bounds_list[-1]
+    next_pt = bounds_list[0]
+    point_sum += (next_pt[0] - pt[0]) * (next_pt[1] + pt[1])
+
+
+    # southern constellations actually need to be anti-clockwise to work with d3 polygon paths
+    southern = all([dec < 0 for _, dec in bounds_list])
+
+    if southern:
+        compat = point_sum < 0
+    else:
+        compat = point_sum > 0
+
+    return compat
+
+
+
 def get_name_and_constellation(star_info):
     """get the name and constellation from a line in the STARDATA file"""
 
@@ -169,39 +208,84 @@ def load_const_boundaries(datadir):
     announce('loading constellation boundaries')
 
     boundfile = open_datafile(datadir, 'bounds')
-    
-    # keep track of what constellation we're on, in order to reset indexes when
-    # we switch constellations
-    last_const = None
+
+    # make dictionary listing constellation bounds
+    const_bounds = {}
 
     for boundline in boundfile:
-        try: 
+        try:
             ra_in_hrs, dec, const = boundline.strip().split()
-        except: 
-            if DEBUG: 
-                print "bad line in boundfile: [{}]".format(boundline) 
+        except:
+            if DEBUG:
+                print "bad line in boundfile: [{}]".format(boundline)
             continue
 
-        # translate ra into degrees
+        # translate ra into degrees and dec to float
         ra_in_deg = get_degrees_from_hours(ra_in_hrs)
         dec_in_deg = float(dec)
 
-        # reset the index if necessary
-        if const != last_const:
-            index = 0
-            last_const = const
+        # add the pt to the list for this constellation
+        const_bounds.setdefault(const, []).append((ra_in_deg, dec_in_deg))
 
-        vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
+    # determine if each const is clockwise or anti-clockwise and if the list
+    # needs to be reversed
+    for name, bounds in const_bounds.iteritems():
 
-        # add the vertex to the constellation boundary
-        const_bound_vertex = ConstBoundVertex(const_code=const,
-                                              vertex_id=vertex.vertex_id,
-                                              index=index)
-        db.session.add(const_bound_vertex)
+        compat_before = is_d3_compatible(bounds)
+        bounds_before = bounds
+
+        if not is_d3_compatible(bounds):
+            bounds = list(reversed(bounds))
+
+        if not is_d3_compatible(bounds):
+            print "{} before compat: {}".format(name, compat_before)
+            print bounds_before
+            print "{} after compat: {}".format(name, is_d3_compatible(bounds))
+            print bounds
+            print
 
 
-        # increment the index
-        index += 1
+        for index, pt in enumerate(bounds):
+
+            ra, dec = pt
+            vertex = get_bounds_vertex(ra, dec)
+
+            # add the vertex to the constellation boundary
+            const_bound_vertex = ConstBoundVertex(const_code=const,
+                                                  vertex_id=vertex.vertex_id,
+                                                  index=index)
+            db.session.add(const_bound_vertex)
+
+    # last_const = None
+
+    # for boundline in boundfile:
+    #     try: 
+    #         ra_in_hrs, dec, const = boundline.strip().split()
+    #     except: 
+    #         if DEBUG: 
+    #             print "bad line in boundfile: [{}]".format(boundline) 
+    #         continue
+
+    #     # translate ra into degrees
+    #     ra_in_deg = get_degrees_from_hours(ra_in_hrs)
+    #     dec_in_deg = float(dec)
+
+    #     # reset the index if necessary
+    #     if const != last_const:
+    #         index = 0
+    #         last_const = const
+
+    #     vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
+
+    #     # add the vertex to the constellation boundary
+    #     const_bound_vertex = ConstBoundVertex(const_code=const,
+    #                                           vertex_id=vertex.vertex_id,
+    #                                           index=index)
+    #     db.session.add(const_bound_vertex)
+
+
+    #     # increment the index
+    #     index += 1
 
     db.session.commit()
 
@@ -359,8 +443,8 @@ def load_seed_data(ddir):
 
     load_constellations(ddir)
     load_const_boundaries(ddir)
-    load_stars(ddir)
-    load_constellation_lines(ddir)
+    # load_stars(ddir)
+    # load_constellation_lines(ddir)
 
 
 if __name__ == '__main__':

@@ -80,7 +80,8 @@ var drawSky = function(skyData) {
         .clipAngle(90)
         .precision(0.1)
         // .rotate(([0, 360 - 37, 0]));
-        .rotate(([92, 331, 0]));
+        // .rotate(([92, 331, 0])); -- this is a bad one for inverted constellation bounds
+
 
     // create a path generator for the sphere of the sky
     // globally scoped
@@ -119,6 +120,8 @@ var rotateSky = function(lambda, phi) {
     // phi (based on longitude / time)
 
     // uses global skyProjection, 
+
+    console.log('rotating to', lambda, phi);
 
     // calculate duration based on distance to go
     var oldRotation = skyProjection.rotate();

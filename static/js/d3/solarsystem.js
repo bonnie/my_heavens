@@ -1,28 +1,6 @@
 // d3 for drawing planets (including sun/moon)
 // pulls globals xxxx from main-d3.js
 
-// when form is submitted (event listener code in geocode.js)
-var getPlanets = function(locTime) {
-
-    // clear previous planets
-    // $('#star-field').empty();
-
-    // d3.request needs data in a query string format
-    var data = 'lat=' + locTime.lat;
-    data += '&lng=' + locTime.lng;
-    if (datetime !== undefined) {
-        data += '&datetime=' + locTime.datetime;
-    }
-
-    // can't do simple d3.json because we need to post data
-    d3.request('/planets.json')
-        .mimeType("application/json")
-        .response(function(xhr) { return JSON.parse(xhr.responseText); })
-        .header("Content-Type","application/x-www-form-urlencoded")
-        // .on('progress', function()) // TODO: show progress bar!
-        .post(data, drawSolarSystem);
-
-}
 
 var revealPlanets = function() {
     // make planets grow and shrink to highlight their position(s)
@@ -30,8 +8,8 @@ var revealPlanets = function() {
     // TODO: post message (in error div?) if no planets are visible 
     //        e.g.  berkeley 1/1/2017 1:00 AM
 
-    var trans1time = 1000
-    var trans2time = 1000
+    var trans1time = 1000;
+    var trans2time = 1000;
 
     // disable the button
     $('#reveal-planets').attr('disabled', 'disabled');
@@ -40,29 +18,49 @@ var revealPlanets = function() {
     var planets = d3.selectAll('circle.planet');
 
     // do fun zoom transitions
-    planets.transition()        
-        .duration(trans1time)      
-        .attr('r', function(d) { return d3.select(this).attr('r') * 5 });
+    planets.transition()
+        .duration(trans1time)
+        .attr('r', function(d) { return d3.select(this).attr('r') * 5; });
 
     planets.transition()
         .delay(trans1time)
         .duration(trans2time)
-        .attr('r', function(d) { return d3.select(this).attr('r') });
+        .attr('r', function(d) { return d3.select(this).attr('r'); });
 
     // re-enable the button
     setTimeout(function() {
-                    $('#reveal-planets').removeAttr('disabled')
-                }, 
+                    $('#reveal-planets').removeAttr('disabled');
+                },
                 trans1time + trans2time);
 
-}
+};
+
+
+var rotateAndDrawSolarSystem = function(locationResponse) {
+  // callback for getting data related to location and time 
+  // (rotation and planet data)
+
+  console.log(locationResponse);
+
+  // first rotate
+  rotateInfo = locationResponse.rotation;
+  rotateSky(rotateInfo.lambda, rotateInfo.phi);
+
+  // then set global ss data and moon data
+  ssData = locationResponse.planets;
+  moonData = locationResponse.moon;
+
+  // then draw planets
+  drawPlanets();
+
+};
 
 //////////////////////////////////////////
 // functions to draw planets, moon, sun //
 //////////////////////////////////////////
 
 
-var drawPlanets = function(planetData) {
+var drawPlanets = function() {
     // draw planets on sky sphere
     // uses globals skySphere, skyProjection, sunMoonRadius
 
@@ -72,14 +70,14 @@ var drawPlanets = function(planetData) {
 
     // One div for every planet info window
     // planetInfoDiv is globally scoped
-    planetInfoDiv = d3.select("body").append("div")   
-        .attr("class", "planet-info info")               
+    planetInfoDiv = d3.select("body").append("div")
+        .attr("class", "planet-info info")
         .style("opacity", 0)
-        .style('border-radius', '4px');            
+        .style('border-radius', '4px');
 
     // create group for planet
     var planets = svgContainer.selectAll('g.planet')
-                            .data(skyData.planets)
+                            .data(ssData)
                             .enter()
                             .append('g')
                             .attr('class', 'planet-group');
@@ -95,16 +93,16 @@ var drawPlanets = function(planetData) {
                         .attr('fill', d.color)
                         .attr('class', 'planet');
 
-        var planetRadius
+        var planetRadius;
         if (d.name === 'Sun') {
 
-            planetRadius = sunMoonRadius
+            planetRadius = sunMoonRadius;
             planet.attr('class', 'sun')
                   .attr('r', planetRadius);
             
         } else {
             // let smaller planets be sized according to magnitude
-            planetRadius = (5 - d.magnitude) * 0.5
+            planetRadius = (5 - d.magnitude) * 0.5;
             planet.attr('r', planetRadius);
         }
 
@@ -122,7 +120,7 @@ var drawPlanets = function(planetData) {
 
     
     });
-}
+};
 
 
 var drawMoon = function(moonData) {
@@ -143,7 +141,7 @@ var drawMoon = function(moonData) {
       .scale(sunMoonRadius) // this determines the size of the moon
       .translate([d.x, d.y]) // moon coords here
       .clipAngle(90)
-      .precision(.1)
+      .precision(0.1)
       .rotate([0, 0, d.rotation]); // rotate the moon so the lit part points to the sun
 
   // create a path generator
@@ -162,8 +160,8 @@ var drawMoon = function(moonData) {
   var litHemisphere = d3.geoCircle()
           // sets the circle center to the specified point [longitude, latitude] in degrees
           // 0 degrees is on the left side of the sphere
-          .center([90 - d.colong, 0]) 
-          .radius(90) // sets the circle radius to the specified angle in degrees
+          .center([90 - d.colong, 0])
+          .radius(90); // sets the circle radius to the specified angle in degrees
 
   // project the lit hemisphere onto the moon sphere
   svgContainer.append('path')
@@ -174,9 +172,9 @@ var drawMoon = function(moonData) {
       .attr('stroke-width', 1)
       .attr('class', 'lit-moon');
 
-  addInfoWindowMouseOver(moon, d, planetInfoDiv)
+  addInfoWindowMouseOver(moon, d, planetInfoDiv);
 
-}
+};
 
 var drawSolarSystem = function(error, ssData) {
     // success function for planet data from planets.json
@@ -193,7 +191,7 @@ var drawSolarSystem = function(error, ssData) {
     if (error) {
         showAjaxError(error);
         return;
-    } 
+    }
 
     /////////////
     // planets //
@@ -213,7 +211,7 @@ var drawSolarSystem = function(error, ssData) {
     //////////////
 
     // re-enable the "show stars" button
-    $('#show-stars').removeAttr('disabled')
+    $('#show-stars').removeAttr('disabled');
 
     // show the starfield controls 
     $('#starfield-controls').show();
@@ -222,6 +220,6 @@ var drawSolarSystem = function(error, ssData) {
     $('#reveal-planets').on('click', revealPlanets);
 
 
-}
+};
 
 

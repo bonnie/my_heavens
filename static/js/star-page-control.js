@@ -41,7 +41,7 @@ var processFormInputs = function(latlng) {
     }
 
     // disable the button
-    $('#show-stars').attr('disabled', 'disabled');
+    // $('#show-stars').attr('disabled', 'disabled');
 
     // put the data into an obj
     var locTime = {
@@ -50,11 +50,33 @@ var processFormInputs = function(latlng) {
         datetime: datetime
     }
 
-    // rotate the star field; rotateSky defined in sky.js
-    rotateSky(locTime);
+    // get rotation and ss data
+    getLocTimeData(locTime);
 
-    // getPlanets is defined in solarsystem.js
-    getPlanets(locTime);
+};
+
+// when form is submitted
+var getLocTimeData = function(locTime) {
+
+    // clear previous planets
+    // $('#star-field').empty();
+
+    // d3.request needs data in a query string format
+    var data = 'lat=' + locTime.lat;
+    data += '&lng=' + locTime.lng;
+    if (locTime.datetime !== undefined) {
+        data += '&datetime=' + locTime.datetime;
+    }
+
+    // can't do simple d3.json because we need to post data
+    d3.request('/planets.json')
+        .mimeType("application/json")
+        .response(function(xhr) { return JSON.parse(xhr.responseText); })
+        .header("Content-Type","application/x-www-form-urlencoded")
+        // .on('progress', function()) // TODO: show progress bar!
+
+        // rotateAndDrawSolarSystem is in solarsystem.js
+        .post(data, rotateAndDrawSolarSystem);
 
 };
 

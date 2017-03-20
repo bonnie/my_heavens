@@ -11,6 +11,7 @@
 /// https://bl.ocks.org/wwymak/dcdd12937bd4643cd9b3 --animated drag d3 sphere
 /// http://bl.ocks.org/KoGor/5994960 --sphere rotation animation
 /// https://github.com/d3/d3-transition --transitions documentation
+/// https://bl.ocks.org/mbostock/a7bdfeb041e850799a8d3dce4d8c50c8 --polygon interior
 
 ////////
 // rotation reference: https://www.jasondavies.com/maps/rotate/
@@ -24,7 +25,7 @@
 // globals to use across functions
 var sunMoonRadius, planetInfoDiv, sunInSky, svgContainer;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, labelDatum;
-var starData, constData, ssData;
+var starData, constData, ssData, moonData;
 var skyRadius = 300;  // for now
 
 

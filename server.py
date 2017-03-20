@@ -28,10 +28,9 @@ def return_stars():
     """return a json of star and constellation info
     """
 
-    max_magnitude = 5 # dimmest stars to show
+    max_magnitude = 5  # dimmest stars to show
 
-    return jsonify({
-                    'constellations': get_constellations(),
+    return jsonify({'constellations': get_constellations(),
                     'stars': get_stars(max_magnitude)})
 
 
@@ -43,14 +42,15 @@ def return_planets():
     lat = request.form.get('lat')
     lng = request.form.get('lng')
     localtime_string = request.form.get('datetime')
-    max_magnitude = 5 # dimmest stars to show
+    max_magnitude = 5  # dimmest stars to show
 
     stf = StarField(lat=float(lat),
                     lng=float(lng),
                     max_mag=max_magnitude,
                     localtime_string=localtime_string)
 
-    return jsonify({'planets': stf.get_planets(), 
+    return jsonify({'rotation': stf.get_rotation(),
+                    'planets': stf.get_planets(),
                     'moon': stf.get_moon()})
 
 

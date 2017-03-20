@@ -80,7 +80,7 @@ var drawSky = function(skyData) {
         .clipAngle(90)
         .precision(0.1)
         // .rotate(([0, 360 - 37, 0]));
-        .rotate(([90, 331, 0]));
+        .rotate(([92, 331, 0]));
 
     // create a path generator for the sphere of the sky
     // globally scoped
@@ -125,7 +125,7 @@ var rotateSky = function(lambda, phi) {
     var oldLambda = oldRotation[0];
     var oldPhi = oldRotation[1];
     var durTime = Math.sqrt(Math.pow((oldLambda - lambda), 2) + Math.pow((oldPhi - phi), 2)) * 15;
-    console.log(durTime);
+    // console.log(durTime);
 
 
     // adapted from http://bl.ocks.org/KoGor/5994960
@@ -176,15 +176,11 @@ var isVisible = function(obj) {
             !isNaN(pt)) {
 
                 return true;
+            }
         }
-
     }
 
     // if we haven't yet returned true, return false
     return false;
     
-}
-
-
-
-}
+};

@@ -2,7 +2,6 @@
 
 import os
 import csv
-import math
 import re
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -11,7 +10,7 @@ from model import db, connect_to_db, Star, Constellation, ConstLineVertex, \
 
 from colors import COLOR_BY_SPECTRAL_CLASS
 
-# for debugging output. False by default unless running the script directly. 
+# for debugging output. False by default unless running the script directly.
 DEBUG = False
 
 # to be able to distinguish between data dir for testing
@@ -25,6 +24,7 @@ BF_RE = re.compile(r'^\d+\s*')
 
 # for stars with unrecognizable spectral classes
 DEFAULT_COLOR = "#ffffff"
+
 
 def open_datafile(datadir, file_type):
     """Return path to the data file type using the datadir as the location.
@@ -52,7 +52,7 @@ def open_datafile(datadir, file_type):
 def announce(action):
     """Give feedback on where in the script we are."""
 
-    if DEBUG: 
+    if DEBUG:
         print
         print '*'*20
         print action
@@ -93,43 +93,44 @@ def get_color(spectral_class):
         return DEFAULT_COLOR
 
 
-def is_d3_compatible(bounds_list):
-    """Determine if a bounds list is compatible with d3 geoPaths.
+# def preprocess_const_bounds():
+#     """Pre-process the constellation bounds file to reverse any non-clockwise polygons.
 
-    Southern and clockwise constellations need to be reversed for proper d3
-    display."""
+#     I tried to do this programmatically using
 
-    # from http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+#         http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
 
-    # keep a running sum
-    point_sum = 0
+#     but I wasn't able to make it work (within a reasonable amt of time). So, manual it is."""
 
+#     announce('reversing constellation bounds where necessary')
 
-    # compare up to the second-to-last point
-    for i in range(len(bounds_list) - 1):
-        pt = bounds_list[1]
-        next_pt = bounds_list[i + 1]
+#     CONSTS_NEEDING_REVERSING = ['OCT', 'PAV', 'CEP']
 
-        # point_sum += pt[0] * next_pt[1] - next_pt[0] * pt[1]
-        point_sum += (next_pt[0] - pt[0]) * (next_pt[1] + pt[1])
+#     bfile_out = open(os.path.join(DATADIR, 'constellation_boundaries.txt'), 'w+')
+#     bfile = open(os.path.join(DATADIR, 'constellation_boundaries.txt.orig'))
 
+#     const_bounds = {}
 
-    # then close the loop
-    pt = bounds_list[-1]
-    next_pt = bounds_list[0]
-    point_sum += (next_pt[0] - pt[0]) * (next_pt[1] + pt[1])
+#     # make a dict of the const_bounds
+#     for boundline in bfile:
+#         try:
+#             ra, dec, const = boundline.strip().split()
+#         except:
+#             if DEBUG:
+#                 print "bad line in boundfile: [{}]".format(boundline)
+#             continue
 
+#         # add the pt to the list for this constellation
+#         const_bounds.setdefault(const, []).append((ra, dec))
 
-    # southern constellations actually need to be anti-clockwise to work with d3 polygon paths
-    southern = all([dec < 0 for _, dec in bounds_list])
+#     # reverse the constellations in need of reversing
+#     for const in CONSTS_NEEDING_REVERSING:
+#         const_bounds[const].reverse()
 
-    if southern:
-        compat = point_sum < 0
-    else:
-        compat = point_sum > 0
-
-    return compat
-
+#     # write to the new file
+#     for const, boundslist in const_bounds.iteritems():
+#         for ra, dec in boundslist:
+#             bfile_out.write("{} {} {}\n".format(ra, dec, const))
 
 
 def get_name_and_constellation(star_info):
@@ -143,7 +144,7 @@ def get_name_and_constellation(star_info):
     bf = re.sub(r' +', ' ', bf)
     bf = re.sub(r'^[\d ]+', '', bf)
 
-    if not name and len(bf) > 3: 
+    if not name and len(bf) > 3:
         # if bf is just 3 characters long, it's only the constellation
         name = bf
 
@@ -166,7 +167,7 @@ def load_constellations(datadir):
         reader = csv.DictReader(csvfile)
 
         # make a new const obj for each line and add to db
-        for constline in reader: 
+        for constline in reader:
             newconst = Constellation(const_code=constline['Abbrev'],
                                      name=constline['Name'])
             db.session.add(newconst)
@@ -209,8 +210,9 @@ def load_const_boundaries(datadir):
 
     boundfile = open_datafile(datadir, 'bounds')
 
-    # make dictionary listing constellation bounds
-    const_bounds = {}
+    # keep track of what constellation we're on, in order to reset indexes when
+    # we switch constellations
+    last_const = None
 
     for boundline in boundfile:
         try:
@@ -220,72 +222,26 @@ def load_const_boundaries(datadir):
                 print "bad line in boundfile: [{}]".format(boundline)
             continue
 
-        # translate ra into degrees and dec to float
+        # translate ra into degrees
         ra_in_deg = get_degrees_from_hours(ra_in_hrs)
         dec_in_deg = float(dec)
 
-        # add the pt to the list for this constellation
-        const_bounds.setdefault(const, []).append((ra_in_deg, dec_in_deg))
+        # reset the index if necessary
+        if const != last_const:
+            index = 0
+            last_const = const
 
-    # determine if each const is clockwise or anti-clockwise and if the list
-    # needs to be reversed
-    for name, bounds in const_bounds.iteritems():
+        vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
 
-        compat_before = is_d3_compatible(bounds)
-        bounds_before = bounds
-
-        if not is_d3_compatible(bounds):
-            bounds = list(reversed(bounds))
-
-        if not is_d3_compatible(bounds):
-            print "{} before compat: {}".format(name, compat_before)
-            print bounds_before
-            print "{} after compat: {}".format(name, is_d3_compatible(bounds))
-            print bounds
-            print
+        # add the vertex to the constellation boundary
+        const_bound_vertex = ConstBoundVertex(const_code=const,
+                                              vertex_id=vertex.vertex_id,
+                                              index=index)
+        db.session.add(const_bound_vertex)
 
 
-        for index, pt in enumerate(bounds):
-
-            ra, dec = pt
-            vertex = get_bounds_vertex(ra, dec)
-
-            # add the vertex to the constellation boundary
-            const_bound_vertex = ConstBoundVertex(const_code=const,
-                                                  vertex_id=vertex.vertex_id,
-                                                  index=index)
-            db.session.add(const_bound_vertex)
-
-    # last_const = None
-
-    # for boundline in boundfile:
-    #     try: 
-    #         ra_in_hrs, dec, const = boundline.strip().split()
-    #     except: 
-    #         if DEBUG: 
-    #             print "bad line in boundfile: [{}]".format(boundline) 
-    #         continue
-
-    #     # translate ra into degrees
-    #     ra_in_deg = get_degrees_from_hours(ra_in_hrs)
-    #     dec_in_deg = float(dec)
-
-    #     # reset the index if necessary
-    #     if const != last_const:
-    #         index = 0
-    #         last_const = const
-
-    #     vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
-
-    #     # add the vertex to the constellation boundary
-    #     const_bound_vertex = ConstBoundVertex(const_code=const,
-    #                                           vertex_id=vertex.vertex_id,
-    #                                           index=index)
-    #     db.session.add(const_bound_vertex)
-
-
-    #     # increment the index
-    #     index += 1
+        # increment the index
+        index += 1
 
     db.session.commit()
 
@@ -300,7 +256,7 @@ def load_stars(datadir):
     with open_datafile(datadir, 'stars') as csvfile:
         reader = csv.DictReader(csvfile)
         for starline in reader:
-            
+
             # display progress
             line_num += 1
             if line_num % 5000 == 0:
@@ -348,17 +304,17 @@ def load_stars(datadir):
 def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
     """Get the closest star matching the input values.
 
-    const and name are strings used only for debugging. 
+    const and name are strings used only for debugging.
 
     Returns a Star object"""
 
    # find the star matching this constellation line point
-    query = Star.query.filter(db.func.abs(Star.ra - ra_in_deg) < 0.02, 
+    query = Star.query.filter(db.func.abs(Star.ra - ra_in_deg) < 0.02,
                          db.func.abs(Star.dec - dec_in_deg) < 0.02)
 
     query_with_magnitude = query.filter(db.func.abs(db.func.abs(Star.magnitude) - db.func.abs(mag)) < 0.5)
-                                 
-    try: 
+
+    try:
         try:
             star = query_with_magnitude.one()
 
@@ -367,7 +323,7 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
             # some of the magnitudes are way off (variable stars?). Try without the magnitude
             try:
                 star = query.one()
-                if DEBUG: 
+                if DEBUG:
                     print "matched {} {} without magnitude".format(const, name)
 
             except NoResultFound:
@@ -390,7 +346,7 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
 def load_constellation_lines(datadir):
     """Add the constellation lines into the db.
 
-    * Each continuous line gets its own line group. 
+    * Each continuous line gets its own line group.
     * Match stars to existing stars in the db using ra, dec, and magnitude
     """
 
@@ -402,9 +358,9 @@ def load_constellation_lines(datadir):
     with open_datafile(datadir, 'lines') as csvfile:
         reader = csv.DictReader(csvfile)
 
-        for constpoint in reader: 
+        for constpoint in reader:
 
-            # time to make a new group? 
+            # time to make a new group?
             if not constpoint['RA']:
                 group_break = True
                 continue
@@ -443,14 +399,13 @@ def load_seed_data(ddir):
 
     load_constellations(ddir)
     load_const_boundaries(ddir)
-    # load_stars(ddir)
-    # load_constellation_lines(ddir)
+    load_stars(ddir)
+    load_constellation_lines(ddir)
 
 
 if __name__ == '__main__':
 
-    
-    # don't import app from server; we don't want to have to wait for the 
+    # don't import app from server; we don't want to have to wait for the
     # the tzwhere instance
     from flask import Flask
     app = Flask(__name__)

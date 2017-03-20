@@ -48,6 +48,12 @@ var drawConstellations = function() {
         // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
         if (d.bound_verts.length > 0) {
 
+
+            // reverse the bounds polygons if we're in the southern hemisphere
+            // so d3 understands we want the constellations, not their inverse
+            
+
+
             var constBoundsPolygon = {
                 geometry: {
                     type: 'Polygon',
@@ -80,13 +86,13 @@ var drawConstellations = function() {
             // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
             if (d.line_groups.length > 0) {
 
-                var constLineMultiLine = { 
+                var constLineMultiLine = {
                     geometry: {
                         type: 'MultiLineString',
                         coordinates: d.line_groups
                     },
                     type: 'Feature'
-                }
+                };
 
                 var constLines = thisConst.append('path')
                                     .datum(constLineMultiLine)
@@ -104,7 +110,6 @@ var drawConstellations = function() {
             // get better positioning for the constellation labels along the edges
             // TODO: do a better job of positioning, esp for constellation off the middle right 
             // TODO: separate out into a function.
-            var textAnchor;
             var bounds = skyPath.bounds(boundsObj);
             var minX = bounds[0][0];
             var minY = bounds[0][1];
@@ -125,9 +130,9 @@ var drawConstellations = function() {
 
         }
 
-        if (d.name === 'Octans') {
-            debugger;
-        }
+        // if (d.name === 'Octans') {
+        //     debugger;
+        // }
 
 
     });

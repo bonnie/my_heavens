@@ -16,3 +16,8 @@ clarity):
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 
+ISSUE: Calculating rotation of sky sphere from latitude and longitude. 
+
+EXPLANATION: First, I noticed that the sky was reversed, because I was looking
+at the celestial sphere from the outside, when really we look at it from the
+inside.

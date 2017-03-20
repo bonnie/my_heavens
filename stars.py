@@ -2,36 +2,33 @@
 
 from model import db, Star, Constellation
 
+
 def get_stars(max_mag):
     """Return list of star dicts for the given maximum magnitude.
 
     Returns all stars to populate entire celestial sphere
 
-    star dict keys: 
+    star dict keys:
         "ra": right ascension for star, in degrees
         "dec": declination for star, in degrees
         "magnitude": magnitude of star
         "color": color corresponding to star's spectral class
         "name": star's name
 
-    sample output: 
+    sample output:
 
     [ {"ra": 88.793, "dec": 7.407, "magnitude": 0.45, "color": "#ffc168", "name": "Betelgeuse"}
         ...
     ]
     """
 
-    # get list of stars
-    db_stars = Star.query.all()
+    # get list of stars with specified max magnitude
+    db_stars = Star.query.filter(Star.magnitude <= max_mag).all()
     star_field = []
 
     for star in db_stars:
 
-        if star.magnitude > max_mag: 
-            # skip stars that are too dim
-            continue
-
-        # names based on the constellation aren't interesting (and often 
+        # names based on the constellation aren't interesting (and often
         # obscure the traditional names); don't include them
         name = star.name
         if star.name and star.const_code and star.name[-3:].lower() == star.const_code.lower():
@@ -39,10 +36,11 @@ def get_stars(max_mag):
 
         # add it to the list in a neat little package
         #
-        # cast magnitude to float, as it comes back as a Decimal obj: bad json
-        star_field.append({'ra': float(star.ra), 
-                           'dec': float(star.dec), 
-                           'magnitude': float(star.magnitude), 
+        # cast numbers to float, as it comes back as a Decimal obj: bad json
+
+        star_field.append({'ra': float(star.ra),
+                           'dec': float(star.dec),
+                           'magnitude': float(star.magnitude),
                            'color': star.color,
                            'name': name
                            })

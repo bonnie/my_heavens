@@ -59,12 +59,15 @@ def announce(action):
         print '*'*20
 
 
-def get_degrees_from_hours(ra_in_hrs):
-    """Return a degree equivalent of input RA in hours
+def get_degrees_from_hours_and_invert(ra_in_hrs):
+    """Return a degree equivalent of input RA in hours and invert.
+
+    Inversion (subtraction from 360) is necessary to simulate looking at the
+    *inside* of the celestial sphere in d3, instead of the outside
 
     (input in string or Decimal format)"""
 
-    return float(ra_in_hrs) * 360 / 24
+    return 360 - float(ra_in_hrs) * 360 / 24
 
 
 def get_color(spectral_class):
@@ -222,8 +225,8 @@ def load_const_boundaries(datadir):
                 print "bad line in boundfile: [{}]".format(boundline)
             continue
 
-        # translate ra into degrees
-        ra_in_deg = get_degrees_from_hours(ra_in_hrs)
+        # translate ra into degrees and invert for d3
+        ra_in_deg = get_degrees_from_hours_and_invert(ra_in_hrs)
         dec_in_deg = float(dec)
 
         # reset the index if necessary
@@ -267,8 +270,8 @@ def load_stars(datadir):
             if magnitude > 7:
                 continue
 
-            # translate ra into degrees
-            ra_in_deg = get_degrees_from_hours(starline['RA'])
+            # translate ra into degrees and invert for d3
+            ra_in_deg = get_degrees_from_hours_and_invert(starline['RA'])
             dec_in_deg = float(starline['Dec'])
 
             # sometimes color_index is a bunch of space characters
@@ -365,8 +368,10 @@ def load_constellation_lines(datadir):
                 group_break = True
                 continue
 
+            # translate degrees to hours and invert
+            ra_in_deg = get_degrees_from_hours_and_invert(constpoint['RA'])
+
             # get data into proper format
-            ra_in_deg = get_degrees_from_hours(constpoint['RA'])
             dec_in_deg = float(constpoint['DEC'])
             mag = float(constpoint['MAG'])
 
@@ -374,8 +379,8 @@ def load_constellation_lines(datadir):
             star = get_matching_star(ra_in_deg, dec_in_deg, mag, constpoint['CON'], constpoint['NAME'])
 
             # make a new group if necessary
-            if group_break: 
-                group = ConstLineGroup(const_code = constpoint['CON'])
+            if group_break:
+                group = ConstLineGroup(const_code=constpoint['CON'])
                 db.session.add(group)
                 db.session.flush()
 

@@ -8,31 +8,42 @@ var revealPlanets = function() {
     // TODO: disable button and/or post message (in error div?) if no planets are visible 
     //        e.g.  berkeley 1/1/2017 1:00 AM
 
-    var trans1time = 1000;
-    var trans2time = 1000;
 
-    // disable the button
-    $('#reveal-planets').attr('disabled', 'disabled');
+    // TODO: make a nice ux here, like clicking a button to put a circle around planets 
+    // and show the planet names, and then clicking the same button to hide
 
-    // select planets
-    var planets = d3.selectAll('circle.planet');
+  // var t = d3.transition()
+  //     .duration(1000)
+  //     .ease(d3.easeLinear);
 
-    // do fun zoom transitions
-    // TODO: chain these transitions, rather than delays and settimeouts the second one
-    planets.transition()
-        .duration(trans1time)
-        .attr('r', function(d) { return d3.select(this).attr('r') * 5; });
+  // d3.selectAll('g.planet-group')
+  //     .on('start', $('#reveal-planets').attr('disabled', 'disabled'))
+  //     .transition(t)
+  //       .attr('transform', 'scale(5)')
+  //     .transition(t)
+  //       .attr('transform', 'scale(1)')
+  //     .on('end', $('#reveal-planets').removeAttr('disabled'));
 
-    planets.transition()
-        .delay(trans1time)
-        .duration(trans2time)
-        .attr('r', function(d) { return d3.select(this).attr('r'); });
 
-    // re-enable the button
-    setTimeout(function() {
-                    $('#reveal-planets').removeAttr('disabled');
-                },
-                trans1time + trans2time);
+// d3.selectAll(".orange").transition(t)
+//     .style("fill", "orange");
+
+//     // do fun zoom transitions
+//     // TODO: chain these transitions, rather than delays and settimeouts the second one
+//     planets.transition()
+//         .duration(transtime)
+//         .attr('r', function(d) { return d3.select(this).attr('r') * 5; });
+
+//     planets.transition()
+//         .delay(trans1time)
+//         .duration(trans2time)
+//         .attr('r', function(d) { return d3.select(this).attr('r'); });
+
+//     // re-enable the button
+//     setTimeout(function() {
+//                     ;
+//                 },
+//                 trans1time + trans2time);
 
 };
 
@@ -112,32 +123,31 @@ var drawMoon = function(mode) {
   // simluate the phase of the moon based on colong, using a half-lit sphere
   // append moon to svg parameter
 
-  // uses globals sunMoonData, planetInfoDiv, sunInSky, daySkyColor and svgContainer
+  // uses globals moonData, sunMoonRadius, skyObjects, 
 
   // TODO: rotate the moon appropriately! 
 
-  if (moonData === null) {
-    // the moon isn't out; nothing to draw
-    return;
-  }
+  // for easier access
+  d = moonData;
 
   // create the projection
   var moonProjection = d3.geoOrthographic()
       .scale(sunMoonRadius) // this determines the size of the moon
-      .translate([d.x, d.y]) // moon coords here
+      .translate(skyProjection([d.ra, d.dec])) // moon coords here
       .clipAngle(90)
-      .precision(0.1)
-      .rotate([0, 0, d.rotation]); // rotate the moon so the lit part points to the sun
+      .precision(0.1);
+      // .rotate([0, 0, d.rotation]); // rotate the moon so the lit part points to the sun
 
   // create a path generator
   var moonPath = d3.geoPath()
       .projection(moonProjection);
 
   // create the moon sphere
-  var moon = svgContainer.append("path")
+  var moon = skyObjects.append("path")
       .datum({type: "Sphere"})
       .attr("id", "moon-sphere")
-      .attr("d", moonPath)
+      .attr("d", function(d) { return moonPath(d); })
+      // .attr('fill', 'red')
       .attr('opacity', 0);
 
 
@@ -149,9 +159,9 @@ var drawMoon = function(mode) {
           .radius(90); // sets the circle radius to the specified angle in degrees
 
   // project the lit hemisphere onto the moon sphere
-  svgContainer.append('path')
+  skyObjects.append('path')
       .datum(litHemisphere)
-      .attr("d", moonPath)
+      .attr("d", function(d) { return moonPath(d); })
       .attr('fill', 'white')
       .attr('stroke', 'white')
       .attr('stroke-width', 1)
@@ -185,7 +195,7 @@ var drawSolarSystem = function(mode) {
 
   drawSun(mode);
   drawPlanets(mode);
-  // drawMoon(mode);
+  drawMoon(mode);
 
 };
 

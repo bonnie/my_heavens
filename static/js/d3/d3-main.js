@@ -195,18 +195,11 @@ var drawSkyAndStars = function(error, starDataResult) {
 var drawSkyObjects = function() {
     // draw sky objects either at beginning of page load or after change in data
 
-    console.log('drawing sky objects');
-
     // defined in constellations.js
     drawConstellations();
 
-
-    console.log('drew constellations');
-
     // defined in stars.js
     drawStars();
-
-        console.log('drew stars');
 
     if (planetData !== undefined) {
         // on intial page load, there will be no planet data.
@@ -214,11 +207,6 @@ var drawSkyObjects = function() {
         //      conditions 
         drawSolarSystem();
     }
-
-
-    console.log('drew planets');
-
-
 
 };
 

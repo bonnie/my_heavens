@@ -59,15 +59,6 @@ var drawSky = function(skyData) {
     printSkyBackground();
 
 
-    // the sphere of the sky
-    // globally scoped. TODO: does this need to be global? should it get its own function? 
-    // skySphere = svgContainer.append("path")
-    //   .datum({type: "Sphere"})
-    //   .attr("id", "sky-sphere")
-    //   .attr("d", skyPath)
-    //   .attr('opacity', 0);
-
-
     // for zooming, make a group for all the contents of the skySphere
     // globally scoped
     skyObjects = svgContainer.append('g')

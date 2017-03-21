@@ -4,7 +4,7 @@
 
 // globals that will be initialized on document load
 var datetimeRadio, changetimeRadio, datetimeSelector, datetimeInput, errorDiv,
-    starfieldControlDiv, warnDiv;
+    starfieldControlDiv, warnDiv, eclipticToggleButton;
 
 var displayError = function(error) {
 
@@ -90,6 +90,7 @@ $(document).ready(function() {
     errorDiv = $('#error');
     starfieldControlDiv = $('#starfield-controls');
     warnDiv = $('#warn');
+    eclipticToggleButton = $('#ecliptic-toggle');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {

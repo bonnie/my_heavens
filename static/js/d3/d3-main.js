@@ -24,8 +24,12 @@
 
 // globals to use across functions
 var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
-var skySphere, skyProjection, skyPath, skyObjects, skyTransform;
+var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData;
+var eclipticIsOn = false; // for tracking whether or not the ecliptic is showing
+                          // needs to be a global independent of the actual
+                          // element, since during animation, everything is
+                          // repeatedly deleted and redrawn
 var skyRadius = 350;  // for now
 
 
@@ -190,10 +194,18 @@ var drawSkyAndStars = function(error, starDataResult) {
 
     drawSkyObjects();
 
+    // show ecliptic toggle button and attach event listener
+    $('#starfield-controls').show()
+    eclipticToggleButton.on('click', toggleEcliptic);
+
+
 };
 
 var drawSkyObjects = function() {
     // draw sky objects either at beginning of page load or after change in data
+
+    // draw ecliptic first, so that everything else is on top of it
+    drawEcliptic();
 
     // defined in constellations.js
     drawConstellations();

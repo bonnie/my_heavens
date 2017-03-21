@@ -97,6 +97,7 @@ var rotateSky = function(lambda, phi) {
           $('#all-sky-objects').empty();
 
           // draw all the objects
+          if (eclipticIsOn) { drawEcliptic(); }
 
           // draw the background and sun/moon/planets without labels
           drawSolarSystem('transition');
@@ -118,6 +119,62 @@ var rotateSky = function(lambda, phi) {
             // debugger;
 
         });
+
+};
+
+var drawEcliptic = function() {
+    // draw the line of the ecliptic in the sky. It will be hidden until
+    // revealed with a button click
+    //
+    // uses global skyObjects, skyPath
+    //
+    // for reference: https://en.wikipedia.org/wiki/Ecliptic
+
+    // var ecliptic = d3.geoCircle()
+    //     .center([90, 90 - 23.4])
+    //     .radius(90); // sets the circle radius to the specified angle in degrees
+
+
+    // ecliptic path goes from equinox to lowest point to equinox to highest
+    // point I could do this with a circle, but then there's an ugly ring around
+    // the sky where the circle completes -- much more visually appealing to do
+    // it with a line
+    var eclipticPathCoords = [[0,0], [90, -23.4], [180,0], [270, 23.4], [0,0]];
+
+    var eclipticPolygon = {
+                geometry: {
+                    type: 'LineString',
+                    coordinates: eclipticPathCoords
+                },
+                type: 'Feature'
+    };
+
+    var overallOpacity = eclipticIsOn ? 1 : 0;
+
+    eclipticPath = skyObjects.append('path')
+      .datum(eclipticPolygon)
+      .attr("d", function(d) { return skyPath(d); })
+      .attr('stroke', 'red')
+      .attr('stroke-width', 2)
+      .attr('fill-opacity', 0)
+      .attr('opacity', overallOpacity)
+      .attr('stroke-opacity', 0.6)
+      .attr('id', 'ecliptic');
+};
+
+
+var toggleEcliptic = function() {
+    // a function to show / hide the ecliptic
+
+    // show or hide the ecliptic and change button text
+    var newText = eclipticIsOn ? 'Show' : 'Hide';
+    var newOpacity = eclipticIsOn ? 0 : 1;
+
+    eclipticToggleButton.html(newText + ' ecliptic');
+    eclipticPath.attr('opacity', newOpacity);
+
+    // reset eclipticIsOn
+    eclipticIsOn = !eclipticIsOn;
 
 };
 

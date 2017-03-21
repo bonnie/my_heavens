@@ -90,7 +90,8 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   $('#show-stars').removeAttr('disabled');
 
   // show the starfield controls 
-  $('#starfield-controls').show();
+  starfieldControlDiv.show();
+  $('#reveal-planets').removeAttr('disabled');
 
   // attach 'reveal planets' button to the revealPlanets function
   $('#reveal-planets').on('click', revealPlanets);

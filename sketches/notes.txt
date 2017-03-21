@@ -77,3 +77,13 @@ Needed to reverse coordinates (360 - ra) in the db for constellations not to
 be mirror-images
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+
+ISSUE: since d3 can't project a sphere onto a sphere, and I'm using a sphere to 
+represent the moon phases, the moon still shows even if it's on the "wrong" side
+of the sky sphere. 
+
+resolved: make a proxy point and check to see if it's visible. If it's not, 
+don't draw the moon. 
+
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~

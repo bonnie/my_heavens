@@ -130,6 +130,22 @@ var drawMoon = function(mode) {
   // for easier access
   d = moonData;
 
+  // how to tell if the moon is on the far side of the sky? Make a proxy point
+  // and see  if it's visible...
+  var moonPoint = {
+            geometry: {
+                type: 'Point',
+                coordinates: [d.ra, d.dec]
+            },
+            type: 'Feature',
+  };
+
+  if (!isVisible(moonPoint)) {
+    return;
+  }
+
+  // otherwise, carry on...
+
   // create the projection
   var moonProjection = d3.geoOrthographic()
       .scale(sunMoonRadius) // this determines the size of the moon
@@ -167,8 +183,10 @@ var drawMoon = function(mode) {
       .attr('stroke-width', 1)
       .attr('class', 'lit-moon');
 
-  addInfoWindowMouseOver(moon, d, planetInfoDiv);
+  moonLabel = skyObjects.append('text')
+        .attr('class', 'moon-label sky-label');
 
+  addInfoWindowMouseOver(moon, d, moonLabel);
 };
 
 var drawSun = function(mode) {

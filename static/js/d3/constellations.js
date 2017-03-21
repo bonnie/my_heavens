@@ -18,7 +18,7 @@ var isInverted = function(poly) {
     var screenArea = (bounds[1][0] - bounds[0][0]) * (bounds[1][1] - bounds[0][1]);
     var totalScreenArea = Math.pow(2 * skyRadius, 2);
 
-    return Math.abs(totalScreenArea - screenArea) < skyRadius * 20;
+    return screenArea / totalScreenArea > 3/4;
 
 
 };

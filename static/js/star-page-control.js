@@ -69,7 +69,7 @@ var getLocTimeData = function(locTime) {
     }
 
     // can't do simple d3.json because we need to post data
-    d3.request('/planets.json')
+    d3.request('/place-time-data.json')
         .mimeType("application/json")
         .response(function(xhr) { return JSON.parse(xhr.responseText); })
         .header("Content-Type","application/x-www-form-urlencoded")

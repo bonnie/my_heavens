@@ -14,10 +14,43 @@ d3.geo requires polygons to wind clockwise around their interior (right-hand
 (self-intersecting) at first glance (I removed the coincident point for
 clarity):
 
+/// https://bl.ocks.org/mbostock/a7bdfeb041e850799a8d3dce4d8c50c8 --polygon interior
+
+
+**
+
+It was harder than it may have first seemed: 
+
+    * just finding what was the issue was difficult -- what to google? 
+
+    * what was clockwise for some rotations was anti-clockwise for others (??
+      that doesn't seem right, does it?)
+
+    * As an after-the-fact measure, d3.geoArea and skyPath.area did not give
+      consistent results. The only consistent thing was screen area
+
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 
 ISSUE: Calculating rotation of sky sphere from latitude and longitude. 
 
-EXPLANATION: First, I noticed that the sky was reversed, because I was looking
+EXPLANATION: 
+
+from wikipedia: 
+
+The hour angle of a point is the angle between two planes: one containing the
+Earth's axis and the zenith (the meridian plane), and the other containing the
+Earth's axis and the given point (the hour circle passing through the point).
+
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+
+
+ISSUE: the sky was reversed, because I was looking
 at the celestial sphere from the outside, when really we look at it from the
 inside.
+
+
+Needed to reverse coordinates (360 - ra) in the db for constellations not to
+be mirror-images
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~

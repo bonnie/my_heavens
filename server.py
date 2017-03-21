@@ -34,9 +34,11 @@ def return_stars():
                     'stars': get_stars(max_magnitude)})
 
 
-@app.route('/planets.json', methods=['POST'])
-def return_planets():
-    """return a json of planet, sun and moon info, based on location and time
+@app.route('/place-time-data.json', methods=['POST'])
+def return_place_time_data():
+    """Return json of sky rotation, planet, sun and moon info.
+
+    Returned data is based on location and time from POST data.
     """
 
     lat = request.form.get('lat')
@@ -49,9 +51,10 @@ def return_planets():
                     max_mag=max_magnitude,
                     localtime_string=localtime_string)
 
-    return jsonify({'rotation': stf.get_rotation(),
+    return jsonify({'rotation': stf.get_sky_rotation(),
                     'planets': stf.get_planets(),
-                    'moon': stf.get_moon()})
+                    'moon': stf.get_moon(),
+                    'sun': stf.get_sun()})
 
 
 if __name__ == '__main__':

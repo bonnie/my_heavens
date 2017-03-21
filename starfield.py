@@ -14,8 +14,8 @@ from colors import PLANET_COLORS_BY_NAME
 TZW = tzwhere.tzwhere()
 
 # to determine which non-star objects to find
-NON_STARS = [ ephem.Sun, ephem.Mercury, ephem.Venus, ephem.Mars, 
-              ephem.Jupiter, ephem.Saturn, ephem.Neptune, ephem.Uranus ]
+PLANETS = [ephem.Mercury, ephem.Venus, ephem.Mars,
+           ephem.Jupiter, ephem.Saturn, ephem.Neptune, ephem.Uranus]
 
 # how datetime comes in from bootstrap. For example "2017-01-01T01:00"
 BOOTSTRAP_DTIME_FORMAT = '%Y-%m-%dT%H:%M'
@@ -110,15 +110,15 @@ class StarField(object):
         """
 
         if not localtime_string:
-            # no time like the present! 
+            # no time like the present!
             self.utctime = datetime.utcnow()
 
         else:
-            
-            # get localtime with no timezone        
+
+            # get localtime with no timezone
             dtime_local = datetime.strptime(localtime_string, BOOTSTRAP_DTIME_FORMAT)
 
-            # get time zone based on lat/lng 
+            # get time zone based on lat/lng
             local_tz = self.get_timezone()
 
             # give it a time zone
@@ -132,16 +132,16 @@ class StarField(object):
 
         Returns None if planet is not visible for this starfield.
 
-        Example planet dict: 
+        Example planet dict:
         {'name': 'Jupiter',
-         'x': 117.34,
-         'y': 489.13,
+         'ra': 117.34,
+         'dec': 489.13,
          'magnitude': -2.21,
          'color': '#ffffc8'
          'size': 3.4 } # size is in arcsec
 
 
-         Note: Moon also has two more keys: 
+         Note: Moon also has two more keys:
             * colong (the angle of the terminus of the lit hemisphere, in degrees)
             * rotation (the angle to rotate the image of the moon, along the
                 axis pointing toward earth, in degrees)
@@ -157,15 +157,16 @@ class StarField(object):
         # otherwise, gather data
         planet_data = {}
 
-        planet_data['ra'] = pla.ra
-        planet_data['dec'] = pla.dec
+        # invert the RA for better inside sphere viewing
+        planet_data['ra'] = 360 - rad_to_deg(pla.ra)
+        planet_data['dec'] = rad_to_deg(pla.dec)
+
         planet_data['magnitude'] = pla.mag
         planet_data['name'] = pla.name
         planet_data['color'] = PLANET_COLORS_BY_NAME[pla.name]
         planet_data['size'] = pla.size
 
-
-        # for the moon, include the longitude of the terminus of the lit half, 
+        # for the moon, include the longitude of the terminus of the lit half,
         # for phase drawing purposes, plus calculate the rotation
         if planet == ephem.Moon:
 
@@ -188,7 +189,7 @@ class StarField(object):
 
         planets = []
 
-        for planet in NON_STARS:
+        for planet in PLANETS:
             pdata = self.get_planet_data(planet)
             if pdata:
                 planets.append(pdata)
@@ -206,10 +207,20 @@ class StarField(object):
 
         return self.get_planet_data(ephem.Moon)
 
-    def get_rotation(self):
-        """Return d3 rotation for this starfield.
+    def get_sun(self):
 
-        The rotation is equivalent to the alt/az of 0 ra, 0 dec.
+        """Return a dict of moon data, transformed for d3.
+
+        Since the sun is important for determining the background, it gets its
+        own data dict.
+
+        See get_planet_data docstring for dict details.
+        """
+
+        return self.get_planet_data(ephem.Sun)
+
+    def get_sky_rotation(self):
+        """Return d3 sky rotation for this starfield.
 
         Return value is a dict in the format:
 
@@ -226,10 +237,31 @@ class StarField(object):
 
         # ra, dec = self.ephem.radec_of(0, 90)
 
-        coords = sidereal.RADec(0, 0)
+        # ra = 0
+        # dec = 0
+        # coords = sidereal.RADec(ra, dec)
+
+        # # assume ra and dec come in as Decimal objects
+        # coords = RADec(float(ra), float(dec))
+
+        # ha = coords.hourAngle(self.utctime, self.lng)
+        # altaz = coords.altAz(ha, self.lat)
+
+
+        # hour angle pi (180) => azimuth 0
+        # without rotation, azimuth 0 is ra 0
+        # so if ra 0 has hour angle pi => no rotation
+        # otherwise, rotate pi - ha (??)
         ha = sidereal.raToHourAngle(0, self.utctime, deg_to_rad(self.lng))
-        altaz = coords.altAz(ha, deg_to_rad(self.lat))
-        lda = rad_to_deg(altaz.az)
+        ha_shift = rad_to_deg(math.pi / 2 - ha)
+
+        # it needs to be reversed since we're looking at everything in reverse
+        # on this particular celestial sphere
+        # lda = 360 - ha_shift
+        lda = ha_shift
+
+        # the phi rotation is dependent solely on the latitude
         phi = -1 * self.lat
+
 
         return {'lambda': lda, 'phi': phi}

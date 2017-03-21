@@ -6,7 +6,7 @@
 var daySkyColor = '#4169E1';
 
 
-function printSkyBackground(planets) {
+function printSkyBackground() {
     // print the sky background as light blue or a dark gradient, depending on 
     // whether the sun is in the sky 
 
@@ -19,11 +19,11 @@ function printSkyBackground(planets) {
     sunInSky = false;
 
     // check to see if the sun is in the sky
-    for (var i=0; i < planets.length; i++) {
-        if (planets[i].name == 'Sun') {
-            sunInSky = true;
-        }
-    }
+    // for (var i=0; i < planets.length; i++) {
+    //     if (planets[i].name == 'Sun') {
+    //         sunInSky = true;
+    //     }
+    // }
 
     if (sunInSky) {
         // If so, make background lighter blue
@@ -41,7 +41,7 @@ function printSkyBackground(planets) {
             .attr("stop-color", 'black');
 
         radialGradient.append("stop")
-            .attr("offset", "95%")
+            .attr("offset", "93%")
             .attr("stop-color", "#101035");
 
         radialGradient.append("stop")
@@ -80,7 +80,7 @@ var drawSky = function(skyData) {
         .clipAngle(90)
         .precision(0.1)
         // .rotate(([0, 360 - 37, 0]));
-        .rotate([92, 331, 0]); // this is a bad one for inverted constellation bounds
+        // .rotate([92, 331, 0]); // this is a bad one for inverted constellation bounds
 
 
     // create a path generator for the sphere of the sky
@@ -95,14 +95,17 @@ var drawSky = function(skyData) {
     };
 
 
-    // the background sphere of the sky
+    // print the background
+    printSkyBackground();
+
+
+    // the sphere of the sky
     // globally scoped. TODO: does this need to be global? should it get its own function? 
-    skySphere = svgContainer.append("path")
-      .datum({type: "Sphere"})
-      .attr("id", "sky-sphere")
-      .attr("d", skyPath)
-      .attr('opacity', 1)
-      .attr('fill', 'black'); // for now...
+    // skySphere = svgContainer.append("path")
+    //   .datum({type: "Sphere"})
+    //   .attr("id", "sky-sphere")
+    //   .attr("d", skyPath)
+    //   .attr('opacity', 0);
 
 
     // for zooming, make a group for all the contents of the skySphere
@@ -110,8 +113,6 @@ var drawSky = function(skyData) {
     skyObjects = svgContainer.append('g')
         .attr('id', 'all-sky-objects');
 
-    // show the background
-    // printSkyBackground(skyData.planets);
 
 };
 
@@ -150,6 +151,9 @@ var rotateSky = function(lambda, phi) {
 
           // draw stars without labels and only bright stars (for faster transition)
           drawStars('transition');
+
+          // draw the planets without labels
+          drawPlanets('transition');
 
             };
           })

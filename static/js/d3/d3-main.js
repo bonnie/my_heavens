@@ -25,8 +25,8 @@
 // globals to use across functions
 var sunMoonRadius, planetInfoDiv, sunInSky, svgContainer;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, labelDatum;
-var starData, constData, ssData, moonData;
-var skyRadius = 300;  // for now
+var starData, constData, planetData, sunData, moonData;
+var skyRadius = 350;  // for now
 
 
 ////////////////
@@ -176,8 +176,8 @@ var drawSkyObjects = function() {
     // on intial page load, there will be no planet data
     // TODO: use html5 geolocation and current date/time to set initial sky
     //      conditions 
-    if (ssData) {
-        drawPlanets();
+    if (planetData !== undefined) {
+        drawSolarSystem();
     }
 
 };

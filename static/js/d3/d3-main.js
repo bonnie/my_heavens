@@ -23,7 +23,7 @@
 ///////////////////////////
 
 // globals to use across functions
-var sunMoonRadius, planetInfoDiv, sunInSky, svgContainer;
+var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, labelDatum;
 var starData, constData, planetData, sunData, moonData;
 var skyRadius = 350;  // for now
@@ -42,6 +42,12 @@ svgContainer = svgBodySelection.append('svg')
                                 .attr('width', 2 * skyRadius)
                                 .attr('height', 2 * skyRadius);
 
+
+// make a background for the sky 
+skyBackground = svgContainer.append('circle')
+                              .attr('cx', skyRadius)
+                              .attr('cy', skyRadius)
+                              .attr('r', skyRadius);
 
 var showAjaxError = function(error) {
     // display error from ajax call
@@ -235,7 +241,7 @@ var renderSkyObject = function(params) {
     //      group (group to which to attach this item)
     //      mode (e.g. transition)
     //      classPrefix (class for individual object, e.g. star)
-    //      d (data object, expected to have ra, dec, magnitude, name)
+    //      d (data object, expected to have ra, dec, magnitude, name, color)
     //      radiusFunction (radius function for this object)
     //      itemLabel (svg text element for object label)
 
@@ -290,5 +296,8 @@ var renderSkyObject = function(params) {
                 addInfoWindowMouseOver(surroundingCircle, d, params.itemLabel);
             }
         }
+        // for sun, return the point for ease in telling whether it's visible
+        return itemPoint;
     }
+
 };

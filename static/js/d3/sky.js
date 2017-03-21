@@ -3,27 +3,16 @@
 
 'use strict';
 
-var daySkyColor = '#4169E1';
-
-
-function printSkyBackground() {
+function printSkyBackground(sunInSky) {
     // print the sky background as light blue or a dark gradient, depending on 
     // whether the sun is in the sky 
+    // sunInSky is a boolean indicating whether sun is visible or not
 
-    // uses global svgContainer, daySkyColor, skyRadius
-    // sets global sunInSky
+    // uses global skyBackground
 
     // will be gradient or light blue depending on whether it's daytime
     var skyFill;
-
-    sunInSky = false;
-
-    // check to see if the sun is in the sky
-    // for (var i=0; i < planets.length; i++) {
-    //     if (planets[i].name == 'Sun') {
-    //         sunInSky = true;
-    //     }
-    // }
+    var daySkyColor = '#4169E1';
 
     if (sunInSky) {
         // If so, make background lighter blue
@@ -51,11 +40,8 @@ function printSkyBackground() {
         skyFill = "url(#radial-gradient)";
     }
 
-    var background = svgContainer.append('circle')
-                              .attr('cx', skyRadius)
-                              .attr('cy', skyRadius)
-                              .attr('r', skyRadius)
-                              .style("fill", skyFill);
+    skyBackground.style("fill", skyFill);
+
 }
 
 var drawSky = function(skyData) {
@@ -153,7 +139,7 @@ var rotateSky = function(lambda, phi) {
           drawStars('transition');
 
           // draw the planets without labels
-          drawPlanets('transition');
+          drawSolarSystem('transition');
 
             };
           })

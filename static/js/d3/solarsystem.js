@@ -59,16 +59,16 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   console.log(locationResponse);
 
-  // first rotate
+  // first start rotation
+  // drawing planets will be taken care of during rotation
   rotateInfo = locationResponse.rotation;
   rotateSky(rotateInfo.lambda, rotateInfo.phi);
 
   // then set global ss data and moon data
   planetData = locationResponse.planets;
   moonData = locationResponse.moon;
+  sunData = locationResponse.sundata;
 
-  // then draw planets
-  drawSolarSystem();
 
   //////////////
   // controls //
@@ -103,11 +103,11 @@ var drawPlanets = function(mode) {
                         mode: mode};
 
     renderSkyObjectList(planetParams);
-    
+
 };
 
 
-var drawMoon = function(moonData) {
+var drawMoon = function(mode) {
   // simluate the phase of the moon based on colong, using a half-lit sphere
   // append moon to svg parameter
 
@@ -160,21 +160,36 @@ var drawMoon = function(moonData) {
 
 };
 
-var drawSun = function() {
+var drawSun = function(mode) {
   // draw the sun (and adjust background color if necessary)
+
+  var sunLabel = skyObjects.append('text').attr('class', 'sun-label sky-label');
+
+  var sunParams = { group: skyObjects,
+                    classPrefix: 'sun',
+                    mode: mode,
+                    d: sunData,
+                    radius: sunMoonRadius,
+                    itemLabel: sunLabel
+                  };
+
+  var sunPoint = renderSkyObject(sunParams);
+  var sunInSky = isVisible(sunPoint);
+  printSkyBackground(sunInSky);
 
 };
 
-var drawSolarSystem = function() {
+var drawSolarSystem = function(mode) {
   // draw the sun, moon and planets 
+  // mode may be set to 'transition' for faster rendering during animation
 
   // set the radius for the sun and the moon
   // sunMoonRadius is globally scoped
   sunMoonRadius = skyRadius / 42;
 
-  drawSun();
-  drawPlanets();
-  // drawMoon(ssData.moon);
+  drawSun(mode);
+  drawPlanets(mode);
+  // drawMoon(mode);
 
 };
 

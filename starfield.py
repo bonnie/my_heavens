@@ -72,8 +72,8 @@ class StarField(object):
     def __repr__(self):
         """Helpful representation when printed."""
 
-        return '< Starfield lat={}, lng={}, utctime={} >'.format(self.lat_deg,
-                                                                 self.lng_deg,
+        return '< Starfield lat={}, lng={}, utctime={} >'.format(self.lat,
+                                                                 self.lng,
                                                                  self.utctime)
 
     def make_ephem(self):
@@ -228,40 +228,13 @@ class StarField(object):
           'phi': phi (in degrees) }
         """
 
-        # TODO: this is not right. Returns -15 for bkly phi when it should be ~ -38
-
-        # TODO: fix things on the d3 side so that I can use smaller angles
-        # (from -180 to 180) for less crazy rotating. As it is now, if I use
-        # the smaller angles, I get the inverse of many constellation polygons
-        # after rotation. Phooey.
-
-        # ra, dec = self.ephem.radec_of(0, 90)
-
-        # ra = 0
-        # dec = 0
-        # coords = sidereal.RADec(ra, dec)
-
-        # # assume ra and dec come in as Decimal objects
-        # coords = RADec(float(ra), float(dec))
-
-        # ha = coords.hourAngle(self.utctime, self.lng)
-        # altaz = coords.altAz(ha, self.lat)
-
-
-        # hour angle pi (180) => azimuth 0
-        # without rotation, azimuth 0 is ra 0
-        # so if ra 0 has hour angle pi => no rotation
-        # otherwise, rotate pi - ha (??)
-        ha = sidereal.raToHourAngle(0, self.utctime, deg_to_rad(self.lng))
-        ha_shift = rad_to_deg(math.pi / 2 - ha)
-
-        # it needs to be reversed since we're looking at everything in reverse
-        # on this particular celestial sphere
-        # lda = 360 - ha_shift
-        lda = ha_shift
+        # the lambda rotation depends on the right ascension that's transiting
+        # at the given latitude and time. The sidereal module's hourAngleToRa
+        # calculates this nicely. The hour angle is 0 for the meridian.
+        ha_in_rad = sidereal.hourAngleToRA(0, self.utctime, deg_to_rad(self.lng))
+        lda = rad_to_deg(ha_in_rad)
 
         # the phi rotation is dependent solely on the latitude
         phi = -1 * self.lat
-
 
         return {'lambda': lda, 'phi': phi}

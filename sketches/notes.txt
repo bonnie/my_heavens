@@ -28,6 +28,9 @@ It was harder than it may have first seemed:
 
     * As an after-the-fact measure, d3.geoArea and skyPath.area did not give
       consistent results. The only consistent thing was screen area
+      (and even that wasn't consistent sometimes! Octans was a particular 
+      motherf***er, sometimes taking up the whole screen both before *and* after
+      reversing the bound verts list)
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 
@@ -41,6 +44,26 @@ The hour angle of a point is the angle between two planes: one containing the
 Earth's axis and the zenith (the meridian plane), and the other containing the
 Earth's axis and the given point (the hour circle passing through the point).
 
+
+from the master branch: in Berkeley on 7/1/2017 at 1am, Vega is approx at zenith
+
+vega ra: 18.61560722 (hours) = 279.2341083 degrees
+vega dec: +38.78299311 (degrees) -- no coincidence that this is approx the latitude of berkeley
+
+If I rotate the rotate-not-calc sphere to 
+    rotateSky(279.2341083, -37.8715926), 
+I get Vega at zenith
+
+The question: how to get that ra / dec from lat/lng/time? 
+
+It would seem that pyephem radec_of would do the trick, but it doesn't. Maybe I'm not using it right? 
+
+Basically: I want to provide a dec (the latitude) and altitude (90 degrees), and get the ra
+
+What I ended up doing: providing an hour angle of 0 (the meridian), the time, and the longitude,
+and getting the right ascension. Bingo. That was waaaaaaaaay harder than I thought it would be. 
+Too much guessing and hoping rather than really thinking about it. 
+sidereal.hourAngleToRA
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 

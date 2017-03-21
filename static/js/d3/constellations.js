@@ -76,7 +76,7 @@ var drawConstellations = function() {
                 type: 'Feature'
             };
 
-            // if (d.name === 'Aquarius') {
+            // if (d.name === 'Octans') {
             //     debugger;
             // }
 
@@ -99,6 +99,19 @@ var drawConstellations = function() {
             // don't bother drawing constellation if it's not visible
             // isVisible is defined in sky.js
             var boundsViz = isVisible(constBoundsPolygon);
+
+            if (boundsViz && isInverted(constBoundsPolygon)) {
+
+            // sometimes constellations (like octans at -228.63065300575627 -37.8715926)
+            // are inverted with their bounds forwards or backwards
+
+            // TODO: understand better what's going on here and/or record error on server via ajax
+
+                console.log('constellation ' + d.name + ' inverted in both directions. Skipping.')
+                boundsViz = false;
+
+            } 
+
             if (boundsViz) {
 
                 var constBounds = thisConst.append('path')

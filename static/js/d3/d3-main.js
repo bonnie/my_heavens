@@ -24,7 +24,7 @@
 
 // globals to use across functions
 var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
-var skySphere, skyProjection, skyPath, skyObjects, skyTransform, labelDatum;
+var skySphere, skyProjection, skyPath, skyObjects, skyTransform;
 var starData, constData, planetData, sunData, moonData;
 var skyRadius = 350;  // for now
 
@@ -47,7 +47,29 @@ svgContainer = svgBodySelection.append('svg')
 skyBackground = svgContainer.append('circle')
                               .attr('cx', skyRadius)
                               .attr('cy', skyRadius)
-                              .attr('r', skyRadius);
+                              .attr('r', skyRadius)
+                              .attr('id', 'sky-background');
+
+
+// define the sky gradient just once, not every time we print the sky background
+// used in drawSkyBackground in solarsystem.js
+// adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
+var radialGradient = svgContainer.append("defs")
+            .append("radialGradient")
+            .attr("id", "radial-gradient");
+
+        radialGradient.append("stop")
+            .attr("offset", "85%")
+            .attr("stop-color", 'black');
+
+        radialGradient.append("stop")
+            .attr("offset", "93%")
+            .attr("stop-color", "#101035");
+
+        radialGradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", "#191970");
+
 
 var showAjaxError = function(error) {
     // display error from ajax call
@@ -173,18 +195,30 @@ var drawSkyAndStars = function(error, starDataResult) {
 var drawSkyObjects = function() {
     // draw sky objects either at beginning of page load or after change in data
 
+    console.log('drawing sky objects');
+
     // defined in constellations.js
     drawConstellations();
+
+
+    console.log('drew constellations');
 
     // defined in stars.js
     drawStars();
 
-    // on intial page load, there will be no planet data
-    // TODO: use html5 geolocation and current date/time to set initial sky
-    //      conditions 
+        console.log('drew stars');
+
     if (planetData !== undefined) {
+        // on intial page load, there will be no planet data.
+        // TODO: use html5 geolocation and current date/time to set initial sky
+        //      conditions 
         drawSolarSystem();
     }
+
+
+    console.log('drew planets');
+
+
 
 };
 
@@ -209,12 +243,14 @@ var renderSkyObjectList = function(params) {
     var itemLabel = skyObjects.append('text')
         .attr('class', params.classPrefix + '-label sky-label');
 
+    var groupClass = params.classPrefix + '-group';
+
     // add the item groups
-    var items = skyObjects.selectAll('g.' + params.groupClass)
+    var items = skyObjects.selectAll('g.' + groupClass)
                             .data(params.listData)
                             .enter()
                             .append('g')
-                            .attr('class', params.classPrefix + '-group');
+                            .attr('class', groupClass);
 
     // add sub-elements for each star
     items.each(function(d) {
@@ -232,6 +268,39 @@ var renderSkyObjectList = function(params) {
 
 };
 
+var renderSingleSkyObject = function(params) {
+    // render a list of sky objects
+    // for use in drawing stars and planets
+    //
+    // params is an object with these keys:
+    //      d (e.g. sunData)
+    //      classPrefix (e.g. sun)
+    //      mode (e.g. transition)
+    //      radius (eg sunMoonRadius)
+
+    // uses global skyObjects
+
+    // make a group for this obj and its label
+
+    var itemGroup = skyObjects.append('g')
+                            .attr('class', params.classPrefix + '-group');
+
+    // One label that just gets repurposed depending on moused-over item,
+    // since we're never going to be showing more than one item label at once
+    // TODO: make function for this for less repitition
+    var itemLabel = itemGroup.append('text')
+        .attr('class', params.classPrefix + '-label sky-label');
+
+    var objParams = {group: itemGroup,
+                     mode: params.mode,
+                     d: params.d,
+                     radius: params.radius,
+                     classPrefix: params.classPrefix,
+                     itemLabel: itemLabel};
+
+    return renderSkyObject(objParams);
+
+};
 
 var renderSkyObject = function(params) {
     // render one sky object

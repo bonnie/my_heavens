@@ -59,16 +59,17 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   console.log(locationResponse);
 
-  // first start rotation
-  // drawing planets will be taken care of during rotation
-  rotateInfo = locationResponse.rotation;
-  rotateSky(rotateInfo.lambda, rotateInfo.phi);
 
-  // then set global ss data and moon data
+  // set global ss data and moon data
   planetData = locationResponse.planets;
   moonData = locationResponse.moon;
   sunData = locationResponse.sundata;
 
+
+  // then rotate sky
+  // drawing planets will be taken care of during rotation
+  rotateInfo = locationResponse.rotation;
+  rotateSky(rotateInfo.lambda, rotateInfo.phi);
 
   //////////////
   // controls //
@@ -163,19 +164,14 @@ var drawMoon = function(mode) {
 var drawSun = function(mode) {
   // draw the sun (and adjust background color if necessary)
 
-  var sunLabel = skyObjects.append('text').attr('class', 'sun-label sky-label');
-
-  var sunParams = { group: skyObjects,
+  var sunParams = { d: sunData,
                     classPrefix: 'sun',
-                    mode: mode,
-                    d: sunData,
                     radius: sunMoonRadius,
-                    itemLabel: sunLabel
-                  };
+                    mode: mode};
 
-  var sunPoint = renderSkyObject(sunParams);
+  var sunPoint = renderSingleSkyObject(sunParams);
   var sunInSky = isVisible(sunPoint);
-  printSkyBackground(sunInSky);
+  printSkyBackground(sunInSky, mode);
 
 };
 

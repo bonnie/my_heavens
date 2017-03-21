@@ -3,43 +3,17 @@
 
 'use strict';
 
+
 function printSkyBackground(sunInSky) {
     // print the sky background as light blue or a dark gradient, depending on 
     // whether the sun is in the sky 
     // sunInSky is a boolean indicating whether sun is visible or not
 
-    // uses global skyBackground
+    // uses global skyBackground and element #radial-gradient from d3-main.js
 
     // will be gradient or light blue depending on whether it's daytime
-    var skyFill;
     var daySkyColor = '#4169E1';
-
-    if (sunInSky) {
-        // If so, make background lighter blue
-        skyFill = daySkyColor;
-
-    } else {
-        // print the radial gradient for the sky background
-        // adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
-        var radialGradient = svgContainer.append("defs")
-            .append("radialGradient")
-            .attr("id", "radial-gradient");
-
-        radialGradient.append("stop")
-            .attr("offset", "85%")
-            .attr("stop-color", 'black');
-
-        radialGradient.append("stop")
-            .attr("offset", "93%")
-            .attr("stop-color", "#101035");
-
-        radialGradient.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", "#191970");
-
-        skyFill = "url(#radial-gradient)";
-    }
-
+    var skyFill = sunInSky ? daySkyColor : "url(#radial-gradient)";
     skyBackground.style("fill", skyFill);
 
 }
@@ -132,17 +106,16 @@ var rotateSky = function(lambda, phi) {
           $('#all-sky-objects').empty();
 
           // draw all the objects
-          // setSunInSky();
-          // printSkyBackground();
+
+          // draw the background and sun/moon/planets without labels
+          drawSolarSystem('transition');
 
           // draw stars without labels and only bright stars (for faster transition)
           drawStars('transition');
 
-          // draw the planets without labels
-          drawSolarSystem('transition');
+        };
+      })
 
-            };
-          })
       .on('end', function() {
 
             // finally, draw constellations and redraw the stars with labels on top of them
@@ -150,6 +123,9 @@ var rotateSky = function(lambda, phi) {
 
             // defined in d3-main.js
             drawSkyObjects();
+
+            // debugger;
+
         });
 
 };

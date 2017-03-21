@@ -182,3 +182,113 @@ var drawSkyObjects = function() {
 
 };
 
+var getRadiusFromMag = function(d) {
+    return (5 - d.magnitude) * 0.5;
+};
+
+var renderSkyObjectList = function(params) {
+    // render a list of sky objects
+    // for use in drawing stars and planets
+    //
+    // params is an object with these keys:
+    //      listData (e.g. starData)
+    //      classPrefix (e.g. star)
+    //      mode (e.g. transition)
+    //      radiusFunction (e.g. function(d) {return (5 - d.magnitude) * 0.5})
+
+    // uses global skyObjects
+
+    // One label that just gets repurposed depending on moused-over item,
+    // since we're never going to be showing more than one item label at once
+    var itemLabel = skyObjects.append('text')
+        .attr('class', params.classPrefix + '-label sky-label');
+
+    // add the item groups
+    var items = skyObjects.selectAll('g.' + params.groupClass)
+                            .data(params.listData)
+                            .enter()
+                            .append('g')
+                            .attr('class', params.classPrefix + '-group');
+
+    // add sub-elements for each star
+    items.each(function(d) {
+
+        var objParams = {group: d3.select(this),
+                     mode: params.mode,
+                     d: d,
+                     radius: params.radiusFunction(d),
+                     classPrefix: params.classPrefix,
+                     itemLabel: itemLabel};
+
+        renderSkyObject(objParams);
+    });
+
+
+};
+
+
+var renderSkyObject = function(params) {
+    // render one sky object
+    // for use in drawing individual stars and planets, sun, moon
+    //
+    // params is an object with these keys:
+    //      group (group to which to attach this item)
+    //      mode (e.g. transition)
+    //      classPrefix (class for individual object, e.g. star)
+    //      d (data object, expected to have ra, dec, magnitude, name)
+    //      radiusFunction (radius function for this object)
+    //      itemLabel (svg text element for object label)
+
+    // for easier reference
+    var d = params.d;
+
+    // don't bother drawing dim items during transition
+    if (params.mode !== 'transition' || d.magnitude < 3) {
+        var itemPoint = {
+            geometry: {
+                type: 'Point',
+                coordinates: [d.ra, d.dec]
+            },
+            type: 'Feature',
+            properties: {
+                radius: params.radius
+            }
+        };
+
+        if (params.mode !== 'transition' && !isVisible(itemPoint)) {
+            // remove the star if it's not visible and don't bother going on
+            // skip this step if the mode is transition, as it slows things down a tad
+            params.group.remove();
+
+        } else {
+
+            // circle to represent item
+            // since we're in d3 geo world, this needs to be a path with a point
+            // geometry, not an svg circle
+            var itemCircle = params.group.append('path')
+                                .datum(itemPoint)
+                                .attr('class', params.objClass)
+                                .attr('d', function(d){
+                                    skyPath.pointRadius(d.properties.radius);
+                                    return skyPath(d); })
+                                .attr('fill', d.color)
+                                .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
+
+
+            if (params.mode !== 'transition' && d.name !== null) {
+                // make a fixed-width, larger surrounding circle for the
+                // mouseover, as some items are too  small to mouse over
+                // effectively
+                var surroundingCircle = params.group.append('path')
+                                .datum(itemPoint)
+                                .attr('d', function(d){
+                                    skyPath.pointRadius(params.radius < 4 ? 4 : params.radius);
+                                    return skyPath(d); })
+                                .attr('class', params.objClass + '-surround')
+                                .style('opacity', 0);
+
+                addInfoWindowMouseOver(surroundingCircle, d, params.itemLabel);
+            }
+        }
+    }
+};

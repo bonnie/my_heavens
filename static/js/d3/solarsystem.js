@@ -91,73 +91,19 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
 
 var drawPlanets = function(mode) {
-    // draw planets on sky sphere
+    // draw the stars on the sphere of the sky
+    // mode is a string that can either be omitted or set to 'transition'
+    // It will be 'transition' when animating, to make animations faster
+    //
+    // uses global planetData
 
-    // mode can be omitted or set to 'transition' for faster animation
+    var planetParams = {listData: planetData,
+                        classPrefix: 'planet',
+                        radiusFunction: getRadiusFromMag,
+                        mode: mode};
 
-    // uses globals ?????
-    // TODO: make function to avoid so much repeated code between this and stars
-
-    // One label that just gets repurposed depending on moused-over star,
-    // since we're never going to be showing more than one planet label at once
-    var planetLabel = skyObjects.append('text')
-        .attr('class', 'planet-label sky-label');
-
-    // create group for planet
-    var planets = skyObjects.selectAll('g.planet')
-                            .data(planetData)
-                            .enter()
-                            .append('g')
-                            .attr('id', function(d) {return d.name;}) // for debugging
-                            .attr('class', 'planet-group');
-
-    // add details
-    planets.each(function(d) {
-
-        var thisPlanet = d3.select(this);
-        var planetRadius = (5 - d.magnitude) * 0.5;
-
-        var planetPoint = {
-            geometry: {
-                type: 'Point',
-                coordinates: [d.ra, d.dec]
-            },
-            type: 'Feature',
-            properties: {
-                radius: planetRadius
-            }
-        };
-
-
-        // circle to represent planet
-        var planetCircle = thisPlanet.append('path')
-                            .datum(planetPoint)
-                            .attr('class', 'planet')
-                            .attr('d', function(d){
-                                skyPath.pointRadius(d.properties.radius);
-                                return skyPath(d); })
-                            .attr('fill', d.color)
-                            .style('opacity', 1); // planets are all opaque
-
-
-
-        if (mode !== 'transition') {
-          // make a surrounding circle for tiny planets
-          // (I'm looking at you, mercury)
-
-          var surroundingPlanetCircle = thisPlanet.append('path')
-                          .datum(planetPoint)
-                          .attr('d', function(d){
-                              skyPath.pointRadius(planetRadius < 4 ? 4 : planetRadius);
-                              return skyPath(d); })
-                          .attr('class', 'planet-surround')
-                          .style('opacity', 0);
-
-          addInfoWindowMouseOver(surroundingPlanetCircle, d, planetLabel);
-
-        }
+    renderSkyObjectList(planetParams);
     
-    });
 };
 
 

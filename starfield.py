@@ -165,12 +165,13 @@ class StarField(object):
         planet_data['name'] = pla.name
         planet_data['color'] = PLANET_COLORS_BY_NAME[pla.name]
         planet_data['size'] = pla.size
-        planet_data['distance'] = pla.earth_distance
+        planet_data['distance'] = '{:.3f}'.format(pla.earth_distance)
         planet_data['distanceUnits'] = 'AU'
-        planet_data['type'] = 'planet'
+        planet_data['phase'] = '{:.1f}'.format(pla.phase)
+        planet_data['celestialType'] = 'planet'
 
         if pla.name == 'Sun':
-            planet_data['type'] = 'star'
+            planet_data['celestialType'] = 'star'
 
         # for the moon, include the longitude of the terminus of the lit half,
         # for phase drawing purposes, plus calculate the rotation
@@ -183,9 +184,11 @@ class StarField(object):
             # planet_data['rotation'] = -23.5 * math.cos(pla.hlong)
             # planet_data['rotation'] = -23.5 * math.cos(ephem.Ecliptic(pla).lon)
 
-            planet_data['phase'] = pla.phase
             planet_data['sunAngle'] = rad_to_deg(pla.subsolar_lat)
-            planet_data['type'] = 'moon'
+            planet_data['celestialType'] = 'moon'
+
+            # more digits for the moon, because the number's small
+            planet_data['distance'] = '{:.6f}'.format(pla.earth_distance)
 
         return planet_data
 

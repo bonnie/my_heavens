@@ -56,28 +56,28 @@ class Star(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<Star star_id=%s name=%s ra=%s dec=%s>" % (self.star_id, 
+        return "<Star star_id=%s name=%s ra=%s dec=%s>" % (self.star_id,
                                                            self.name,
                                                            self.ra,
                                                            self.dec)
 
 class ConstLineVertex(db.Model):
-    """a vertex that forms one endpoint of a constellation line. 
+    """a vertex that forms one endpoint of a constellation line.
 
     this corresponds to a star"""
 
     __tablename__ = "const_line_vertices"
 
-    const_line_vertex_id = db.Column(db.Integer, 
-                            autoincrement=True, 
+    const_line_vertex_id = db.Column(db.Integer,
+                            autoincrement=True,
                             primary_key=True)
 
-    const_line_group_id = db.Column(db.Integer, 
-                            db.ForeignKey("const_line_group.const_line_group_id"), 
+    const_line_group_id = db.Column(db.Integer,
+                            db.ForeignKey("const_line_group.const_line_group_id"),
                             nullable=False)
 
-    star_id = db.Column(db.Integer, 
-                            db.ForeignKey("stars.star_id"), 
+    star_id = db.Column(db.Integer,
+                            db.ForeignKey("stars.star_id"),
                             nullable=False)
 
     # where in the constellation line sequence is this? 

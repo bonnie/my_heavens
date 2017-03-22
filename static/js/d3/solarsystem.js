@@ -1,75 +1,31 @@
 // d3 for drawing planets (including sun/moon)
 // pulls globals xxxx from main-d3.js
 
-
-disablePlanetButton = function() {
-  // disable the "reveal planets" button
-  $('#reveal-planets').attr('disabled', 'disabled');
-
-};
-
-enablePlanetButton = function() {
-  // enable the "reveal planets" button
-  $('#reveal-planets').removeAttr('disabled');
-};
+'use strict';
 
 var revealPlanets = function() {
-    // make planets grow and shrink to highlight their position(s)
+    // show / hide rings to highlight planet position(s)
     // TODO: label planets during reveal
     // TODO: disable button and/or post message (in error div?) if no planets are visible 
     //        e.g.  berkeley 1/1/2017 1:00 AM
 
+    //      triggerButton (button that called function; e.g. planetRevealButton)
+    //      elementsShowing (state variable for this button; e.g. planetsRevealed)
+    //      showText (text on button to show elements; e.g. 'Reveal Planets')
+    //      hideText (text on button to hide elements; e.g. 'Hide planet indicators')
+    //      obj (svg object to show/hide; e.g. planetHighlights)
 
-  var t = d3.transition()
-      .duration(500)
-      .ease(d3.easeLinear);
-
-    planetHighlights.transition(t)
-        .attr('opacity', 1)
-      .transition(t)
-        .attr('opacity', 0)
-      .on('start', disablePlanetButton)
-      .on('end', enablePlanetButton);
-
-
-    // TODO: make a nice ux here, like clicking a button to put a circle around planets 
-    // and show the planet names, and then clicking the same button to hide
-
-  // var t = d3.transition()
-  //     .duration(1000)
-  //     .ease(d3.easeLinear);
-
-  // d3.selectAll('g.planet-group')
-  //     .on('start', $('#reveal-planets').attr('disabled', 'disabled'))
-  //     .transition(t)
-  //       .attr('transform', 'scale(5)')
-  //     .transition(t)
-  //       .attr('transform', 'scale(1)')
-  //     .on('end', $('#reveal-planets').removeAttr('disabled'));
-
-
-// d3.selectAll(".orange").transition(t)
-//     .style("fill", "orange");
-
-//     // do fun zoom transitions
-//     // TODO: chain these transitions, rather than delays and settimeouts the second one
-//     planets.transition()
-//         .duration(transtime)
-//         .attr('r', function(d) { return d3.select(this).attr('r') * 5; });
-
-//     planets.transition()
-//         .delay(trans1time)
-//         .duration(trans2time)
-//         .attr('r', function(d) { return d3.select(this).attr('r'); });
-
-//     // re-enable the button
-//     setTimeout(function() {
-//                     ;
-//                 },
-//                 trans1time + trans2time);
+    var params = {
+      triggerButton: planetRevealButton,
+      elementsShowing: planetsRevealed,
+      showText: 'Reveal planets',
+      hideText: 'Hide planet indicators',
+      obj: planetHighlights
+    };
+    opacityTransition(params);
+    planetsRevealed = !planetsRevealed;
 
 };
-
 
 var rotateAndDrawSolarSystem = function(error, locationResponse) {
   // callback for getting data related to location and time 
@@ -102,7 +58,7 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // then rotate sky
   // drawing planets will be taken care of during rotation
-  rotateInfo = locationResponse.rotation;
+  var rotateInfo = locationResponse.rotation;
   rotateSky(rotateInfo.lambda, rotateInfo.phi);
 
   //////////////
@@ -114,10 +70,10 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // show the starfield controls 
   starfieldControlDiv.show();
-  $('#reveal-planets').removeAttr('disabled');
+  planetRevealButton.removeAttr('disabled');
 
   // attach 'reveal planets' button to the revealPlanets function
-  $('#reveal-planets').on('click', revealPlanets);
+  planetRevealButton.on('click', revealPlanets);
 
 };
 
@@ -159,7 +115,7 @@ var drawPlanets = function(mode) {
 var getScreenCoords = function(d, axis) {
   // return the current screen coordinate for the data and axis
 
-  coords = skyProjection([d.ra, d.dec]);
+  var coords = skyProjection([d.ra, d.dec]);
   return axis === 'x' ? coords[0] : coords[1];
 };
 
@@ -173,7 +129,7 @@ var drawMoon = function(mode) {
   // TODO: rotate the moon appropriately! 
 
   // for easier access
-  d = moonData;
+  var d = moonData;
 
   // how to tell if the moon is on the far side of the sky? Make a proxy point
   // and see  if it's visible...
@@ -191,7 +147,7 @@ var drawMoon = function(mode) {
 
   // otherwise, carry on...
 
-  rotAngle = calculateMoonRotationAngle();
+  var rotAngle = calculateMoonRotationAngle();
 
   // create the projection
   var moonProjection = d3.geoOrthographic()
@@ -229,7 +185,7 @@ var drawMoon = function(mode) {
       .attr('stroke-width', 1)
       .attr('class', 'lit-moon');
 
-  moonLabel = skyObjects.append('text')
+  var moonLabel = skyObjects.append('text')
         .attr('class', 'moon-label sky-label');
 
   addInfoMouseOverAndClick(moon, d, moonLabel);

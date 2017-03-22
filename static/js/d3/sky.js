@@ -75,6 +75,15 @@ var rotateSky = function(lambda, phi) {
 
     console.log('rotating to', lambda, phi);
 
+    // planet rings are going to be removed during transition
+    // do it deliberately here first]
+    // TODO: this doesn't work. Reveal planets hides them after this code runs, and doesn't toggle the button.
+    if (planetsRevealed === true) {
+        planetsRevealed = false;
+        planetRevealButton.html('Reveal planets');
+    }
+
+
     // calculate duration based on distance to go
     var oldRotation = skyProjection.rotate();
     var oldLambda = oldRotation[0];
@@ -149,7 +158,7 @@ var drawEcliptic = function() {
                 type: 'Feature'
     };
 
-    var overallOpacity = eclipticIsOn ? 1 : 0;
+    var overallOpacity = eclipticIsOn ? 0.6 : 0;
 
     eclipticPath = skyObjects.append('path')
       .datum(eclipticPolygon)
@@ -158,7 +167,6 @@ var drawEcliptic = function() {
       .attr('stroke-width', 2)
       .attr('fill-opacity', 0)
       .attr('opacity', overallOpacity)
-      .attr('stroke-opacity', 0.6)
       .attr('id', 'ecliptic');
 };
 
@@ -166,14 +174,17 @@ var drawEcliptic = function() {
 var toggleEcliptic = function() {
     // a function to show / hide the ecliptic
 
-    // show or hide the ecliptic and change button text
-    var newText = eclipticIsOn ? 'Show' : 'Hide';
-    var newOpacity = eclipticIsOn ? 0 : 1;
+    // TODO: make transitions like revealPlanets
+    // probably make a unified function so all transitions are uniform
 
-    eclipticToggleButton.html(newText + ' ecliptic');
-    eclipticPath.attr('opacity', newOpacity);
-
-    // reset eclipticIsOn
+    var params = {
+      triggerButton: eclipticToggleButton,
+      elementsShowing: eclipticIsOn,
+      showText: 'Show ecliptic',
+      hideText: 'Hide ecliptic',
+      obj: eclipticPath
+    };
+    opacityTransition(params);
     eclipticIsOn = !eclipticIsOn;
 
 };

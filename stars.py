@@ -45,7 +45,7 @@ def get_stars(max_mag):
                            'name': name,
                            'distance': float(star.distance),
                            'distanceUnits': 'parsecs',
-                           'type': 'star'
+                           'celestialType': 'star'
                            })
 
     return star_field

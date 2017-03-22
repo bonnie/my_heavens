@@ -177,7 +177,8 @@ class StarField(object):
             # planet_data['rotation'] = -23.5 * math.cos(pla.hlong)
             # planet_data['rotation'] = -23.5 * math.cos(ephem.Ecliptic(pla).lon)
 
-            planet_data['hlong'] = rad_to_deg(pla.hlong)
+            planet_data['phase'] = pla.phase
+            planet_data['sunAngle'] = rad_to_deg(pla.subsolar_lat)
 
         return planet_data
 

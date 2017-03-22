@@ -12,6 +12,7 @@
 /// http://bl.ocks.org/KoGor/5994960 --sphere rotation animation
 /// https://github.com/d3/d3-transition --transitions documentation
 /// https://bl.ocks.org/mbostock/a7bdfeb041e850799a8d3dce4d8c50c8 --polygon interior
+/// https://github.com/mourner/suncalc --js library for calculating things like twilight and moon phases
 
 ////////
 // rotation reference: https://www.jasondavies.com/maps/rotate/

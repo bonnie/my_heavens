@@ -1,6 +1,7 @@
 """Starfield object and methods for calculating stars and constellation display"""
 
 import math
+from math import sin, cos, atan2
 from datetime import datetime
 from sidereal import sidereal
 import pytz
@@ -170,25 +171,12 @@ class StarField(object):
         planet_data['phase'] = '{:.1f}'.format(pla.phase)
         planet_data['celestialType'] = 'planet'
 
+        # set attributes for sun and moon for later use
         if pla.name == 'Sun':
-            planet_data['celestialType'] = 'star'
+            self.sun = pla
 
-        # for the moon, include the longitude of the terminus of the lit half,
-        # for phase drawing purposes, plus calculate the rotation
-        if planet == ephem.Moon:
-
-            # translate colong into degrees
-            planet_data['colong'] = rad_to_deg(pla.colong)
-
-            # get the angle rotate the lit moon (in degrees)
-            # planet_data['rotation'] = -23.5 * math.cos(pla.hlong)
-            # planet_data['rotation'] = -23.5 * math.cos(ephem.Ecliptic(pla).lon)
-
-            planet_data['sunAngle'] = rad_to_deg(pla.subsolar_lat)
-            planet_data['celestialType'] = 'moon'
-
-            # more digits for the moon, because the number's small
-            planet_data['distance'] = '{:.6f}'.format(pla.earth_distance)
+        if pla.name == 'Moon':
+            self.moon = pla
 
         return planet_data
 
@@ -207,6 +195,72 @@ class StarField(object):
 
         return planets
 
+    def calculate_moon_angle(self):
+        """Calculate the rotation angle of the phased moon for displaying in d3.
+
+        Returns the angle to rotate the moon, in degrees.
+        This function is more efficient if self.sun and self.moon have already
+        been set, but will set them if they haven't already.
+        """
+
+        try:
+            moon = self.moon
+        except AttributeError:
+            self.moon = ephem.Moon(self.ephem)
+            moon = self.moon
+
+        try:
+            sun = self.sun
+        except AttributeError:
+            self.sun = ephem.Sun(self.ephem)
+            sun = self.sun
+        sun = ephem.Sun(self.ephem)
+
+
+        ############# from js library ############
+        # angle = atan(cos(s.dec) * sin(s.ra - m.ra), sin(s.dec) * cos(m.dec) -
+        #         cos(s.dec) * sin(m.dec) * cos(s.ra - m.ra));
+        #### using ra / dec -- but formula is a bit different...
+        # delta_ra = sun.ra - pla.ra
+        # x = cos(sun.dec) * sin(delta_ra)
+        # y = sin(sun.dec) * cos(pla.dec) - cos(sun.dec) * sin(pla.dec) * cos(delta_ra)
+        # moon_rotation = atan2(x, y)
+        # if pla.phase < 50:
+        #     moon_rotation = math.pi / 2 - moon_rotation_in_deg
+        ############ end js library ################
+
+
+        ########### from http://hrcak.srce.hr/file/197562 for this formula!
+        # the below moon phase calc is:
+        # spot on for christchurch, 1/1/17 12pm
+        # spot on for berkeley, 3/22/17 12pm
+
+        # a little off for berkeley, 1/1/17 12pm
+        # quite off for christchurch, 3/22/17 12pm
+
+        # aaaarrrrgggghhhh!!
+
+        ### using alt / az
+        delta_az = sun.az - moon.az
+        y = math.sin(delta_az)
+        x = math.cos(moon.alt) * math.tan(sun.alt) - math.sin(moon.alt) * math.cos(delta_az)
+        moon_rotation = math.atan2(y, x)
+        moon_rotation = math.atan2(y, x)
+
+        # adjust depending on the phase
+        if moon.phase < 50:
+            moon_rotation = - moon_rotation
+
+        # adjust depending on latitude
+        if self.lat > 0:
+            moon_rotation = moon_rotation
+
+        #     moon_rotation = moon_rotation + math.pi / 2
+        # else:
+        ############ end http://hrcak.srce.hr/file/197562 ##############
+
+        return rad_to_deg(moon_rotation)
+
     def get_moon(self):
         """Return a dict of moon data, transformed for d3.
 
@@ -216,7 +270,20 @@ class StarField(object):
         See get_planet_data docstring for dict details.
         """
 
-        return self.get_planet_data(ephem.Moon)
+        moon_data = self.get_planet_data(ephem.Moon)
+        moon_data['celestialType'] = 'moon'
+
+        # translate colong into degrees
+        moon_data['colong'] = rad_to_deg(self.moon.colong)
+
+        # calculate rotation of the moon disk
+        moon_rotation_in_deg = self.calculate_moon_angle()
+        moon_data['rotation'] = moon_rotation_in_deg
+
+        # more digits for the moon, because the number's small
+        moon_data['distance'] = '{:.5f}'.format(self.moon.earth_distance)
+
+        return moon_data
 
     def get_sun(self):
 
@@ -228,7 +295,10 @@ class StarField(object):
         See get_planet_data docstring for dict details.
         """
 
-        return self.get_planet_data(ephem.Sun)
+        sun_data = self.get_planet_data(ephem.Sun)
+        sun_data['celestialType'] = 'star'
+
+        return sun_data
 
     def get_sky_rotation(self):
         """Return d3 sky rotation for this starfield.

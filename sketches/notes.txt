@@ -87,3 +87,25 @@ don't draw the moon.
 
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+
+ISSUE: rotating the phased moon to the proper angle for the current view
+
+want: screen angle of a line through the moon center, perpendicular to the ecliptic
+
+1/1/17 12:00pm
+moon ra: 21:40:08.38, dec: -13:41:07.4
+
+screen coordinates: 
+skyProjection([moonData.ra, moonData.dec])
+[106.8318552604459, 561.3034047483948]
+
+breakthrough: 
+AXIS OF TERMINUS ALWAYS POINTS TOWARD VEGA (... except when it points more toward deneb...)
+
+star_chart=# select ra, dec from stars where name = 'Vega';
+   ra   |  dec   
+--------+--------
+ 80.766 | 38.783
+
+
+ https://planetarium.madison.k12.wi.us/mooncal/crescent-tilt/Crescent.html

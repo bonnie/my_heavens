@@ -33,6 +33,8 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // success function for planet data from planets.json
 
+  // TODO: catch error where server is down and connection is refused
+
   // clear previous errors and warnings
   // errorDiv and warnDiv defined in star-page-control.js
   errorDiv.empty().hide();
@@ -145,15 +147,12 @@ var drawMoon = function(mode) {
     return;
   }
 
-  // otherwise, carry on...
-
-  var rotAngle = calculateMoonRotationAngle();
-
   // create the projection
   var moonProjection = d3.geoOrthographic()
       .scale(sunMoonRadius) // this determines the size of the moon
       .translate(skyProjection([d.ra, d.dec])) // moon coords here
       .clipAngle(90)
+      .rotate([0, 0, d.rotation])
       .precision(0.1);
 
   // create a path generator
@@ -173,7 +172,7 @@ var drawMoon = function(mode) {
   var litHemisphere = d3.geoCircle()
           // sets the circle center to the specified point [longitude, latitude] in degrees
           // 0 degrees is on the left side of the sphere
-          .center([90 - d.colong, 0]) // TODO: change the 0 to the proper rotation angle
+          .center([90 - d.colong, 0]) 
           .radius(90); // sets the circle radius to the specified angle in degrees
 
   // project the lit hemisphere onto the moon sphere
@@ -216,21 +215,5 @@ var drawSolarSystem = function(mode) {
   drawSun(mode);
   drawPlanets(mode);
   drawMoon(mode);
-
-};
-
-var calculateMoonRotationAngle = function() {
-  // get the angle that the moon will need to rotate in order to be "pointing"
-  // in the right direction, based on where it is, and where the sun is
-
-  var moonCoords = skyProjection([moonData.ra, moonData.dec]);
-  var sunCoords = skyProjection([sunData.ra, sunData.dec]);
-  var moonX = moonCoords[0];
-  var moonY = moonCoords[1];
-  var sunX = sunCoords[0];
-  var sunY = sunCoords[1];
-
-  var rotationInRads = Math.atan2(sunX - moonX, sunY - moonY);
-  return rotationInRads * 180 / Math.PI - 90;
 
 };

@@ -53,8 +53,8 @@ def return_place_time_data():
 
     return jsonify({'rotation': stf.get_sky_rotation(),
                     'planets': stf.get_planets(),
-                    'moon': stf.get_moon(),
-                    'sundata': stf.get_sun()}) # sun is a reserved word in js!
+                    'sundata': stf.get_sun(), # sun is a reserved word in js!
+                    'moon': stf.get_moon()})
 
 
 if __name__ == '__main__':

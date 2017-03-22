@@ -66,7 +66,12 @@ text.constellation-label {
 
 #celestial-info {
     border: 2px solid black;
+    padding: 10px;
     display: none;
+}
+
+h1#celestial-name-value, h4#celestial-type-value {
+    text-align: center;
 }
 
 .star, .planet, .lit-moon, .planet-highlight {

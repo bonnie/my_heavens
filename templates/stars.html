@@ -8,8 +8,6 @@
   <script src='https://d3js.org/d3.v4.min.js'></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.min.js"></script>
   <script src='https://code.jquery.com/jquery.js'></script>
-  <script src='https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces'
-        async defer></script>
 </head>
 <body>
 
@@ -44,6 +42,7 @@
         </div>
         <div id='celestial-info'>
           <h1 id='celestial-name-value'></h1>
+          <h4 id='celestial-type-value'></h4>
           <table class='table'>
             <tr id='magnitude'><td>Magnitude</td><td id='celestial-magnitude-value'></td></tr>
             <tr id='distance'><td>Distance</td><td><span id='celestial-distance-value'></span> <span id='celestial-distance-units-value'></span></td></tr>
@@ -65,5 +64,7 @@
   <script type='text/javascript' src='/static/js/d3/stars.js'></script>
   <script type='text/javascript' src='/static/js/d3/solarsystem.js'></script>
   <script type='text/javascript' src='/static/js/d3/d3-main.js'></script>
+  <script src='https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces'
+        async defer></script>
 </body>
 </html>

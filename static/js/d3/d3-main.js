@@ -152,6 +152,7 @@ var addInfoMouseOverAndClick = function(obj, d, infoLabel) {
         // reveal and populate the info div
         $('#celestial-info').show();
         $('#celestial-name-value').html(d.name);
+        if (d.name !== d.type) { $('#celestial-type-value').html(d.type) }
         $('#celestial-magnitude-value').html(d.magnitude);
         $('#celestial-distance-value').html(d.distance);
         $('#celestial-distance-units-value').html(d.distanceUnits);

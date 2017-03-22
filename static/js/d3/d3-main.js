@@ -26,6 +26,7 @@
 var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData;
+var planetHighlights; // for the identifier circles for the planets
 var eclipticIsOn = false; // for tracking whether or not the ecliptic is showing
                           // needs to be a global independent of the actual
                           // element, since during animation, everything is

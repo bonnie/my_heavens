@@ -64,6 +64,6 @@ text.constellation-label {
     display: none;
 }
 
-.star, .planet, .lit-moon {
+.star, .planet, .lit-moon, .planet-highlight {
     pointer-events: none;
 }

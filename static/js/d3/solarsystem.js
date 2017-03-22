@@ -2,11 +2,34 @@
 // pulls globals xxxx from main-d3.js
 
 
+disablePlanetButton = function() {
+  // disable the "reveal planets" button
+  $('#reveal-planets').attr('disabled', 'disabled');
+
+};
+
+enablePlanetButton = function() {
+  // enable the "reveal planets" button
+  $('#reveal-planets').removeAttr('disabled');
+};
+
 var revealPlanets = function() {
     // make planets grow and shrink to highlight their position(s)
     // TODO: label planets during reveal
     // TODO: disable button and/or post message (in error div?) if no planets are visible 
     //        e.g.  berkeley 1/1/2017 1:00 AM
+
+
+  var t = d3.transition()
+      .duration(500)
+      .ease(d3.easeLinear);
+
+    planetHighlights.transition(t)
+        .attr('opacity', 1)
+      .transition(t)
+        .attr('opacity', 0)
+      .on('start', disablePlanetButton)
+      .on('end', enablePlanetButton);
 
 
     // TODO: make a nice ux here, like clicking a button to put a circle around planets 
@@ -117,6 +140,27 @@ var drawPlanets = function(mode) {
 
     renderSkyObjectList(planetParams);
 
+    if (mode !== 'transition') {
+      // add identifier circles for each visible planet
+      planetHighlights = d3.selectAll('g.planet-group')
+              .append('circle')
+              .attr('cx', function(d) { return getScreenCoords(d, 'x'); })
+              .attr('cy', function(d) { return getScreenCoords(d, 'y'); })
+              .attr('r', sunMoonRadius * 3)
+              .attr('stroke-width', 2)
+              .attr('stroke', 'red')
+              .attr('fill-opacity', 0)
+              .attr('opacity', 0)
+              .attr('class', 'planet-highlight');
+    }
+};
+
+
+var getScreenCoords = function(d, axis) {
+  // return the current screen coordinate for the data and axis
+
+  coords = skyProjection([d.ra, d.dec]);
+  return axis === 'x' ? coords[0] : coords[1];
 };
 
 
@@ -233,4 +277,4 @@ var calculateMoonRotationAngle = function() {
   var rotationInRads = Math.atan2(sunX - moonX, sunY - moonY);
   return rotationInRads * 180 / Math.PI - 90;
 
-}
+};

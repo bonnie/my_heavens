@@ -95,15 +95,15 @@ var showAjaxError = function(error) {
 };
 
 
-var addInfoWindowMouseOver = function(obj, d, infoLabel) {
-
-// update infoLabel position and text when star or planet gets a mouseover
+var addInfoMouseOverAndClick = function(obj, d, infoLabel) {
+// make a couple event handlers for this object:
+// 1. update info div when clicked
+// 2. update infoLabel position and text when star or planet gets a mouseover
 // adapted from http://bl.ocks.org/d3noob/a22c42db65eb00d4e369
+
 
 // uses global skyTransform, defined in the drawSkyAndStars function
 // uses global skyRadius from d3-main.js
-
-// TODO: make dimensions relative to radius, rather than hard-coded
 
     obj.on("mouseover", function() {
             // snazzy fading in
@@ -147,6 +147,14 @@ var addInfoWindowMouseOver = function(obj, d, infoLabel) {
     .on("mouseout", function() { infoLabel.transition()
         .duration(500)
         .style("opacity", 0);
+    })
+    .on('click', function() {
+        // reveal and populate the info div
+        $('#celestial-info').show();
+        $('#celestial-name-value').html(d.name);
+        $('#celestial-magnitude-value').html(d.magnitude);
+        $('#celestial-distance-value').html(d.distance);
+        $('#celestial-distance-units-value').html(d.distanceUnits);
     });
 };
 
@@ -363,7 +371,7 @@ var renderSkyObject = function(params) {
                                 .attr('class', params.objClass + '-surround')
                                 .style('opacity', 0);
 
-                addInfoWindowMouseOver(surroundingCircle, d, params.itemLabel);
+                addInfoMouseOverAndClick(surroundingCircle, d, params.itemLabel);
             }
         }
         // for sun, return the point for ease in telling whether it's visible

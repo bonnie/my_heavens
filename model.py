@@ -46,7 +46,7 @@ class Star(db.Model):
     name = db.Column(db.String(128), nullable=True)
     ra = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
     dec = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
-    distance = db.Column(db.Numeric(12, 2), nullable=True)
+    distance = db.Column(db.Numeric(12, 2), nullable=True) # in parsecs
     magnitude = db.Column(db.Numeric(4, 2), nullable=False)
     absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
     spectrum = db.Column(db.String(16), nullable=False)

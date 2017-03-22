@@ -232,7 +232,7 @@ var drawMoon = function(mode) {
   moonLabel = skyObjects.append('text')
         .attr('class', 'moon-label sky-label');
 
-  addInfoWindowMouseOver(moon, d, moonLabel);
+  addInfoMouseOverAndClick(moon, d, moonLabel);
 };
 
 var drawSun = function(mode) {

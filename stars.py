@@ -42,7 +42,10 @@ def get_stars(max_mag):
                            'dec': float(star.dec),
                            'magnitude': float(star.magnitude),
                            'color': star.color,
-                           'name': name
+                           'name': name,
+                           'distance': float(star.distance),
+                           'distanceUnits': 'parsecs',
+                           'type': 'star'
                            })
 
     return star_field

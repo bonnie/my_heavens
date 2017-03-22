@@ -64,6 +64,11 @@ text.constellation-label {
     display: none;
 }
 
+#celestial-info {
+    border: 2px solid black;
+    display: none;
+}
+
 .star, .planet, .lit-moon, .planet-highlight {
     pointer-events: none;
 }

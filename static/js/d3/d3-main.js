@@ -181,9 +181,9 @@ var populateInfoDiv = function(d) {
     addInfoTableRow('Distance', d.distance + ' ' + d.distanceUnits);
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
-        addInfoTableRow('Phase', d.phase); }
+        addInfoTableRow('Phase', d.phase + '%'); }
 
-    if (d.celestialType !== 'star') {
+    if (d.celestialType !== 'star' || d.name == 'Sun') {
         addInfoTableRow('Rose at', d.prevRise);
         addInfoTableRow('Will set at', d.nextSet);
     }
@@ -193,7 +193,7 @@ var populateInfoDiv = function(d) {
 var addInfoTableRow = function(rowName, rowValue) {
     // add a row to the info table (celestialInfoTable)
 
-    var rowString = '<tr><td>';
+    var rowString = '<tr><td class="info-table-name text-right">';
     rowString += rowName;
     rowString += '</td><td>';
     rowString += rowValue;

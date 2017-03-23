@@ -46,16 +46,6 @@ def rad_to_deg(angle):
     return angle / math.pi * 180
 
 
-def generate_ephem_time(ephem_date):
-    """Take an ephem Date object and return the time portion as a formatted string.
-
-    String is in the format DISPLAY_TIME_FORMAT.
-    """
-
-    dtime = datetime.strptime(str(ephem_date), EPHEM_DTIME_FORMAT)
-    return dtime.strftime(DISPLAY_TIME_FORMAT)
-
-
 class StarField(object):
     """Class for calculating stars and constellation display"""
 
@@ -149,7 +139,7 @@ class StarField(object):
         ephem_date is in the ephem.Date format, and is in utc.
         """
 
-        dtime = datetime.strptime(str(prev_rise), EPHEM_DTIME_FORMAT)
+        dtime = datetime.strptime(str(ephem_date), EPHEM_DTIME_FORMAT)
         dtime_utc = dtime.replace(tzinfo=pytz.UTC)
         dtime_local = dtime_utc.astimezone(self.timezone)
 
@@ -166,11 +156,11 @@ class StarField(object):
 
         prev_rise = self.ephem.previous_rising(obj)
         prev_rise_local = self.get_local_from_ephem(prev_rise)
-        prev_rise_string = generate_ephem_time(prev_rise_local)
+        prev_rise_string = prev_rise_local.strftime(DISPLAY_TIME_FORMAT)
 
         next_set = self.ephem.next_setting(obj)
         next_set_local = self.get_local_from_ephem(next_set)
-        next_set_string = generate_ephem_time(next_set_local)
+        next_set_string = next_set_local.strftime(DISPLAY_TIME_FORMAT)
 
         return (prev_rise_string, next_set_string)
 

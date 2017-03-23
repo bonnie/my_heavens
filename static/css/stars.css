@@ -77,3 +77,7 @@ h1#celestial-name-value, h4#celestial-type-value {
 .star, .planet, .lit-moon, .planet-highlight {
     pointer-events: none;
 }
+
+td.info-table-name {
+    font-weight: bold;
+}

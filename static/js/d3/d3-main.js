@@ -166,24 +166,37 @@ var findLabelPosition = function(d) {
 var populateInfoDiv = function(d) {
     // reveal and populate the info div when someone clicks on an item
     
+    // show the div
     $('#celestial-info').show();
+
+    // populate the headers
     $('#celestial-name-value').html(d.name);
     if (d.name !== d.celestialType) { $('#celestial-type-value').html(d.celestialType) }
-    $('#celestial-magnitude-value').html(d.magnitude);
-    $('#celestial-distance-value').html(d.distance);
-    $('#celestial-distance-units-value').html(d.distanceUnits);
+
+    // empty the info table
+    celestialInfoTable.empty();
+
+    // populate table info
+    addInfoTableRow('Magnitude', d.magnitude);
+    addInfoTableRow('Distance', d.distance + ' ' + d.distanceUnits);
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
+        addInfoTableRow('Phase', d.phase); }
 
-        $('#celestial-phase-row').show();
-        $('#celestial-phase-value').html(d.phase);
+};
 
-    } else {
+var addInfoTableRow = function(rowName, rowValue) {
+    // add a row to the info table (celestialInfoTable)
 
-        $('#celestial-phase-row').hide();
-    }
+    var rowString = '<tr><td>';
+    rowString += rowName;
+    rowString += '</td><td>';
+    rowString += rowValue;
+    rowString += '</td></tr>';
 
-}
+    celestialInfoTable.append(rowString);
+
+};
 
 ////////////////////////////
 // main printing function //

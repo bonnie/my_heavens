@@ -89,6 +89,9 @@ var drawPlanets = function(mode) {
     renderSkyObjectList(planetParams);
 
     if (mode !== 'transition') {
+
+      var opacity = planetToggle.is(':checked') ? 0.6 : 0;
+
       // add identifier circles for each visible planet
       planetHighlights = d3.selectAll('g.planet-group')
               .append('circle')
@@ -98,7 +101,7 @@ var drawPlanets = function(mode) {
               .attr('stroke-width', 2)
               .attr('stroke', 'red')
               .attr('fill-opacity', 0)
-              .attr('opacity', 0)
+              .attr('opacity', opacity)
               .attr('class', 'planet-highlight');
     }
 };

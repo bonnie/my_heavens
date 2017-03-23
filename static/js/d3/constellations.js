@@ -47,9 +47,11 @@ var drawConstellations = function() {
                     .style("opacity", 1);})
 
         .on('mouseout', function() {
+                if (!constellationToggle.is(':checked')) {}
                   d3.select(this).transition()
                     .duration(500)
                     .style("opacity", 0);});
+                };
 
 
     //////////////////

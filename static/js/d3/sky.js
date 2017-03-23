@@ -106,7 +106,7 @@ var rotateSky = function(lambda, phi) {
           $('#all-sky-objects').empty();
 
           // draw all the objects
-          if (eclipticIsOn) { drawEcliptic(); }
+          if (eclipticToggle.is(':checked')) { drawEcliptic(); }
 
           // draw the background and sun/moon/planets without labels
           drawSolarSystem('transition');
@@ -158,7 +158,7 @@ var drawEcliptic = function() {
                 type: 'Feature'
     };
 
-    var overallOpacity = eclipticIsOn ? 0.6 : 0;
+    var overallOpacity = eclipticToggle.is(':checked') ? 0.6 : 0;
 
     eclipticPath = skyObjects.append('path')
       .datum(eclipticPolygon)
@@ -172,20 +172,14 @@ var drawEcliptic = function() {
 
 
 var toggleEcliptic = function() {
-    // a function to show / hide the ecliptic
-
-    // TODO: make transitions like revealPlanets
-    // probably make a unified function so all transitions are uniform
+    // a callback function to show / hide the ecliptic
+    // uses opacityTransition from d3-main.js
 
     var params = {
-      triggerButton: eclipticToggleButton,
-      elementsShowing: eclipticIsOn,
-      showText: 'Show ecliptic',
-      hideText: 'Hide ecliptic',
+      trigger: eclipticToggle,
       obj: eclipticPath
     };
     opacityTransition(params);
-    eclipticIsOn = !eclipticIsOn;
 
 };
 

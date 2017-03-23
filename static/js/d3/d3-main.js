@@ -28,11 +28,6 @@ var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData;
 var planetHighlights; // for the identifier circles for the planets
-var eclipticIsOn = false; // for tracking whether or not the ecliptic is showing
-                          // needs to be a global independent of the actual
-                          // element, since during animation, everything is
-                          // repeatedly deleted and redrawn
-var planetsRevealed = false; // are planet reveal rings showing? 
 var skyRadius = 350;  // for now
 
 
@@ -249,7 +244,7 @@ var drawSkyAndStars = function(error, starDataResult) {
 
     // show ecliptic toggle button and attach event listener
     $('#starfield-controls').show()
-    eclipticToggleButton.on('click', toggleEcliptic);
+    eclipticToggle.on('click', toggleEcliptic);
 
 
 };
@@ -428,26 +423,23 @@ var opacityTransition = function(p) {
     // do an opacity transition with the specified params
     //
     // p is a parameters object with these keys: 
-    //      triggerButton (button that called function; e.g. planetRevealButton)
-    //      elementsShowing (state variable for this button; e.g. planetsRevealed)
-    //      showText (text on button to show elements; e.g. 'Reveal Planets')
-    //      hideText (text on button to hide elements; e.g. 'Hide planet indicators')
+    //      trigger (checkbox that triggered this transition; e.g. planetTrigger)
     //      obj (svg object to show/hide; e.g. planetHighlights)
+
+
+    // determine whether to turn the feature on or off
+    var finalOpacity = p.trigger.is(':checked') ? 0.5 : 0;
 
     var t = d3.transition()
             .duration(500)
             .ease(d3.easeLinear);
 
-    var finalOpacity = p.elementsShowing ? 0 : 0.5;
-    var buttonText = p.elementsShowing ? p.showText : p.hideText;
-
     p.obj.transition(t)
         .attr('opacity', 1)
       .transition(t)
         .attr('opacity', finalOpacity)
-      .on('start', function() { p.triggerButton.attr('disabled', 'disabled'); })
+      .on('start', function() { p.trigger.attr('disabled', 'disabled'); })
       .on('end', function() {
-        p.triggerButton.removeAttr('disabled');
-        p.triggerButton.html(buttonText);});
+        p.trigger.removeAttr('disabled');});
 };
 

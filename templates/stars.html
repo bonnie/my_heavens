@@ -37,8 +37,15 @@
         <button class='btn' id='show-stars'>Show me the stars!</button>
         <div class='alert alert-danger' role='alert' id='error'></div>
         <div id='starfield-controls'>
-          <button class='btn' id='ecliptic-toggle'>Show ecliptic</button>
-          <button class='btn' id='reveal-planets' disabled='disabled'>Reveal planets</button>
+          <div class="checkbox">
+            <label><input type="checkbox" value="" id='ecliptic-toggle'>Reveal ecliptic</label>
+          </div>
+          <div class="checkbox disabled">
+            <label><input type="checkbox" value="" id='constellation-toggle'>Reveal constellations</label>
+          </div>        
+          <div class="checkbox">
+            <label><input type="checkbox" value="" id='planet-toggle' disabled='disabled'>Reveal planet indicators</label>
+          </div>
         </div>
         <div id='celestial-info'>
           <h1 id='celestial-name-value'></h1>
@@ -55,7 +62,6 @@
           src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
   <script type='text/javascript' src='/static/js/star-page-control.js'></script>
   <script type='text/javascript' src='/static/js/geocode.js'></script>
-  <!-- <script type='text/javascript' src='/static/js/star-utilities.js'></script> -->
   <script type='text/javascript' src='/static/js/d3/sky.js'></script>
   <script type='text/javascript' src='/static/js/d3/constellations.js'></script>
   <script type='text/javascript' src='/static/js/d3/stars.js'></script>

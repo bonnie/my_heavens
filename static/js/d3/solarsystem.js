@@ -9,21 +9,11 @@ var revealPlanets = function() {
     // TODO: disable button and/or post message (in error div?) if no planets are visible 
     //        e.g.  berkeley 1/1/2017 1:00 AM
 
-    //      triggerButton (button that called function; e.g. planetRevealButton)
-    //      elementsShowing (state variable for this button; e.g. planetsRevealed)
-    //      showText (text on button to show elements; e.g. 'Reveal Planets')
-    //      hideText (text on button to hide elements; e.g. 'Hide planet indicators')
-    //      obj (svg object to show/hide; e.g. planetHighlights)
-
     var params = {
-      triggerButton: planetRevealButton,
-      elementsShowing: planetsRevealed,
-      showText: 'Reveal planets',
-      hideText: 'Hide planet indicators',
+      trigger: planetToggle,
       obj: planetHighlights
     };
     opacityTransition(params);
-    planetsRevealed = !planetsRevealed;
 
 };
 
@@ -72,10 +62,10 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // show the starfield controls 
   starfieldControlDiv.show();
-  planetRevealButton.removeAttr('disabled');
+  planetToggle.removeAttr('disabled');
 
   // attach 'reveal planets' button to the revealPlanets function
-  planetRevealButton.on('click', revealPlanets);
+  planetToggle.on('click', revealPlanets);
 
 };
 

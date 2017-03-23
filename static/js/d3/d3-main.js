@@ -113,66 +113,77 @@ var addInfoMouseOverAndClick = function(obj, d, infoLabel) {
                 .duration(200)
                 .style("opacity", 0.9);
 
-            // figure out the best position for the label so it doesn't go off
-            // the circle of the sky
-            var textAnchor, dxMultiplier, dyMultiplier;
-            var coords = skyProjection([d.ra, d.dec]);
-            var x = coords[0];
-            var y = coords[1];
-
-            if (x < skyRadius) {
-                textAnchor = 'start';
-                dxMultiplier = 1;
-            } else {
-                textAnchor = 'end';
-                dxMultiplier = -1;
-            }
-
-            if (y < skyRadius / 2) {
-                dyMultiplier = 2;
-            } else {
-                dyMultiplier = -1;
-            }
+            var labelPos = findLabelPosition(d);
 
             // add text and reposition   
             // with help from https://bost.ocks.org/mike/map/
             // TODO: make background color and/or make placement always on "globe"
-            infoLabel.attr('dy', (0.35 * dyMultiplier) + 'em')
-                .attr('dx', (0.35 * dxMultiplier) + 'em')
+            infoLabel.attr('dy', (0.35 * labelPos.dyMultiplier) + 'em')
+                .attr('dx', (0.35 * labelPos.dxMultiplier) + 'em')
                 .attr('transform', skyTransform(d.ra, d.dec))
-                .attr('text-anchor', textAnchor)
+                .attr('text-anchor', labelPos.textAnchor)
                 .text(d.name);
 
-
-
     })
-    .on("mouseout", function() { infoLabel.transition()
+    .on("mouseout", function() {
+        infoLabel.transition()
         .duration(500)
         .style("opacity", 0);
     })
-    .on('click', function() {
-        // reveal and populate the info div
-        $('#celestial-info').show();
-        $('#celestial-name-value').html(d.name);
-        if (d.name !== d.celestialType) { $('#celestial-type-value').html(d.celestialType) }
-        $('#celestial-magnitude-value').html(d.magnitude);
-        $('#celestial-distance-value').html(d.distance);
-        $('#celestial-distance-units-value').html(d.distanceUnits);
-
-        if (d.celestialType === 'planet' || d.celestialType === 'moon') {
-
-            $('#celestial-phase-row').show();
-            $('#celestial-phase-value').html(d.phase);
-
-        } else {
-
-            $('#celestial-phase-row').hide();
-        }
-
-
-    });
+    .on('click', function() { populateInfoDiv(d); });
 };
 
+var findLabelPosition = function(d) {
+    // figure out the best position for a label so it doesn't go off
+    // the circle of the sky
+    var textAnchor, dxMultiplier, dyMultiplier;
+    var coords = skyProjection([d.ra, d.dec]);
+    var x = coords[0];
+    var y = coords[1];
+
+    if (x < skyRadius) {
+        textAnchor = 'start';
+        dxMultiplier = 1;
+    } else {
+        textAnchor = 'end';
+        dxMultiplier = -1;
+    }
+
+    if (y < skyRadius / 2) {
+        dyMultiplier = 2;
+    } else {
+        dyMultiplier = -1;
+    }
+
+    var labelPos = {textAnchor: textAnchor,
+                dxMultiplier: dxMultiplier,
+                dyMultiplier: dyMultiplier};
+
+    return labelPos;
+};
+
+
+var populateInfoDiv = function(d) {
+    // reveal and populate the info div when someone clicks on an item
+    
+    $('#celestial-info').show();
+    $('#celestial-name-value').html(d.name);
+    if (d.name !== d.celestialType) { $('#celestial-type-value').html(d.celestialType) }
+    $('#celestial-magnitude-value').html(d.magnitude);
+    $('#celestial-distance-value').html(d.distance);
+    $('#celestial-distance-units-value').html(d.distanceUnits);
+
+    if (d.celestialType === 'planet' || d.celestialType === 'moon') {
+
+        $('#celestial-phase-row').show();
+        $('#celestial-phase-value').html(d.phase);
+
+    } else {
+
+        $('#celestial-phase-row').hide();
+    }
+
+}
 
 ////////////////////////////
 // main printing function //

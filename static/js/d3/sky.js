@@ -78,10 +78,10 @@ var rotateSky = function(lambda, phi) {
     // planet rings are going to be removed during transition
     // do it deliberately here first]
     // TODO: this doesn't work. Reveal planets hides them after this code runs, and doesn't toggle the button.
-    if (planetsRevealed === true) {
-        planetsRevealed = false;
-        planetRevealButton.html('Reveal planets');
-    }
+    // if (planetsRevealed === true) {
+    //     planetsRevealed = false;
+    //     planetRevealBox.html('Reveal planets');
+    // }
 
 
     // calculate duration based on distance to go

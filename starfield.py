@@ -22,7 +22,10 @@ PLANETS = [ephem.Mercury, ephem.Venus, ephem.Mars,
 BOOTSTRAP_DTIME_FORMAT = '%Y-%m-%dT%H:%M'
 
 # how ephem expects / gives dates
-EPHEM_DTIME_FORMAT = '%Y/%-m/%-d %H:%M:%S'
+EPHEM_DTIME_FORMAT = '%Y/%m/%d %H:%M:%S'
+
+# time format to send to front end for display
+DISPLAY_TIME_FORMAT = '%-I:%M %p'
 
 # for getting time zones
 GOOGLE_TZ_URL = 'https://maps.googleapis.com/maps/api/timezone/json'
@@ -43,6 +46,16 @@ def rad_to_deg(angle):
     return angle / math.pi * 180
 
 
+def generate_ephem_time(ephem_date):
+    """Take an ephem Date object and return the time portion as a formatted string.
+
+    String is in the format DISPLAY_TIME_FORMAT.
+    """
+
+    dtime = datetime.strptime(str(ephem_date), EPHEM_DTIME_FORMAT)
+    return dtime.strftime(DISPLAY_TIME_FORMAT)
+
+
 class StarField(object):
     """Class for calculating stars and constellation display"""
 
@@ -60,6 +73,9 @@ class StarField(object):
         self.max_mag = max_mag
         self.lat = lat
         self.lng = lng
+
+        # set the local time zone
+        self.set_timezone()
 
         # translate local time to utc if necessary
         if localtime_string is None:
@@ -90,7 +106,7 @@ class StarField(object):
         # ephem uses utctime
         self.ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
 
-    def get_timezone(self):
+    def set_timezone(self):
         """return the timezone based on the lat/lng and desired time.
 
         localtime is a naive (non-timezone-aware) datetime object.
@@ -102,7 +118,7 @@ class StarField(object):
         # TODO: inform user if error
         timezone_str = TZW.tzNameAt(self.lat, self.lng) or 'Etc/UTC'
 
-        return pytz.timezone(timezone_str)
+        self.timezone = pytz.timezone(timezone_str)
 
     def set_utc_time(self, localtime_string):
         """Sets self.utctime based on the local time and the lat/lng.
@@ -113,20 +129,50 @@ class StarField(object):
         if not localtime_string:
             # no time like the present!
             self.utctime = datetime.utcnow()
+            self.localtime = self.utctime.astimezone(self.timezone)
 
         else:
 
             # get localtime with no timezone
             dtime_local = datetime.strptime(localtime_string, BOOTSTRAP_DTIME_FORMAT)
 
-            # get time zone based on lat/lng
-            local_tz = self.get_timezone()
-
             # give it a time zone
-            local_tz.localize(dtime_local)
+            self.timezone.localize(dtime_local)
+            self.localtime = dtime_local
 
             # translate to utc
-            self.utctime = to_utc(local_tz, dtime_local)
+            self.utctime = to_utc(self.timezone, dtime_local)
+
+    def get_local_from_ephem(self, ephem_date):
+        """Return datetime obj for local time zone, corresponding to ephem date.
+
+        ephem_date is in the ephem.Date format, and is in utc.
+        """
+
+        dtime = datetime.strptime(str(prev_rise), EPHEM_DTIME_FORMAT)
+        dtime_utc = dtime.replace(tzinfo=pytz.UTC)
+        dtime_local = dtime_utc.astimezone(self.timezone)
+
+        return dtime_local
+
+    def get_rise_set_times(self, obj):
+        """Return tuple of (rise_time, set_time) for the object in question.
+
+        Since this will only show for objects currently visible, the previous
+        rise and the next set will be informative.
+
+        Times will be strings in the format DISPLAY_TIME_FORMAT.
+        """
+
+        prev_rise = self.ephem.previous_rising(obj)
+        prev_rise_local = self.get_local_from_ephem(prev_rise)
+        prev_rise_string = generate_ephem_time(prev_rise_local)
+
+        next_set = self.ephem.next_setting(obj)
+        next_set_local = self.get_local_from_ephem(next_set)
+        next_set_string = generate_ephem_time(next_set_local)
+
+        return (prev_rise_string, next_set_string)
 
     def get_planet_data(self, planet):
         """Return a dict of planet data for the ephem object and planet object.
@@ -170,6 +216,11 @@ class StarField(object):
         planet_data['distanceUnits'] = 'AU'
         planet_data['phase'] = '{:.1f}'.format(pla.phase)
         planet_data['celestialType'] = 'planet'
+
+        # get rising and setting times
+        prev_rise, next_set = self.get_rise_set_times(pla)
+        planet_data['prevRise'] = prev_rise
+        planet_data['nextSet'] = next_set
 
         # set attributes for sun and moon for later use
         if pla.name == 'Sun':

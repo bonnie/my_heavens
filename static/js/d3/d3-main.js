@@ -171,7 +171,7 @@ var populateInfoDiv = function(d) {
 
     // populate the headers
     $('#celestial-name-value').html(d.name);
-    if (d.name !== d.celestialType) { $('#celestial-type-value').html(d.celestialType) }
+    if (d.name !== d.celestialType) { $('#celestial-type-value').html(d.celestialType); }
 
     // empty the info table
     celestialInfoTable.empty();
@@ -182,6 +182,11 @@ var populateInfoDiv = function(d) {
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
         addInfoTableRow('Phase', d.phase); }
+
+    if (d.celestialType !== 'star') {
+        addInfoTableRow('Rose at', d.prevRise);
+        addInfoTableRow('Will set at', d.nextSet);
+    }
 
 };
 

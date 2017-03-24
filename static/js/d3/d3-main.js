@@ -204,7 +204,7 @@ var addInfoDivHeader = function(infoHeaderDiv, header, subHeader) {
     infoHeaderDiv.append('<h3' + headerClass + '>' + header + '</h3>');
 
     if (subHeader !== null && subHeader !== undefined) {
-        infoHeaderDiv.append('<h4' + headerClass + '>' + subHeader + '</h4>');
+        infoHeaderDiv.append('<h5' + headerClass + '>' + subHeader + '</h5>');
     }
 
 };

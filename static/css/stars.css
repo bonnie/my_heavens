@@ -61,7 +61,7 @@ div.info {
 }
 
 td.info-table-name {
-    font-weight: bold;
+    font-weight: 700;
 }
 
 #planet-warning {
@@ -71,4 +71,19 @@ td.info-table-name {
 
 #master-info-div, #dateloc-form-cancel, #datetime-form-group, #error {
     display: none;
+}
+
+.info-table {
+    margin-bottom: 10px;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+h3 {
+    font-family: 'Forum', cursive;
+    font-size: 200%;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }

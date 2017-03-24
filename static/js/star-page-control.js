@@ -7,7 +7,8 @@ var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     starfieldControlDiv, warnDiv, eclipticToggle, planetToggle, planetWarning,
     celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv,
     datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
-    datelocFormCancel, masterInfoDiv;
+    datelocFormCancel, masterInfoDiv, celestialDivInstructions,
+    celestialInfoHeader, datelocInfoHeader;
 
 var displayError = function(error) {
 
@@ -107,8 +108,9 @@ var populateDatelocInfo = function(datelocInfo) {
     // to populate the date/location info div
     // uses global addInfoTableRow from d3-main.js
 
-    $('#city').html(autocomplete.getPlace().name);
-    $('#datetime').html(datelocInfo.dateString + ' ' + datelocInfo.timeString);
+    var placeString = autocomplete.getPlace().name;
+    var datetimeString = datelocInfo.dateString + ' ' + datelocInfo.timeString;
+    addInfoDivHeader(datelocInfoHeader, placeString, datetimeString);
     addDatelocTableRow('Latitude', datelocInfo.lat);
     addDatelocTableRow('Longitude', datelocInfo.lng);
 
@@ -123,20 +125,29 @@ $(document).ready(function() {
     errorDiv = $('#error');
     starfieldControlDiv = $('#starfield-controls');
     warnDiv = $('#warn');
+
     eclipticToggle = $('#ecliptic-toggle');
     planetToggle = $('#planet-toggle');
-    celestialInfoTable = $('#celestial-info-table');
+
     planetWarning = $('#planet-warning');
-    datelocFormGroups = $('#dateloc-form .form-group');
-    datetimeFormGroup = $('#datetime-form-group');
-    celestialInfoDiv = $('#celestial-info');
-    datelocInfoDiv = $('#dateloc-info');
-    datelocInfoTable = $('#dateloc-info-table');
-    datelocChangeBtn = $('#dateloc-change-btn');
-    datelocForm = $('#dateloc-form');
+
     showStarsBtn = $('#show-stars');
-    datelocFormCancel = $('#dateloc-form-cancel');
     masterInfoDiv = $('#master-info-div');
+    datetimeFormGroup = $('#datetime-form-group');
+
+    datelocForm = $('#dateloc-form');
+    datelocFormGroups = $('#dateloc-form .form-group');
+    datelocFormCancel = $('#dateloc-form-cancel');
+
+    celestialInfoDiv = $('#celestial-info');
+    celestialInfoTable = $('#celestial-info .info-table');
+    celestialInfoHeader = $('#celestial-info .info-header');
+    celestialDivInstructions = $('#celestial-div-instructions').get(0);
+
+    datelocInfoDiv = $('#dateloc-info');
+    datelocInfoHeader = $('#dateloc-info .info-header');
+    datelocInfoTable = $('#dateloc-info .info-table');
+    datelocChangeBtn = $('#dateloc-change-btn');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {

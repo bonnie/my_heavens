@@ -61,6 +61,10 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   // populate date/location info window
   populateDatelocInfo(locationResponse.dateloc);
 
+  // TODO: clear the celestial info div and re-add instructions
+  celestialInfoTable.empty();
+  celestialInfoHeader.html(celestialDivInstructions);
+
   // show the controls and info divs
   masterInfoDiv.show();
 

@@ -40,10 +40,9 @@
         <div class='alert alert-danger' role='alert' id='error'></div>
         <div id='master-info-div'>
           <div id='dateloc-info' class='info'>
-            <h3 id='city' class='text-center'></h3>
-            <h4 id='datetime' class='text-center'></h4>
-            <table id='dateloc-info-table' class='table table-responsive table-condensed'></table>
-            <button id='dateloc-change-btn' class='btn'>Change</button>
+            <div class='info-header'></div>
+            <table class='table table-responsive table-condensed info-table'></table>
+            <button id='dateloc-change-btn' class='btn text-center'>Change</button>
           </div>
           <div id='starfield-controls' class='info'>
             <div class="checkbox">
@@ -54,10 +53,10 @@
             </div>
           </div>
           <div id='celestial-info' class='info'>
-            <h3 id='celestial-name-value' class='text-center'></h3>
-            <h4 id='celestial-type-value' class='text-center'>Click on an object for more information.</h4>
-            <table id='celestial-info-table' class='table table-responsive table-condensed'>
-            </table>
+            <div class='info-header'>
+              <h4 id='celestial-div-instructions' class='text-center'>Click an object for more information.</h4>
+            </div>
+            <table class='table table-responsive table-condensed info-table'></table>
           </div>
         </div>
       </div>

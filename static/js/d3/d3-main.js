@@ -168,8 +168,8 @@ var populateInfoDiv = function(d) {
     celestialInfoDiv.show();
 
     // populate the headers
-    $('#celestial-name-value').html(d.name);
-    if (d.name !== d.celestialType) { $('#celestial-type-value').html(d.celestialType); }
+    var celType = d.name === d.celestialType ? null : d.celestialType;
+    addInfoDivHeader(celestialInfoHeader, d.name, celType);
 
     // empty the info table
     celestialInfoTable.empty();
@@ -191,6 +191,20 @@ var populateInfoDiv = function(d) {
     if (d.celestialType !== 'star' || d.name === 'Sun') {
         addCelestialTableRow('Rose at', d.prevRise);
         addCelestialTableRow('Will set at', d.nextSet);
+    }
+
+};
+
+var addInfoDivHeader = function(infoHeaderDiv, header, subHeader) {
+    // add a header and subheader to an info table
+
+    infoHeaderDiv.empty();
+
+    var headerClass = ' class="text-center" ';
+    infoHeaderDiv.append('<h3' + headerClass + '>' + header + '</h3>');
+
+    if (subHeader !== null && subHeader !== undefined) {
+        infoHeaderDiv.append('<h4' + headerClass + '>' + subHeader + '</h4>');
     }
 
 };

@@ -3,9 +3,11 @@
 "use strict";
 
 // globals that will be initialized on document load
-var datetimeRadio, changetimeRadio, datetimeInput, errorDiv,
+var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     starfieldControlDiv, warnDiv, eclipticToggle, planetToggle, planetWarning,
-    celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv;
+    celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv,
+    datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
+    datelocFormCancel, masterInfoDiv;
 
 var displayError = function(error) {
 
@@ -21,11 +23,11 @@ var processFormInputs = function(latlng) {
     // clear previous errors
     errorDiv.empty().hide();
 
-    // hide starfield controls
-    starfieldControlDiv.hide();
+    // hide starfield controls and info divs
+    masterInfoDiv.hide();
 
-    // hide info div
-    celestialInfoDiv.hide();
+    // erase info from the date/location table
+    datelocInfoTable.empty();
 
     if (latlng === undefined) {
         // geolocation failed
@@ -39,14 +41,14 @@ var processFormInputs = function(latlng) {
     if (changetimeRadio.is(':checked')) {
         datetime = datetimeInput.val();
         if (!datetime) {
-            displayError('Please either choose "Now" or enter a date and time');
+            displayError('Please either choose "Now" or enter a valid date and time');
             datetimeFormGroup.addClass('has-error');
             return;
         }
     }
 
-    // disable the button
-    // $('#show-stars').attr('disabled', 'disabled');
+    // hide the form
+    datelocForm.hide();
 
     // put the data into an obj
     var locTime = {
@@ -85,6 +87,33 @@ var getLocTimeData = function(locTime) {
 
 };
 
+var changeDateloc = function() {
+    // callback for clicking on the 'change date / location' button
+
+    datelocForm.show();
+    datelocFormCancel.show();
+    masterInfoDiv.hide();
+};
+
+var cancelDatelocForm = function() {
+    // callback for cancel button on date / location form
+
+    datelocForm.hide();
+    masterInfoDiv.show();
+
+};
+
+var populateDatelocInfo = function(datelocInfo) {
+    // to populate the date/location info div
+    // uses global addInfoTableRow from d3-main.js
+
+    $('#city').html(autocomplete.getPlace().name);
+    $('#datetime').html(datelocInfo.dateString + ' ' + datelocInfo.timeString);
+    addDatelocTableRow('Latitude', datelocInfo.lat);
+    addDatelocTableRow('Longitude', datelocInfo.lng);
+
+};
+
 $(document).ready(function() {
 
     // define some globals based on html ids
@@ -98,9 +127,16 @@ $(document).ready(function() {
     planetToggle = $('#planet-toggle');
     celestialInfoTable = $('#celestial-info-table');
     planetWarning = $('#planet-warning');
-    datelocFormGroups = $('.dateloc-form-group');
+    datelocFormGroups = $('#dateloc-form .form-group');
     datetimeFormGroup = $('#datetime-form-group');
     celestialInfoDiv = $('#celestial-info');
+    datelocInfoDiv = $('#dateloc-info');
+    datelocInfoTable = $('#dateloc-info-table');
+    datelocChangeBtn = $('#dateloc-change-btn');
+    datelocForm = $('#dateloc-form');
+    showStarsBtn = $('#show-stars');
+    datelocFormCancel = $('#dateloc-form-cancel');
+    masterInfoDiv = $('#master-info-div');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {
@@ -114,7 +150,17 @@ $(document).ready(function() {
         }
     });
 
+    // getLatLng defined in geocode.js
+    showStarsBtn.on('click', getLatLng);
+
+    // event handler for change button
+    datelocChangeBtn.on('click', changeDateloc);
+
+    // event handler for cancel button
+    datelocFormCancel.on('click', cancelDatelocForm);
+
     // load them stars
     d3.json('/stars.json', drawSkyAndStars);
     
 });
+

@@ -16,38 +16,49 @@
       <div id='star-field' class='col-xs-12 col-md-6 col-lg-8'>
 
       </div>
-      <div id='location-params' class='col-xs-12 col-md-6 col-lg-4'>
-        <h1>Where and when do you want to view the sky?</h1>
-        <div class='form-group dateloc-form-group' id='location-form-group'>
-          <input type='text' class='form-control' id='city-input' placeholder='Enter a location'>
-        </div>
+      <div id='controls' class='col-xs-12 col-md-6 col-lg-4'>
+        <div id='dateloc-form' class='info'>
+          <h1>Where and when?</h1>
+          <div class='form-group' id='location-form-group'>
+            <input type='text' class='form-control' id='city-input' placeholder='Enter a location'>
+          </div>
 
-        <div class='radio'>
-          <label><input type='radio' name='datetime' value='now' id='now-time' checked='checked'>Now</label>
+          <div class='radio'>
+            <label><input id='now-time' type='radio' name='datetime' value='now' checked='checked'>Now</label>
+          </div>
+          <div class='radio'>
+            <label><input id='change-time' type='radio' name='datetime' value='not-now'>Other time</label>
+          </div>
+          <div id='datetime-form-group' class='form-group'>
+              <div class='input-group date'>
+                  <input type='datetime-local' id='datetime-input' class='form-control'>
+              </div>
+          </div>
+          <button id='show-stars' class='btn'>Show me the stars!</button>
+          <button id='dateloc-form-cancel' class='btn'>Cancel</button>
         </div>
-        <div class='radio'>
-          <label><input type='radio' name='datetime' value='not-now' id='change-time'>Other time</label>
-        </div>
-        <div class='form-group dateloc-form-group' id='datetime-form-group'>
-            <div class='input-group date'>
-                <input type='datetime-local' id='datetime-input' class='form-control'>
-            </div>
-        </div>
-        <button class='btn' id='show-stars'>Show me the stars!</button>
         <div class='alert alert-danger' role='alert' id='error'></div>
-        <div id='starfield-controls'>
-          <div class="checkbox">
-            <label><input type="checkbox" value="" id='ecliptic-toggle'>Reveal ecliptic</label>
+        <div id='master-info-div'>
+          <div id='dateloc-info' class='info'>
+            <h3 id='city' class='text-center'></h3>
+            <h4 id='datetime' class='text-center'></h4>
+            <table id='dateloc-info-table' class='table table-responsive table-condensed'></table>
+            <button id='dateloc-change-btn' class='btn'>Change</button>
           </div>
-          <div class="checkbox">
-            <label><input type="checkbox" value="" id='planet-toggle' disabled='disabled'>Reveal planet indicators</label> <span id='planet-warning'>(No time/place selected)</span>
+          <div id='starfield-controls' class='info'>
+            <div class="checkbox">
+              <label><input type="checkbox" value="" id='ecliptic-toggle'>Reveal ecliptic</label>
+            </div>
+            <div class="checkbox">
+              <label><input type="checkbox" value="" id='planet-toggle' disabled='disabled'>Reveal planet indicators</label> <span id='planet-warning'>(No time/place selected)</span>
+            </div>
           </div>
-        </div>
-        <div id='celestial-info'>
-          <h1 id='celestial-name-value'></h1>
-          <h4 id='celestial-type-value'></h4>
-          <table class='table .table-responsive' id='celestial-info-table'>
-          </table>
+          <div id='celestial-info' class='info'>
+            <h3 id='celestial-name-value' class='text-center'></h3>
+            <h4 id='celestial-type-value' class='text-center'></h4>
+            <table id='celestial-info-table' class='table table-responsive table-condensed'>
+            </table>
+          </div>
         </div>
       </div>
     </div>

@@ -58,8 +58,3 @@ var getLatLng = function() {
     });
 
 }
-
-$(document).ready(function() {
-    // getLatLng defined in geocode.js
-    $('#show-stars').on('click', getLatLng);
-});

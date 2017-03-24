@@ -87,6 +87,9 @@ var showAjaxError = function(error) {
     errorDiv.show();
     errorDiv.html(errorTxt);
 
+    // show the form again
+    datelocForm.show();
+
     // console.log(error);  // debugging
 
 };
@@ -173,26 +176,35 @@ var populateInfoDiv = function(d) {
 
     // populate table info
     if (d.constellation !== null) {
-        addInfoTableRow('Constellation', d.constellation);
+        addCelestialTableRow('Constellation', d.constellation);
     }
-    addInfoTableRow('Magnitude', d.magnitude);
+    addCelestialTableRow('Magnitude', d.magnitude);
     if (d.celestialType === 'star' && d.name !== 'Sun') {
-        addInfoTableRow('Absolute Magnitude', d.absMagnitude);
-        addInfoTableRow('Spectral Class', d.specClass);
+        addCelestialTableRow('Absolute Magnitude', d.absMagnitude);
+        addCelestialTableRow('Spectral Class', d.specClass);
     }
-    addInfoTableRow('Distance', d.distance + ' ' + d.distanceUnits);
+    addCelestialTableRow('Distance', d.distance + ' ' + d.distanceUnits);
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
-        addInfoTableRow('Phase', d.phase + '% lit'); }
+        addCelestialTableRow('Phase', d.phase + '% lit'); }
 
     if (d.celestialType !== 'star' || d.name === 'Sun') {
-        addInfoTableRow('Rose at', d.prevRise);
-        addInfoTableRow('Will set at', d.nextSet);
+        addCelestialTableRow('Rose at', d.prevRise);
+        addCelestialTableRow('Will set at', d.nextSet);
     }
 
 };
 
-var addInfoTableRow = function(rowName, rowValue) {
+var addCelestialTableRow = function(rowName, rowValue) {
+    // to avoid visual clutter
+    addInfoTableRow(celestialInfoTable, rowName, rowValue);
+};
+
+var addDatelocTableRow = function(rowName, rowValue) {
+    addInfoTableRow(datelocInfoTable, rowName, rowValue);
+};
+
+var addInfoTableRow = function(infoTable, rowName, rowValue) {
     // add a row to the info table (celestialInfoTable)
 
     var rowString = '<tr><td class="info-table-name text-right">';
@@ -201,7 +213,7 @@ var addInfoTableRow = function(rowName, rowValue) {
     rowString += rowValue;
     rowString += '</td></tr>';
 
-    celestialInfoTable.append(rowString);
+    infoTable.append(rowString);
 
 };
 

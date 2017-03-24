@@ -51,7 +51,8 @@ def return_place_time_data():
                     max_mag=max_magnitude,
                     localtime_string=localtime_string)
 
-    return jsonify({'rotation': stf.get_sky_rotation(),
+    return jsonify({'dateloc': stf.get_specs(),
+                    'rotation': stf.get_sky_rotation(),
                     'planets': stf.get_planets(),
                     'sundata': stf.get_sun(), # sun is a reserved word in js!
                     'moon': stf.get_moon()})

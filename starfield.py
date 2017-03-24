@@ -27,6 +27,9 @@ EPHEM_DTIME_FORMAT = '%Y/%m/%d %H:%M:%S'
 # time format to send to front end for display
 DISPLAY_TIME_FORMAT = '%-I:%M %p'
 
+# date format to send to front end for display
+DISPLAY_DATE_FORMAT = '%B %-d, %Y'
+
 # for getting time zones
 GOOGLE_TZ_URL = 'https://maps.googleapis.com/maps/api/timezone/json'
 
@@ -67,11 +70,8 @@ class StarField(object):
         # set the local time zone
         self.set_timezone()
 
-        # translate local time to utc if necessary
-        if localtime_string is None:
-            self.utctime = datetime.utcnow()
-        else:
-            self.set_utc_time(localtime_string)
+        # set the localtime and utctime
+        self.set_time(localtime_string)
 
         # make an ephemeris for planetary data
         self.make_ephem()
@@ -82,6 +82,17 @@ class StarField(object):
         return '< Starfield lat={}, lng={}, utctime={} >'.format(self.lat,
                                                                  self.lng,
                                                                  self.utctime)
+
+    def get_specs(self):
+        """Return a dict of specs for this starfield, for front end display."""
+
+        specs = {}
+        specs['lat'] = '{:.2f}'.format(self.lat)
+        specs['lng'] = '{:.2f}'.format(self.lng)
+        specs['dateString'] = datetime.strftime(self.localtime, DISPLAY_DATE_FORMAT)
+        specs['timeString'] = datetime.strftime(self.localtime, DISPLAY_TIME_FORMAT)
+
+        return specs
 
     def make_ephem(self):
         """Generate an ephemeris for pyEphem planet positions."""
@@ -113,7 +124,7 @@ class StarField(object):
 
         self.timezone = pytz.timezone(timezone_str)
 
-    def set_utc_time(self, localtime_string):
+    def set_time(self, localtime_string):
         """Sets self.utctime based on the local time and the lat/lng.
 
         * localtime_string is, well, a string
@@ -121,7 +132,8 @@ class StarField(object):
 
         if not localtime_string:
             # no time like the present!
-            self.utctime = datetime.utcnow()
+            naive_utctime = datetime.utcnow()
+            self.utctime = pytz.utc.localize(naive_utctime)
             self.localtime = self.utctime.astimezone(self.timezone)
 
         else:

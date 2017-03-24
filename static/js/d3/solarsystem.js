@@ -40,7 +40,6 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   console.log(locationResponse);
 
-
   // set global ss data and moon data
   planetData = locationResponse.planets;
   moonData = locationResponse.moon;
@@ -59,8 +58,11 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   // re-enable the "show stars" button
   $('#show-stars').removeAttr('disabled');
 
-  // show the starfield controls 
-  starfieldControlDiv.show();
+  // populate date/location info window
+  populateDatelocInfo(locationResponse.dateloc);
+
+  // show the controls and info divs
+  masterInfoDiv.show();
 
   // attach 'reveal planets' button to the revealPlanets function
   planetToggle.on('click', revealPlanets);

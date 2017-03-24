@@ -44,14 +44,16 @@ class Star(db.Model):
     star_id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     const_code = db.Column(db.String(3), db.ForeignKey("constellations.const_code"))
     name = db.Column(db.String(128), nullable=True)
-    ra = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
-    dec = db.Column(db.Numeric(6, 3), nullable=False) # in degrees
-    distance = db.Column(db.Numeric(12, 2), nullable=True) # in parsecs
+    ra = db.Column(db.Numeric(6, 3), nullable=False)  # in degrees
+    dec = db.Column(db.Numeric(6, 3), nullable=False)  # in degrees
+    distance = db.Column(db.Numeric(12, 2), nullable=True)  # in parsecs
     magnitude = db.Column(db.Numeric(4, 2), nullable=False)
     absolute_magnitude = db.Column(db.Numeric(5, 3), nullable=True)
     spectrum = db.Column(db.String(16), nullable=False)
     color_index = db.Column(db.Numeric(4, 3), nullable=True)
     color = db.Column(db.String(7), nullable=False)
+
+    constellation = db.relationship("Constellation")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -60,6 +62,7 @@ class Star(db.Model):
                                                            self.name,
                                                            self.ra,
                                                            self.dec)
+
 
 class ConstLineVertex(db.Model):
     """a vertex that forms one endpoint of a constellation line.

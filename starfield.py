@@ -207,6 +207,9 @@ class StarField(object):
         planet_data['phase'] = '{:.1f}'.format(pla.phase)
         planet_data['celestialType'] = 'planet'
 
+        # ephem.constellation gives a tuple of (abbrev, full name)
+        planet_data['constellation'] = ephem.constellation(pla)[1]
+
         # get rising and setting times
         prev_rise, next_set = self.get_rise_set_times(pla)
         planet_data['prevRise'] = prev_rise

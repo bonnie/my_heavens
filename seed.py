@@ -96,46 +96,6 @@ def get_color(spectral_class):
         return DEFAULT_COLOR
 
 
-# def preprocess_const_bounds():
-#     """Pre-process the constellation bounds file to reverse any non-clockwise polygons.
-
-#     I tried to do this programmatically using
-
-#         http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
-
-#     but I wasn't able to make it work (within a reasonable amt of time). So, manual it is."""
-
-#     announce('reversing constellation bounds where necessary')
-
-#     CONSTS_NEEDING_REVERSING = ['OCT', 'PAV', 'CEP']
-
-#     bfile_out = open(os.path.join(DATADIR, 'constellation_boundaries.txt'), 'w+')
-#     bfile = open(os.path.join(DATADIR, 'constellation_boundaries.txt.orig'))
-
-#     const_bounds = {}
-
-#     # make a dict of the const_bounds
-#     for boundline in bfile:
-#         try:
-#             ra, dec, const = boundline.strip().split()
-#         except:
-#             if DEBUG:
-#                 print "bad line in boundfile: [{}]".format(boundline)
-#             continue
-
-#         # add the pt to the list for this constellation
-#         const_bounds.setdefault(const, []).append((ra, dec))
-
-#     # reverse the constellations in need of reversing
-#     for const in CONSTS_NEEDING_REVERSING:
-#         const_bounds[const].reverse()
-
-#     # write to the new file
-#     for const, boundslist in const_bounds.iteritems():
-#         for ra, dec in boundslist:
-#             bfile_out.write("{} {} {}\n".format(ra, dec, const))
-
-
 def get_name_and_constellation(star_info):
     """get the name and constellation from a line in the STARDATA file"""
 

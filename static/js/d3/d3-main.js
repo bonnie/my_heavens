@@ -172,13 +172,20 @@ var populateInfoDiv = function(d) {
     celestialInfoTable.empty();
 
     // populate table info
+    if (d.constellation !== null) {
+        addInfoTableRow('Constellation', d.constellation);
+    }
     addInfoTableRow('Magnitude', d.magnitude);
+    if (d.celestialType === 'star' && d.name !== 'Sun') {
+        addInfoTableRow('Absolute Magnitude', d.absMagnitude);
+        addInfoTableRow('Spectral Class', d.specClass);
+    }
     addInfoTableRow('Distance', d.distance + ' ' + d.distanceUnits);
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
         addInfoTableRow('Phase', d.phase + '%'); }
 
-    if (d.celestialType !== 'star' || d.name == 'Sun') {
+    if (d.celestialType !== 'star' || d.name === 'Sun') {
         addInfoTableRow('Rose at', d.prevRise);
         addInfoTableRow('Will set at', d.nextSet);
     }
@@ -397,7 +404,7 @@ var renderSkyObject = function(params) {
             // geometry, not an svg circle
             var itemCircle = params.group.append('path')
                                 .datum(itemPoint)
-                                .attr('class', params.objClass)
+                                .attr('class', params.classPrefix)
                                 .attr('d', function(d){
                                     skyPath.pointRadius(d.properties.radius);
                                     return skyPath(d); })
@@ -436,9 +443,10 @@ var opacityTransition = function(p) {
 
     // determine whether to turn the feature on or off
     var finalOpacity = p.trigger.is(':checked') ? 0.5 : 0;
+    var duration = p.trigger.is(':checked') ? 500 : 300;
 
     var t = d3.transition()
-            .duration(500)
+            .duration(duration)
             .ease(d3.easeLinear);
 
     p.obj.transition(t)

@@ -108,7 +108,7 @@ var populateDatelocInfo = function(datelocInfo) {
     // to populate the date/location info div
     // uses global addInfoTableRow from d3-main.js
 
-    var placeString = autocomplete.getPlace().name;
+    var placeString = autocomplete.getPlace().name.split(',')[0];
     var datetimeString = datelocInfo.dateString + ' ' + datelocInfo.timeString;
     addInfoDivHeader(datelocInfoHeader, placeString, datetimeString);
     addDatelocTableRow('Latitude', datelocInfo.lat);

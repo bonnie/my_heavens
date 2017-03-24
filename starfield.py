@@ -83,12 +83,30 @@ class StarField(object):
                                                                  self.lng,
                                                                  self.utctime)
 
+    def get_lat_or_lng_string(self, lat_or_lng):
+        """Return a formatted string of the lat or lng for this starfield.
+
+        lat_or_lng is a string: either 'lat' or 'lng' depending on whether you
+        want the latitude or longitude.
+
+        Return value looks like this: '122&deg; W'
+        """
+
+        if lat_or_lng == 'lat':
+            val = abs(self.lat)
+            direction = 'N' if self.lat > 0 else 'S'
+        else:
+            val = abs(self.lng)
+            direction = 'E' if self.lng > 0 else 'W'
+
+        return '{:.2f}&deg; {}'.format(val, direction)
+
     def get_specs(self):
         """Return a dict of specs for this starfield, for front end display."""
 
         specs = {}
-        specs['lat'] = '{:.2f}'.format(self.lat)
-        specs['lng'] = '{:.2f}'.format(self.lng)
+        specs['lat'] = self.get_lat_or_lng_string('lat')
+        specs['lng'] = self.get_lat_or_lng_string('lng')
         specs['dateString'] = datetime.strftime(self.localtime, DISPLAY_DATE_FORMAT)
         specs['timeString'] = datetime.strftime(self.localtime, DISPLAY_TIME_FORMAT)
 

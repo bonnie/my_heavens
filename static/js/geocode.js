@@ -7,9 +7,6 @@
 var autocomplete;
 
 
-// TODO: deal with error: "initPlaces is not a function" coming from 
-// js?key=<<key>>&libraries=places&callback=initPlaces:103
-
 function initPlaces(error) {
     // this is the callback for the google maps script load
 

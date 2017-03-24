@@ -34,6 +34,7 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   //////////////////
 
   if (error) {
+    console.log(error);
       showAjaxError(error);
       return;
   }

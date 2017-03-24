@@ -93,6 +93,9 @@ class StarField(object):
         self.ephem.lon = deg_to_rad(self.lng)
         self.ephem.lat = deg_to_rad(self.lat)
 
+        # TODO: handle times before 1900 (strftime can't handle them!)
+        # http://stackoverflow.com/questions/10263956/use-datetime-strftime-on-years-before-1900-require-year-1900
+
         # ephem uses utctime
         self.ephem.date = datetime.strftime(self.utctime, EPHEM_DTIME_FORMAT)
 
@@ -239,6 +242,53 @@ class StarField(object):
 
         return planets
 
+    def get_moon_phase_phrase(self):
+        """Get a phrase (e.g. waxing crescent) to describe the moon phase.
+
+        This function is more efficient if self.moon has already been set, but
+        will set it if not.
+        """
+
+        # the tolerance for exact moon phases new, full, quarter
+        tolerance = 0.01
+
+        try:
+            moon = self.moon
+        except AttributeError:
+            self.moon = ephem.Moon(self.ephem)
+            moon = self.moon
+
+        # take care of new and full
+        if moon.phase < tolerance:
+            return 'new moon'
+
+        if 100 - moon.phase < tolerance:
+            return 'full moon'
+
+        # otherwise it's in between
+        next_new = ephem.next_new_moon(self.ephem.date)
+        next_full = ephem.next_full_moon(self.ephem.date)
+
+        if next_new < next_full:
+            growth = 'waxing'
+        else:
+            growth = 'waning'
+
+        # is it a quarter?
+        if abs(moon.phase - 50) < 0.01:
+            if growth == 'waxing':
+                return 'first quarter'
+            if growth == 'waning':
+                return 'third quarter'
+
+        # most likely: an in between state
+        if moon.phase < 50:
+            phase = 'crescent'
+        else:
+            phase = 'gibbous'
+
+        return '{} {}: {:.1f}'.format(growth, phase, moon.phase)
+
     def calculate_moon_angle(self):
         """Calculate the rotation angle of the phased moon for displaying in d3.
 
@@ -326,6 +376,9 @@ class StarField(object):
 
         # more digits for the moon, because the number's small
         moon_data['distance'] = '{:.5f}'.format(self.moon.earth_distance)
+
+        # moon gets descriptive phase info
+        moon_data['phase'] = self.get_moon_phase_phrase()
 
         return moon_data
 

@@ -5,7 +5,7 @@
 // globals that will be initialized on document load
 var datetimeRadio, changetimeRadio, datetimeInput, errorDiv,
     starfieldControlDiv, warnDiv, eclipticToggle, planetToggle, planetWarning,
-    celestialInfoTable, datetimeFormGroup, datelocFormGroups;
+    celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv;
 
 var displayError = function(error) {
 
@@ -24,6 +24,8 @@ var processFormInputs = function(latlng) {
     // hide starfield controls
     starfieldControlDiv.hide();
 
+    // hide info div
+    celestialInfoDiv.hide();
 
     if (latlng === undefined) {
         // geolocation failed
@@ -98,6 +100,7 @@ $(document).ready(function() {
     planetWarning = $('#planet-warning');
     datelocFormGroups = $('.dateloc-form-group');
     datetimeFormGroup = $('#datetime-form-group');
+    celestialInfoDiv = $('#celestial-info');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {

@@ -162,7 +162,7 @@ var populateInfoDiv = function(d) {
     // reveal and populate the info div when someone clicks on an item
     
     // show the div
-    $('#celestial-info').show();
+    celestialInfoDiv.show();
 
     // populate the headers
     $('#celestial-name-value').html(d.name);
@@ -183,7 +183,7 @@ var populateInfoDiv = function(d) {
     addInfoTableRow('Distance', d.distance + ' ' + d.distanceUnits);
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
-        addInfoTableRow('Phase', d.phase + '%'); }
+        addInfoTableRow('Phase', d.phase + '% lit'); }
 
     if (d.celestialType !== 'star' || d.name === 'Sun') {
         addInfoTableRow('Rose at', d.prevRise);

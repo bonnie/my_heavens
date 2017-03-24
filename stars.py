@@ -41,7 +41,7 @@ def get_stars(max_mag):
         star_field.append({'ra': float(star.ra),
                            'dec': float(star.dec),
                            'magnitude': float(star.magnitude),
-                           'absMagnitude': float(star.absolute_magnitude),
+                           'absMagnitude': '{:.2f}'.format(float(star.absolute_magnitude)),
                            'specClass': star.spectrum,
                            'constellation': star.constellation.name if star.constellation else None,
                            'color': star.color,

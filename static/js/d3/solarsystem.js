@@ -6,8 +6,6 @@
 var revealPlanets = function() {
     // show / hide rings to highlight planet position(s)
     // TODO: label planets during reveal
-    // TODO: disable button and/or post message (in error div?) if no planets are visible 
-    //        e.g.  berkeley 1/1/2017 1:00 AM
 
     var params = {
       trigger: planetToggle,
@@ -62,12 +60,12 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // show the starfield controls 
   starfieldControlDiv.show();
-  planetToggle.removeAttr('disabled');
 
   // attach 'reveal planets' button to the revealPlanets function
   planetToggle.on('click', revealPlanets);
 
 };
+
 
 //////////////////////////////////////////
 // functions to draw planets, moon, sun //
@@ -86,7 +84,7 @@ var drawPlanets = function(mode) {
                         radiusFunction: getRadiusFromMag,
                         mode: mode};
 
-    renderSkyObjectList(planetParams);
+    var visiblePlanetCount = renderSkyObjectList(planetParams);
 
     if (mode !== 'transition') {
 
@@ -103,7 +101,20 @@ var drawPlanets = function(mode) {
               .attr('fill-opacity', 0)
               .attr('opacity', opacity)
               .attr('class', 'planet-highlight');
+
+
+      // update "reveal planets" checkbox
+      if (visiblePlanetCount === 0) {
+        planetToggle.attr('disabled', 'disabled');
+        planetWarning.html('(no planets visible)');
+      } else {
+        planetToggle.removeAttr('disabled');
+        planetWarning.empty();
+
+      }
+
     }
+
 };
 
 

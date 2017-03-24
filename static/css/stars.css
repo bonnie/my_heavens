@@ -81,3 +81,8 @@ h1#celestial-name-value, h4#celestial-type-value {
 td.info-table-name {
     font-weight: bold;
 }
+
+#planet-warning {
+    font-style: italic;
+    opacity: 0.7;
+}

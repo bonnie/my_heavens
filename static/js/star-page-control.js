@@ -4,15 +4,15 @@
 
 // globals that will be initialized on document load
 var datetimeRadio, changetimeRadio, datetimeSelector, datetimeInput, errorDiv,
-    starfieldControlDiv, warnDiv, eclipticToggle, planetToggle,
-    constellationToggle, celestialInfoTable;
+    starfieldControlDiv, warnDiv, eclipticToggle, planetToggle, planetWarning,
+    celestialInfoTable;
 
 var displayError = function(error) {
 
     errorDiv.show();
     errorDiv.html(error);
 
-}
+};
 
 // success function for geocode in getLatLng (which is triggered on submit 
 // button click)
@@ -49,7 +49,7 @@ var processFormInputs = function(latlng) {
         lat: latlng.lat,
         lng: latlng.lng,
         datetime: datetime
-    }
+    };
 
     // get rotation and ss data
     getLocTimeData(locTime);
@@ -93,8 +93,8 @@ $(document).ready(function() {
     warnDiv = $('#warn');
     eclipticToggle = $('#ecliptic-toggle');
     planetToggle = $('#planet-toggle');
-    constellationToggle = $('#constellation-toggle')
     celestialInfoTable = $('#celestial-info-table');
+    planetWarning = $('#planet-warning');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {

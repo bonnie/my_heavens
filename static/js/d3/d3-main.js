@@ -286,6 +286,10 @@ var renderSkyObjectList = function(params) {
 
     // uses global skyObjects
 
+    // keep a running count of visible objects -- for noting whether there are
+    // planets visible. 
+    var visibleItemCount = 0;
+
     // One label that just gets repurposed depending on moused-over item,
     // since we're never going to be showing more than one item label at once
     var itemLabel = skyObjects.append('text')
@@ -310,9 +314,12 @@ var renderSkyObjectList = function(params) {
                      classPrefix: params.classPrefix,
                      itemLabel: itemLabel};
 
-        renderSkyObject(objParams);
+        if (renderSkyObject(objParams) !== undefined) {
+            visibleItemCount++;
+        }
     });
 
+    return visibleItemCount;
 
 };
 
@@ -407,14 +414,14 @@ var renderSkyObject = function(params) {
                                 .attr('d', function(d){
                                     skyPath.pointRadius(params.radius < 4 ? 4 : params.radius);
                                     return skyPath(d); })
-                                .attr('class', params.objClass + '-surround')
+                                .attr('class', params.classPrefix + '-surround')
                                 .style('opacity', 0);
 
                 addInfoMouseOverAndClick(surroundingCircle, d, params.itemLabel);
             }
+            // return the point for ease in telling whether it's visible
+            return itemPoint;
         }
-        // for sun, return the point for ease in telling whether it's visible
-        return itemPoint;
     }
 
 };

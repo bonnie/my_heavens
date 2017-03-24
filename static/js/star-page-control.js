@@ -3,9 +3,9 @@
 "use strict";
 
 // globals that will be initialized on document load
-var datetimeRadio, changetimeRadio, datetimeSelector, datetimeInput, errorDiv,
+var datetimeRadio, changetimeRadio, datetimeInput, errorDiv,
     starfieldControlDiv, warnDiv, eclipticToggle, planetToggle, planetWarning,
-    celestialInfoTable;
+    celestialInfoTable, datetimeFormGroup, datelocFormGroups;
 
 var displayError = function(error) {
 
@@ -28,6 +28,7 @@ var processFormInputs = function(latlng) {
     if (latlng === undefined) {
         // geolocation failed
         displayError('Please use autocomplete to select a location');
+        $('#location-form-group').addClass('has-error');
         return;
     }
 
@@ -37,6 +38,7 @@ var processFormInputs = function(latlng) {
         datetime = datetimeInput.val();
         if (!datetime) {
             displayError('Please either choose "Now" or enter a date and time');
+            datetimeFormGroup.addClass('has-error');
             return;
         }
     }
@@ -86,7 +88,6 @@ $(document).ready(function() {
     // define some globals based on html ids
     datetimeRadio = $('input[name=datetime]:radio');
     changetimeRadio = $('#change-time');
-    datetimeSelector =  $('#datetime-selector');
     datetimeInput = $('#datetime-input');
     errorDiv = $('#error');
     starfieldControlDiv = $('#starfield-controls');
@@ -95,6 +96,8 @@ $(document).ready(function() {
     planetToggle = $('#planet-toggle');
     celestialInfoTable = $('#celestial-info-table');
     planetWarning = $('#planet-warning');
+    datelocFormGroups = $('.dateloc-form-group');
+    datetimeFormGroup = $('#datetime-form-group');
 
     // show time picker when someone wants a time other than now
     datetimeRadio.on('change', function() {
@@ -102,9 +105,9 @@ $(document).ready(function() {
         var changetimeChecked = changetimeRadio.is(':checked');
 
         if (changetimeChecked) {
-            datetimeSelector.show();
+            datetimeFormGroup.show();
         } else {
-            datetimeSelector.hide();
+            datetimeFormGroup.hide();
         }
     });
 

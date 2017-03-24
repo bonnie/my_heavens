@@ -213,11 +213,6 @@ var addInfoTableRow = function(rowName, rowValue) {
 var drawSkyAndStars = function(error, starDataResult) {
     // success function for d3 ajax call to get star data
 
-    // clear previous errors and warnings
-    // errorDiv and warnDiv defined in star-page-control.js
-    errorDiv.empty().hide();
-    warnDiv.empty().hide();
-
     //////////////////
     // handle error //
     //////////////////

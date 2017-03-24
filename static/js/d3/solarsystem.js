@@ -23,10 +23,11 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // TODO: catch error where server is down and connection is refused
 
-  // clear previous errors and warnings
-  // errorDiv and warnDiv defined in star-page-control.js
-  errorDiv.empty().hide();
-  warnDiv.empty().hide();
+    // clear previous errors and warnings
+    // errorDiv, warnDiv, and formGroups defined in star-page-control.js
+    errorDiv.empty().hide();
+    warnDiv.empty().hide();
+    datelocFormGroups.removeClass('has-error');
 
   //////////////////
   // handle error //

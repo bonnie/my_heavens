@@ -51,7 +51,7 @@ text.constellation-label {
 }
 
 div.info {
-    border: 2px solid black;
+    border: 2px solid #bbb;
     padding: 10px;
     margin: 10px;
 }
@@ -77,8 +77,25 @@ td.info-table-name {
     margin-bottom: 10px;
 }
 
+.btn {
+    color: black;
+}
+
+/* to make form inputs not so darn bright */
+input.form-control {
+    background-color: #333;
+    color: #eee;
+}
+
+input[type:radio] {
+    background-color: #333;
+}
+
+
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Lato', sans-serif;
+    background-image: url('/static/images/outlets.png');
+    color: #bbb;
 }
 
 h3 {

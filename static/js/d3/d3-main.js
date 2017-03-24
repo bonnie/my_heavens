@@ -50,6 +50,8 @@ skyBackground = svgContainer.append('circle')
                               .attr('cx', skyRadius)
                               .attr('cy', skyRadius)
                               .attr('r', skyRadius)
+                              .attr('stroke-width', 3)
+                              .attr('stroke-color', 'black')
                               .attr('id', 'sky-background');
 
 

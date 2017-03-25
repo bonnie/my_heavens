@@ -6,7 +6,6 @@
 // global var for the autocomplete object
 var autocomplete;
 
-
 function initPlaces(error) {
     // this is the callback for the google maps script load
 
@@ -21,6 +20,9 @@ function initPlaces(error) {
 
     autocomplete = new google.maps.places.Autocomplete(cityInput, autocompleteParams);
     autocomplete.setTypes(['(cities)']);
+    cityInput.addEventListener("blur", function() {
+        place = autocomplete.getPlace();
+    });
 }
 
 

@@ -8,7 +8,7 @@ var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv,
     datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
     datelocFormCancel, masterInfoDiv, celestialDivInstructions,
-    celestialInfoHeader, datelocInfoHeader, compassRose;
+    celestialInfoHeader, datelocInfoHeader, compassRose, datelocFormInputs;
 
 var displayError = function(error) {
 
@@ -109,7 +109,7 @@ var populateDatelocInfo = function(datelocInfo) {
     // uses global addInfoTableRow from d3-main.js
 
     var placeString = autocomplete.getPlace().name.split(',')[0];
-    var datetimeString = datelocInfo.dateString + ' ' + datelocInfo.timeString;
+    var datetimeString = datelocInfo.dateString + ' at ' + datelocInfo.timeString;
     addInfoDivHeader(datelocInfoHeader, placeString, datetimeString);
     addDatelocTableRow('Latitude', datelocInfo.lat);
     addDatelocTableRow('Longitude', datelocInfo.lng);
@@ -137,6 +137,7 @@ $(document).ready(function() {
 
     datelocForm = $('#dateloc-form');
     datelocFormGroups = $('#dateloc-form .form-group');
+    datelocFormInputs = $('#dateloc-form input');
     datelocFormCancel = $('#dateloc-form-cancel');
 
     celestialInfoDiv = $('#celestial-info');
@@ -169,6 +170,9 @@ $(document).ready(function() {
 
     // event handler for cancel button
     datelocFormCancel.on('click', cancelDatelocForm);
+
+    // hide error when someone changes form
+    datelocFormInputs.on('change', function() { errorDiv.hide(); });
 
     // load them stars
     d3.json('/stars.json', drawSkyAndStars);

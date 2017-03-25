@@ -43,7 +43,7 @@ $(document).ready(function() {
     // svgContainer is globally scoped
     svgContainer = svgBodySelection.append('svg')
                                     .attr('width', 2.25 * skyRadius)
-                                    .attr('height', 2 * skyRadius)
+                                    .attr('height', 2 * skyRadius + 30) // account for 15 padding top and bottom
                                     .attr('class', 'star-circle');
 
 

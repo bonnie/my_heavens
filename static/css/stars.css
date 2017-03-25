@@ -69,7 +69,8 @@ td.info-table-name {
     opacity: 0.7;
 }
 
-#master-info-div, #dateloc-form-cancel, #datetime-form-group, #error {
+#master-info-div, #dateloc-form-cancel, #datetime-form-group, #error,
+#compass-rose {
     display: none;
 }
 
@@ -103,4 +104,13 @@ h3 {
     font-size: 200%;
     margin-top: 10px;
     margin-bottom: 5px;
+}
+
+.compass-letter {
+    font-family: 'Cinzel Decorative', cursive;
+    color: white;
+}
+
+svg.star-circle {
+    padding-top: 15px;
 }

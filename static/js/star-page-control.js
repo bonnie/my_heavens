@@ -8,7 +8,7 @@ var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv,
     datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
     datelocFormCancel, masterInfoDiv, celestialDivInstructions,
-    celestialInfoHeader, datelocInfoHeader;
+    celestialInfoHeader, datelocInfoHeader, compassRose;
 
 var displayError = function(error) {
 

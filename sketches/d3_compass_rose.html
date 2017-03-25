@@ -1,0 +1,104 @@
+<html>
+<head>
+    <title></title>
+      <script src='https://d3js.org/d3.v4.min.js'></script>
+            <link href="https://fonts.googleapis.com/css?family=Cinzel+Decorative" rel="stylesheet">
+
+      <style>
+        .compass-letter {
+            font-family: 'Cinzel Decorative', cursive;
+            color: white;
+        }
+    </style>
+</head>
+<body style='background-color: black'>
+
+<script>
+
+var skyRadius = 350;
+var compassSize = skyRadius / 5;
+    
+
+var polyPath = d3.line()
+    .x(function(d) { return d[0]; })
+    .y(function(d) { return d[1]; });
+
+    var svgContainer = d3.select('body')
+            .append('svg')
+            .attr('height', 2*skyRadius)
+            .attr('width', 2.25*skyRadius)
+
+    var skyCircle = svgContainer.append('circle')
+            .attr('cx', skyRadius)
+            .attr('cy', skyRadius)
+            .attr('r', skyRadius)
+            .attr('stroke', 'white')
+            .attr('stroke-width', 2);
+
+    var compassRose = svgContainer.append('g')
+            .attr('id', 'compass-rose');
+
+    compCent = compassSize / 2;
+    compNub = compassSize / 2 - compassSize / 8;
+
+    polyPoints = [[compCent, compCent], 
+                  [compCent, 0],
+                  [compNub, compNub],
+                  [compCent, compCent]];
+
+    compassLetters = [{text: 'W', baseAlign: 'middle', anchor: 'start'},
+                      {text: 'S', baseAlign: 'before-edge', anchor: 'middle'},
+                      {text: 'E', baseAlign: 'middle', anchor: 'end'},
+                      {text: 'N', baseAlign: 'after-edge', anchor: 'middle'}];
+
+    var rotateString = function(theta) {
+        // return svg rotate translation for theta around the compass center
+        return 'rotate(' + theta + ',' + compCent + ',' + compCent + ')';
+    };
+
+    var translateText = function(i) {
+        // translate compass text according to where in the sequence it is
+
+        var theta = i * Math.PI / 2;
+        var y = (compCent + 5) * (1 + Math.sin(theta)) - 5;
+        var x = (compCent + 10) * (1 + Math.cos(theta)) - 10;
+
+        return 'translate(' + x + ',' + y + ')';
+    };
+
+    for (var i=0;i < 4;i++) {
+        compassRose.append('polygon')
+                    .datum(polyPoints)
+                    .attr("points",function(d) { 
+                            return d.join(" ");})
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 1)
+                    .attr('fill', 'white')
+                    .attr('transform', rotateString(i * 90));
+
+        compassRose.append('text')
+                    .datum(compassLetters[i])
+                    .text(function(d) {return d.text;})
+                    .attr('x', 0)
+                    .attr('y', 0)
+                    .attr('transform', translateText(i))
+                    .attr('text-anchor', function(d) {return d.anchor;})
+                    .attr('alignment-baseline', function(d) {return d.baseAlign;})
+                    .attr('fill', 'white')
+                    .attr('class', 'compass-letter');
+
+    }
+
+    // move the rose into position
+    var xShift = skyRadius * 2 - compassSize
+    var yShift = compassSize / 3
+    compassRose.attr('transform', 'translate(' + xShift + ',' + yShift + ')');
+
+    // add the directional letters
+
+
+
+</script>
+
+</body>
+</html>

@@ -35,45 +35,47 @@ var skyRadius = 350;  // for now
 // create svg //
 ////////////////
 
-// start by drawing svg, as a placeholder
-var svgBodySelection = d3.select('#star-field');
+$(document).ready(function() {
+    // start by drawing svg, as a placeholder
+    var svgBodySelection = d3.select('#star-field');
 
-// make a place to draw the stars
-// svgContainer is globally scoped
-svgContainer = svgBodySelection.append('svg')
-                                .attr('width', 2 * skyRadius)
-                                .attr('height', 2 * skyRadius);
-
-
-// make a background for the sky 
-skyBackground = svgContainer.append('circle')
-                              .attr('cx', skyRadius)
-                              .attr('cy', skyRadius)
-                              .attr('r', skyRadius)
-                              .attr('stroke-width', 3)
-                              .attr('stroke-color', 'black')
-                              .attr('id', 'sky-background');
+    // make a place to draw the stars
+    // svgContainer is globally scoped
+    svgContainer = svgBodySelection.append('svg')
+                                    .attr('width', 2.25 * skyRadius)
+                                    .attr('height', 2 * skyRadius)
+                                    .attr('class', 'star-circle');
 
 
-// define the sky gradient just once, not every time we print the sky background
-// used in drawSkyBackground in solarsystem.js
-// adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
-var radialGradient = svgContainer.append("defs")
-            .append("radialGradient")
-            .attr("id", "radial-gradient");
+    // make a background for the sky 
+    skyBackground = svgContainer.append('circle')
+                                  .attr('cx', skyRadius)
+                                  .attr('cy', skyRadius)
+                                  .attr('r', skyRadius)
+                                  .attr('stroke-width', 3)
+                                  .attr('stroke-color', 'black')
+                                  .attr('id', 'sky-background');
 
-        radialGradient.append("stop")
-            .attr("offset", "85%")
-            .attr("stop-color", 'black');
 
-        radialGradient.append("stop")
-            .attr("offset", "93%")
-            .attr("stop-color", "#101035");
+    // define the sky gradient just once, not every time we print the sky background
+    // used in drawSkyBackground in solarsystem.js
+    // adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
+    var radialGradient = svgContainer.append("defs")
+                .append("radialGradient")
+                .attr("id", "radial-gradient");
 
-        radialGradient.append("stop")
-            .attr("offset", "100%")
-            .attr("stop-color", "#191970");
+            radialGradient.append("stop")
+                .attr("offset", "85%")
+                .attr("stop-color", 'black');
 
+            radialGradient.append("stop")
+                .attr("offset", "93%")
+                .attr("stop-color", "#101035");
+
+            radialGradient.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", "#191970");
+});
 
 var showAjaxError = function(error) {
     // display error from ajax call

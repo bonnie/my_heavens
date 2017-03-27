@@ -82,7 +82,12 @@ var showAjaxError = function(error) {
 
     // define error
     var errorTxt = error.srcElement.statusText;
-    if (errorTxt === 'INTERNAL SERVER ERROR') {
+
+    if (error.srcElement.readyState === 4) { // srcElement is the XMLHttpRequest
+        // network error
+        errorTxt = 'Could not connect to server. Please try again later.';
+    }
+    else if (errorTxt === 'INTERNAL SERVER ERROR') {
         errorTxt = 'The server could not complete this request.';
         errorTxt += ' Please contact the system administrator.';
     }

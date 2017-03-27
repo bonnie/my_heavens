@@ -45,6 +45,7 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   planetData = locationResponse.planets;
   moonData = locationResponse.moon;
   sunData = locationResponse.sundata;
+  dateLocData = locationResponse.dateloc;
 
 
   // then rotate sky
@@ -60,7 +61,7 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   $('#show-stars').removeAttr('disabled');
 
   // populate date/location info window
-  populateDatelocInfo(locationResponse.dateloc);
+  populateDatelocInfo(dateLocData);
 
   // TODO: clear the celestial info div and re-add instructions
   celestialInfoTable.empty();
@@ -133,6 +134,23 @@ var getScreenCoords = function(d, axis) {
   return axis === 'x' ? coords[0] : coords[1];
 };
 
+var getMoonRotation = function() {
+  // get the screen rotation of the moon based on angle to the pole, plus
+  // angle rotated from the pole
+  //
+  // uses globals moonData, dateLocData
+
+  // screen angle of pole
+  var poleDec = dateLocData.lat.slice(-1) === 'N' ? 90 : -90;
+  var poleData = {ra: 0, dec: poleDec};
+  var poleX = getScreenCoords(poleData, 'x');
+  var poleY = getScreenCoords(poleData, 'y');
+
+  var moonX = getScreenCoords(moonData, 'x');
+  var moonY = getScreenCoords(moonData, 'y');
+
+}
+
 
 var drawMoon = function(mode) {
   // simluate the phase of the moon based on colong, using a half-lit sphere
@@ -144,6 +162,12 @@ var drawMoon = function(mode) {
 
   // for easier access
   var d = moonData;
+
+  // don't draw moon if it's below the horizon
+  // if (d.alt < 0) {
+  //   return;
+  // }
+
 
   // how to tell if the moon is on the far side of the sky? Make a proxy point
   // and see  if it's visible...
@@ -159,12 +183,14 @@ var drawMoon = function(mode) {
     return;
   }
 
+  var moonRotation = getMoonRotation();
+
   // create the projection
   var moonProjection = d3.geoOrthographic()
       .scale(sunMoonRadius) // this determines the size of the moon
       .translate(skyProjection([d.ra, d.dec])) // moon coords here
       .clipAngle(90)
-      .rotate([0, 0, d.rotation])
+      .rotate([0, 0, -d.az])
       .precision(0.1);
 
   // create a path generator
@@ -184,7 +210,7 @@ var drawMoon = function(mode) {
   var litHemisphere = d3.geoCircle()
           // sets the circle center to the specified point [longitude, latitude] in degrees
           // 0 degrees is on the left side of the sphere
-          .center([90 - d.colong, 0]) 
+          .center([90 - d.colong])
           .radius(90); // sets the circle radius to the specified angle in degrees
 
   // project the lit hemisphere onto the moon sphere

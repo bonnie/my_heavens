@@ -319,10 +319,24 @@ class StarField(object):
 
         return '{} {}: {:.1f}'.format(growth, phase, moon.phase)
 
-    def calculate_moon_angle(self):
+    def calculate_moon_angle(self, waxwan):
         """Calculate the rotation angle of the phased moon for displaying in d3.
 
-        Returns the angle to rotate the moon, in degrees.
+        waxwan will be the first word of the moon phase phrase. It will be on
+        of these:
+            new (moon)
+            full (moon)
+            third (quarter)
+            first (quarter)
+            waxing (crescent / gibbous)
+            waning (crescent / gibbous)
+
+        Returns the angle to rotate the moon, in degrees, using a formula from
+        http://hrcak.srce.hr/file/197562. This formula gives angle from north,
+        not from top of screen, so this is a little off. Angle difference
+        between "moon to top of screen" and "moon to north" must be calculated
+        on the d3 end(?).
+
         This function is more efficient if self.sun and self.moon have already
         been set, but will set them if they haven't already.
         """
@@ -356,15 +370,24 @@ class StarField(object):
 
         ########### from http://hrcak.srce.hr/file/197562 for this formula!
         # the below moon phase calc is:
-        # spot on for christchurch, 1/1/17 12pm
-        # spot on for berkeley, 3/22/17 12pm
+        # spot on for christchurch, 3/22/17 12pm - waxing crescent
+        # pretty close for berkeley, 3/22/17 12pm
 
-        # a little off for berkeley, 1/1/17 12pm
-        # quite off for christchurch, 3/22/17 12pm
+        # spot on for christchurch, 1/1/17 12pm - waning crescent -- is correct at pos 10
+        # pretty close for berkeley, 1/1/17 12pm
+
+        # spot on for christchurch March 7, 2017 at 6:00 PM - waning gibbous
+        # way off for berkeley March 7, 2017 at 6:00 PM
+
+        # quite off for christchurch March 1, 2017 at 6:00 PM - waning crescent -- is pos 17 but should be neg
+        # 
 
         # aaaarrrrgggghhhh!!
 
-        ### using alt / az
+        ### the position angle of the mid- point of the moon's bright limb,
+        ###     measured from the north point of the disk (using alt / az)
+        ####
+        ### switching x and y would give angle to the horizontal
         delta_az = sun.az - moon.az
         y = math.sin(delta_az)
         x = math.cos(moon.alt) * math.tan(sun.alt) - math.sin(moon.alt) * math.cos(delta_az)
@@ -375,9 +398,9 @@ class StarField(object):
         if moon.phase < 50:
             moon_rotation = - moon_rotation
 
-        # adjust depending on latitude
-        if self.lat > 0:
-            moon_rotation = moon_rotation
+        # adjust depending on growth: 
+        if waxwan == 'waning' or waxwan == 'third':
+            moon_rotation = - moon_rotation
 
         #     moon_rotation = moon_rotation + math.pi / 2
         # else:
@@ -397,18 +420,44 @@ class StarField(object):
         moon_data = self.get_planet_data(ephem.Moon)
         moon_data['celestialType'] = 'moon'
 
-        # translate colong into degrees
-        moon_data['colong'] = rad_to_deg(self.moon.colong)
-
-        # calculate rotation of the moon disk
-        moon_rotation_in_deg = self.calculate_moon_angle()
-        moon_data['rotation'] = moon_rotation_in_deg
-
         # more digits for the moon, because the number's small
         moon_data['distance'] = '{:.5f}'.format(self.moon.earth_distance)
 
+        # translate colong into degrees
+        moon_data['colong'] = rad_to_deg(self.moon.colong)
+
         # moon gets descriptive phase info
         moon_data['phase'] = self.get_moon_phase_phrase()
+
+
+        #####################
+        radec = sidereal.RADec(self.moon.ra, self.moon.dec)
+        ha = radec.hourAngle(self.utctime, self.lng)
+        altaz = radec.altAz(ha, self.lat)
+
+        # discrepancy between sidereal altaz / ephem altaz / what shows on sky
+        # disk is perplexing all around. Here's a good example:
+        # Christchurch March 26, 2017 at 12:00 PM
+        # sidAlt: 56.71318927992599
+        # sidAz: 176.15325860981187
+        # ephem alt: -0.26506715524861846
+        # ephem az = 258.87444214799496
+        # eyeballing on sky disk: alt = 355 (just west of due north)
+        # eyeballing on sky disk: az = ~ 60 (hard to estimate with spherical distortion)
+
+        moon_data['sidAlt'] = rad_to_deg(altaz.alt)
+        moon_data['sidAz'] = rad_to_deg(altaz.az)
+
+        # for rotation
+        moon_data['alt'] = rad_to_deg(self.moon.alt)
+        moon_data['az'] = rad_to_deg(self.moon.az)
+
+        # calculate rotation of the moon disk on d3 dislay
+        # waxing / waning (first word in phase phrase) is important to this
+        waxwan = moon_data['phase'].split()[0]
+        moon_rotation_in_deg = self.calculate_moon_angle(waxwan)
+        moon_data['rotation'] = moon_rotation_in_deg
+        #######################
 
         return moon_data
 

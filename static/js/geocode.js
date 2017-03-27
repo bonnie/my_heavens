@@ -21,7 +21,7 @@ function initPlaces(error) {
     autocomplete = new google.maps.places.Autocomplete(cityInput, autocompleteParams);
     autocomplete.setTypes(['(cities)']);
     cityInput.addEventListener("blur", function() {
-        place = autocomplete.getPlace();
+        var place = autocomplete.getPlace();
     });
 }
 

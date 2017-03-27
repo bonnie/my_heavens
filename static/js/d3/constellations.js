@@ -102,12 +102,13 @@ var drawConstellations = function() {
 
             if (boundsViz && isInverted(constBoundsPolygon)) {
 
-            // sometimes constellations (like octans at -228.63065300575627 -37.8715926)
-            // are inverted with their bounds forwards or backwards
+            // sometimes circumpolar constellations that aren't showing are
+            // inverted with their bounds forwards or backwards
+            // example: octans at rotation -228.63065300575627 -37.8715926
 
             // TODO: understand better what's going on here and/or record error on server via ajax
 
-                console.log('constellation ' + d.name + ' inverted in both directions. Skipping.')
+                // console.log('constellation ' + d.name + ' inverted in both directions. Skipping.')
                 boundsViz = false;
 
             } 

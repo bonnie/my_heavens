@@ -47,8 +47,8 @@ var drawCompass = function() {
         compassRoseGrp.append('polygon')
                     .datum(polyPoints)
                     .attr("points",function(d) {return d.join(" ");})
-                    .attr('stroke', 'white')
-                    .attr('stroke-width', 1)
+                    // .attr('stroke', 'white')
+                    // .attr('stroke-width', 1)
                     .attr('fill', 'white')
                     .attr('transform', rotateString(i * 90));
 

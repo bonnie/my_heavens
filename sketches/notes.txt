@@ -109,3 +109,11 @@ star_chart=# select ra, dec from stars where name = 'Vega';
 
 
  https://planetarium.madison.k12.wi.us/mooncal/crescent-tilt/Crescent.html
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+
+ISSUE: Berkeley March 15, 2017 at 4:00 AM: ecliptic and planets in TOTALLY WRONG PLACE
+
+They were in the right place when I showed stuff to Nathan and Joon on March 24 at 1pm
+
+Looking at git logs...

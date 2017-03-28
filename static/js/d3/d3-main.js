@@ -28,7 +28,7 @@ var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData, dateLocData;
 var planetHighlights; // for the identifier circles for the planets
-var skyRadius = 350;  // for now
+var skyRadius = 400;  // for now
 
 
 ////////////////

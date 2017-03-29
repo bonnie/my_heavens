@@ -202,7 +202,6 @@ var drawMoon = function(mode) {
       .datum({type: "Sphere"})
       .attr("id", "moon-sphere")
       .attr("d", function(d) { return moonPath(d); })
-      .attr("clip-path", "url(#sky-clip)")
       .attr('opacity', 0);
 
 

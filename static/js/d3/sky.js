@@ -60,6 +60,7 @@ var drawSky = function(skyData) {
     // for zooming, make a group for all the contents of the skySphere
     // globally scoped
     skyObjects = svgContainer.append('g')
+        .attr("clip-path", "url(#sky-clip)")
         .attr('id', 'all-sky-objects');
 
 

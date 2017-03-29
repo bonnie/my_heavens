@@ -464,7 +464,6 @@ var renderSkyObject = function(params) {
                                 .attr('d', function(d){
                                     skyPath.pointRadius(d.properties.radius);
                                     return skyPath(d); })
-                                .attr("clip-path", "url(#sky-clip)")
                                 .attr('fill', d.color)
                                 .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 

@@ -190,7 +190,7 @@ var drawMoon = function(mode) {
       .scale(sunMoonRadius) // this determines the size of the moon
       .translate(skyProjection([d.ra, d.dec])) // moon coords here
       .clipAngle(90)
-      .rotate([0, 0, -d.az])
+      .rotate([0, 0, d.rotation])
       .precision(0.1);
 
   // create a path generator

@@ -95,7 +95,9 @@ input[type:radio] {
 
 body {
     font-family: 'Lato', sans-serif;
-    background-image: url('/static/images/outlets.png');
+    /*background-image: url('/static/images/black_denim.png');*/
+    background-image: url('/static/images/assault.png');
+    /*background-image: url('/static/images/zwartevilt.png');*/
     color: #bbb;
 }
 

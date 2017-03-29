@@ -110,6 +110,12 @@ star_chart=# select ra, dec from stars where name = 'Vega';
 
  https://planetarium.madison.k12.wi.us/mooncal/crescent-tilt/Crescent.html
 
+
+
+ worst issue, and frustrating. spent probably 12 hours on this if not more. 
+ when I tried to save calculations for moon and sun from earlier, alt and az were TOTALLY OFF. 
+ don't understand. But with fresh calculations for the rotation function, everything was copacetic
+
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 
 ISSUE: Berkeley March 15, 2017 at 4:00 AM: ecliptic and planets in TOTALLY WRONG PLACE
@@ -117,3 +123,11 @@ ISSUE: Berkeley March 15, 2017 at 4:00 AM: ecliptic and planets in TOTALLY WRONG
 They were in the right place when I showed stuff to Nathan and Joon on March 24 at 1pm
 
 Looking at git logs...
+
+--> reverted to older commits on dummy branches: 
+
+git checkout -b regression d8852c1696ea14df7eba72c26135d662394edaf1
+
+The problem still existed. So I re-seeded the db using an old seed file.
+Everything was back in the right place. I re-seeded using current seed file.
+Everything was still in the right place. What happened?? F*** if I know.

@@ -24,7 +24,7 @@
 ///////////////////////////
 
 // globals to use across functions
-var sunMoonRadius, planetInfoDiv, svgContainer, skyBackground;
+var sunMoonRadius, planetInfoDiv, svgContainer, svgDefs, skyBackground;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData, dateLocData;
 var planetHighlights; // for the identifier circles for the planets
@@ -47,20 +47,33 @@ $(document).ready(function() {
                                     .attr('class', 'star-circle');
 
 
+    var addSkyCircle = function(obj) {
+        return obj.append('circle')
+                   .attr('cx', skyRadius)
+                   .attr('cy', skyRadius)
+                   .attr('r', skyRadius)
+    }
+
+    // for svg definitions
+    svgDefs = svgContainer.append("defs")
+
     // make a background for the sky 
-    skyBackground = svgContainer.append('circle')
-                                  .attr('cx', skyRadius)
-                                  .attr('cy', skyRadius)
-                                  .attr('r', skyRadius)
-                                  .attr('stroke-width', 3)
-                                  .attr('stroke-color', 'black')
-                                  .attr('id', 'sky-background');
+    skyBackground = addSkyCircle(svgContainer).attr('stroke-width', 3)
+                                              .attr('stroke-color', 'black')
+                                              .attr('id', 'sky-background');
+
+
+    // make a clip path so points don't appear off the edge of the sky
+    var skyClipPath = svgDefs.append('svg:clipPath')
+                             .attr('id', 'sky-clip')
+
+    addSkyCircle(skyClipPath).attr('id', 'sky-clip-path')
 
 
     // define the sky gradient just once, not every time we print the sky background
     // used in drawSkyBackground in solarsystem.js
     // adapted from https://bl.ocks.org/pbogden/14864573a3971b640a55
-    var radialGradient = svgContainer.append("defs")
+    var radialGradient = svgDefs
                 .append("radialGradient")
                 .attr("id", "radial-gradient");
 
@@ -410,7 +423,7 @@ var renderSkyObject = function(params) {
     var d = params.d;
 
     // don't bother drawing dim items during transition
-    if (params.mode !== 'transition' || d.magnitude < 3) {
+    if (params.mode !== 'transition' || d.magnitude < 2.5) {
         var itemPoint = {
             geometry: {
                 type: 'Point',
@@ -429,6 +442,19 @@ var renderSkyObject = function(params) {
 
         } else {
 
+            // // check for objects that hang off the sphere; clip them
+            // var itemBounds = skyPath.bounds(itemPoint);
+            // for(var i=0; i < 4; i++) {
+            //         var boundPoint = {geometry: {
+            //         type: 'Point',
+            //         coordinates: itemBounds[i] }
+            //         };
+            //     if (!isVisible(boundPoint)) {
+
+
+            //     }
+            // }
+
             // circle to represent item
             // since we're in d3 geo world, this needs to be a path with a point
             // geometry, not an svg circle
@@ -438,6 +464,7 @@ var renderSkyObject = function(params) {
                                 .attr('d', function(d){
                                     skyPath.pointRadius(d.properties.radius);
                                     return skyPath(d); })
+                                .attr("clip-path", "url(#sky-clip)")
                                 .attr('fill', d.color)
                                 .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
 

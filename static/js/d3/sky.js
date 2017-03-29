@@ -54,10 +54,8 @@ var drawSky = function(skyData) {
          return 'translate(' + skyProjection([ra, dec]) + ')';
     };
 
-
     // print the background
     printSkyBackground();
-
 
     // for zooming, make a group for all the contents of the skySphere
     // globally scoped

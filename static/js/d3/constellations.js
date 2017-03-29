@@ -156,7 +156,9 @@ var drawConstellations = function() {
             var boundsObj = isVisible(constLineMultiLine) ? constLineMultiLine : constBoundsPolygon;
 
             // get better positioning for the constellation labels along the edges
-            // TODO: do a better job of positioning, esp for constellation off the middle right 
+            // TODO: do a better job of positioning, esp for constellation off the middle right, 
+            // and also, for example, hydra (curled around bottom, but label is quite far away) 
+            // on Berkeley April 2, 2017 at 12:00 AM 
             // TODO: separate out into a function.
             var bounds = skyPath.bounds(boundsObj);
             var minX = bounds[0][0];

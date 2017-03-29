@@ -202,7 +202,7 @@ var drawMoon = function(mode) {
       .datum({type: "Sphere"})
       .attr("id", "moon-sphere")
       .attr("d", function(d) { return moonPath(d); })
-      // .attr('fill', 'red')
+      .attr("clip-path", "url(#sky-clip)")
       .attr('opacity', 0);
 
 
@@ -248,7 +248,7 @@ var drawSolarSystem = function(mode) {
 
   // set the radius for the sun and the moon
   // sunMoonRadius is globally scoped
-  sunMoonRadius = skyRadius / 42;
+  sunMoonRadius = skyRadius / 60;
 
   drawSun(mode);
   drawPlanets(mode);

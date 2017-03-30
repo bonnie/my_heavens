@@ -183,7 +183,8 @@ var drawMoon = function(mode) {
       .datum({type: "Sphere"})
       .attr("id", "moon-sphere")
       .attr("d", function(d) { return moonPath(d); })
-      .attr('opacity', 0);
+      .attr('fill', 'white')
+      .attr('opacity', 0.1);
 
 
   // create the lit hemisphere

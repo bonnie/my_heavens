@@ -134,23 +134,6 @@ var getScreenCoords = function(d, axis) {
   return axis === 'x' ? coords[0] : coords[1];
 };
 
-var getMoonRotation = function() {
-  // get the screen rotation of the moon based on angle to the pole, plus
-  // angle rotated from the pole
-  //
-  // uses globals moonData, dateLocData
-
-  // screen angle of pole
-  var poleDec = dateLocData.lat.slice(-1) === 'N' ? 90 : -90;
-  var poleData = {ra: 0, dec: poleDec};
-  var poleX = getScreenCoords(poleData, 'x');
-  var poleY = getScreenCoords(poleData, 'y');
-
-  var moonX = getScreenCoords(moonData, 'x');
-  var moonY = getScreenCoords(moonData, 'y');
-
-}
-
 
 var drawMoon = function(mode) {
   // simluate the phase of the moon based on colong, using a half-lit sphere
@@ -182,8 +165,6 @@ var drawMoon = function(mode) {
   if (!isVisible(moonPoint)) {
     return;
   }
-
-  var moonRotation = getMoonRotation();
 
   // create the projection
   var moonProjection = d3.geoOrthographic()
@@ -217,8 +198,6 @@ var drawMoon = function(mode) {
       .datum(litHemisphere)
       .attr("d", function(d) { return moonPath(d); })
       .attr('fill', 'white')
-      .attr('stroke', 'white')
-      .attr('stroke-width', 1)
       .attr('class', 'lit-moon');
 
   var moonLabel = skyObjects.append('text')

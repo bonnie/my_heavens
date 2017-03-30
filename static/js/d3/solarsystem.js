@@ -193,6 +193,8 @@ var drawMoon = function(mode) {
           .center([90 - d.colong])
           .radius(90); // sets the circle radius to the specified angle in degrees
 
+
+  // TODO: moon doesn't show when it's too close to new, for example Berkeley June 23, 2017 at 7:00 PM
   // project the lit hemisphere onto the moon sphere
   skyObjects.append('path')
       .datum(litHemisphere)

@@ -2,13 +2,17 @@
 
 "use strict";
 
-// globals that will be initialized on document load
+// jquery globals that will be initialized on document load
 var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     starfieldControlDiv, warnDiv, eclipticToggle, planetToggle, planetWarning,
     celestialInfoTable, datetimeFormGroup, datelocFormGroups, celestialInfoDiv,
     datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
     datelocFormCancel, masterInfoDiv, celestialDivInstructions,
-    celestialInfoHeader, datelocInfoHeader, compassRose, datelocFormInputs;
+    celestialInfoHeader, datelocInfoHeader, compassRose, datelocFormInputs,
+    starfieldDiv;
+
+// global for skyRadius
+var skyRadius;
 
 var displayError = function(error) {
 
@@ -125,6 +129,7 @@ $(document).ready(function() {
     errorDiv = $('#error');
     starfieldControlDiv = $('#starfield-controls');
     warnDiv = $('#warn');
+    starfieldDiv = $('#star-field');
 
     eclipticToggle = $('#ecliptic-toggle');
     planetToggle = $('#planet-toggle');

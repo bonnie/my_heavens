@@ -2,17 +2,12 @@
 
 'use strict';
 
-// important dimenstions for the compass
-var compassSize = skyRadius / 5;
-var compCent = compassSize / 2;
-var compNub = compassSize / 2 - compassSize / 8;
-
-var rotateString = function(theta) {
+var rotateString = function(theta, compCent) {
     // return svg rotate translation for theta around the compass center
     return 'rotate(' + theta + ',' + compCent + ',' + compCent + ')';
 };
 
-var translateText = function(i) {
+var translateText = function(i, compCent) {
     // return translate compass text according to where in the sequence it is
 
     var theta = i * Math.PI / 2;
@@ -26,6 +21,11 @@ var drawCompass = function() {
     // draw the rose
     // use globals skyRadius and svgContatiner
         
+    // important dimenstions for the compass
+    var compassSize = skyRadius / 5;
+    var compCent = compassSize / 2;
+    var compNub = compassSize / 2 - compassSize / 8;
+
     var polyPath = d3.line()
         .x(function(d) { return d[0]; })
         .y(function(d) { return d[1]; });
@@ -50,14 +50,14 @@ var drawCompass = function() {
                     // .attr('stroke', 'white')
                     // .attr('stroke-width', 1)
                     .attr('fill', 'white')
-                    .attr('transform', rotateString(i * 90));
+                    .attr('transform', rotateString(i * 90, compCent));
 
         compassRoseGrp.append('text')
                     .datum(compassLetters[i])
                     .text(function(d) {return d.text;})
                     .attr('x', 0)
                     .attr('y', 0)
-                    .attr('transform', translateText(i))
+                    .attr('transform', translateText(i, compCent))
                     .attr('text-anchor', function(d) {return d.anchor;})
                     .attr('alignment-baseline', function(d) {return d.baseAlign;})
                     .attr('fill', 'white')
@@ -75,5 +75,3 @@ var drawCompass = function() {
     compassRose = $('#compass-rose');
 
 };
-
-$(document).ready(drawCompass);

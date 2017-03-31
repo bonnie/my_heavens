@@ -28,7 +28,6 @@ var sunMoonRadius, planetInfoDiv, svgContainer, svgDefs, skyBackground;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData, dateLocData;
 var planetHighlights; // for the identifier circles for the planets
-var skyRadius = 400;  // for now
 
 
 ////////////////
@@ -36,6 +35,10 @@ var skyRadius = 400;  // for now
 ////////////////
 
 $(document).ready(function() {
+
+    // calculate the sky radius based on the window size
+    skyRadius = getSkyRadius();
+
     // start by drawing svg, as a placeholder
     var svgBodySelection = d3.select('#star-field');
 
@@ -53,6 +56,9 @@ $(document).ready(function() {
                    .attr('cy', skyRadius)
                    .attr('r', skyRadius)
     }
+
+    // draw the compass
+    drawCompass();
 
     // for svg definitions
     svgDefs = svgContainer.append("defs")
@@ -89,6 +95,18 @@ $(document).ready(function() {
                 .attr("offset", "100%")
                 .attr("stop-color", "#191970");
 });
+
+var getSkyRadius = function() {
+    // return sky radius based on the available width / height
+    //
+    // uses global jquery obj starfieldDiv
+
+    var ht = $(window).height() / 2;
+    var wd = starfieldDiv.width() / 2;
+
+    return Math.min(ht, wd) - 15; // 15 for padding
+
+}
 
 var showAjaxError = function(error) {
     // display error from ajax call

@@ -6,6 +6,7 @@ from flask import Flask, request, render_template, jsonify
 from model import connect_to_db, Constellation
 from starfield import StarField
 from stars import get_stars, get_constellations
+from definitions import DEFINITIONS
 
 # display radius
 STARFIELD_RADIUS = 400
@@ -22,6 +23,11 @@ def display_chart():
 
     return render_template("stars.html", google_key=GOOGLE_KEY)
 
+@app.route('/terms.json')
+def return_terms():
+    """Return json of terms, definitions, and wikipedia links."""
+
+    return jsonify(DEFINITIONS)
 
 @app.route('/stars.json')
 def return_stars():

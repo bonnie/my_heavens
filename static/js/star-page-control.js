@@ -9,10 +9,13 @@ var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
     datelocFormCancel, masterInfoDiv, celestialDivInstructions,
     celestialInfoHeader, datelocInfoHeader, compassRose, datelocFormInputs,
-    starfieldDiv;
+    starfieldDiv, celestialDefDiv, definableTerms;
 
 // global for skyRadius
 var skyRadius;
+
+// global for terms dictionary
+var termDict;
 
 var displayError = function(error) {
 
@@ -120,6 +123,41 @@ var populateDatelocInfo = function(datelocInfo) {
 
 };
 
+var populateDefinition = function(term) {
+    // populate the definition div for this term
+    //
+    // uses globals termDict, celestialDefDiv, addInfoDivHeader
+
+    celestialDefDiv.show();
+    var termInfo = termDict[term];
+
+    term = termInfo.term === undefined ? term : termInfo.term;
+
+    var defString = '<p class="definition">' + termInfo.definition;
+
+    if (termInfo.wikipedia !== null) {
+        defString += ' <span class="wiki-link"><a target="_blank" href="'
+        defString += termInfo.wikipedia
+        defString += '"">Wikipedia link</a></span>'
+    }
+
+    defString += '</p>'
+
+    celestialDefDiv.empty();
+    addInfoDivHeader(celestialDefDiv, term);
+    celestialDefDiv.append(defString);
+}
+
+var addDefinitionOnclick = function() {
+    // add the on click listener for the clickable-terms, which come and go from
+    // the page frequently. 
+
+    $('.term').on('click', function() { 
+        var term = $(this).html().toLowerCase();
+        populateDefinition(term); });
+
+}
+
 $(document).ready(function() {
 
     // define some globals based on html ids
@@ -150,6 +188,8 @@ $(document).ready(function() {
     celestialInfoHeader = $('#celestial-info .info-header');
     celestialDivInstructions = $('#celestial-div-instructions').get(0);
 
+    celestialDefDiv = $('#celestial-definitions');
+
     datelocInfoDiv = $('#dateloc-info');
     datelocInfoHeader = $('#dateloc-info .info-header');
     datelocInfoTable = $('#dateloc-info .info-table');
@@ -178,6 +218,12 @@ $(document).ready(function() {
 
     // hide error when someone changes form
     datelocFormInputs.on('change', function() { errorDiv.hide(); });
+
+    // get dictionary terms
+    $.get('/terms.json', function(result) {
+        termDict = result;
+        addDefinitionOnclick();
+    });
 
     // load them stars
     d3.json('/stars.json', drawSkyAndStars);

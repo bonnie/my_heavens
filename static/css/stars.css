@@ -40,11 +40,9 @@ text.constellation-label {
 
 }
 
-/*.const-name {
-    pointer-events: none;
-    text-anchor: middle;
+.term:hover {
+    color: #fff;
 }
-*/
 
 #error {
     margin-top: 10px;
@@ -56,7 +54,7 @@ div.info {
     margin: 10px;
 }
 
-.star, .planet, .lit-moon, .planet-highlight {
+.star, .planet, .lit-moon, .planet-highlight, #compass-rose  {
     pointer-events: none;
 }
 
@@ -95,9 +93,7 @@ input[type:radio] {
 
 body {
     font-family: 'Lato', sans-serif;
-    /*background-image: url('/static/images/black_denim.png');*/
     background-image: url('/static/images/assault.png');
-    /*background-image: url('/static/images/zwartevilt.png');*/
     color: #bbb;
 }
 
@@ -116,3 +112,8 @@ h3 {
 svg.star-circle {
     padding-top: 15px;
 }
+
+p.definition {
+    font-size: 110%;
+}
+

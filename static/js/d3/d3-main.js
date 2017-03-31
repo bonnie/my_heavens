@@ -203,9 +203,14 @@ var findLabelPosition = function(d) {
 
 var populateInfoDiv = function(d) {
     // reveal and populate the info div when someone clicks on an item
+    //
+    // make sure the terms are clickable by running addDefinitionOnclick
     
-    // show the div
+    // show the info div
     celestialInfoDiv.show();
+
+    // hide the definition div
+    celestialDefDiv.hide();
 
     // populate the headers
     var celType = d.name === d.celestialType ? null : d.celestialType;
@@ -218,12 +223,12 @@ var populateInfoDiv = function(d) {
     if (d.constellation !== null) {
         addCelestialTableRow('Constellation', d.constellation);
     }
-    addCelestialTableRow('Magnitude', d.magnitude);
+    addCelestialTableRow('<span class="term">Magnitude</span>', d.magnitude);
     if (d.celestialType === 'star' && d.name !== 'Sun') {
-        addCelestialTableRow('Absolute Magnitude', d.absMagnitude);
-        addCelestialTableRow('Spectral Class', d.specClass);
+        addCelestialTableRow('<span class="term">Absolute Magnitude</span>', d.absMagnitude);
+        addCelestialTableRow('<span class="term">Spectral Class</span>', d.specClass);
     }
-    addCelestialTableRow('Distance', d.distance + ' ' + d.distanceUnits);
+    addCelestialTableRow('Distance', d.distance + ' <span class="term">' + d.distanceUnits + '</span>');
 
     if (d.celestialType === 'planet' || d.celestialType === 'moon') {
         addCelestialTableRow('Phase', d.phase + '% lit'); }
@@ -232,6 +237,8 @@ var populateInfoDiv = function(d) {
         addCelestialTableRow('Rose at', d.prevRise);
         addCelestialTableRow('Will set at', d.nextSet);
     }
+
+    addDefinitionOnclick();
 
 };
 

@@ -27,14 +27,6 @@ text.sky-label {
     fill: #fff;
 }
 
-text.star-label {
-/*    stroke: #777;
-*/}
-
-text.planet-label {
-    /*stroke: #228;*/
-}
-
 text.constellation-label {
     opacity: 1;
 
@@ -42,6 +34,7 @@ text.constellation-label {
 
 .term:hover {
     color: #fff;
+    cursor: pointer;
 }
 
 #error {
@@ -54,7 +47,7 @@ div.info {
     margin: 10px;
 }
 
-.star, .planet, .lit-moon, .planet-highlight, #compass-rose  {
+.star, .planet, .lit-moon, .planet-highlight {
     pointer-events: none;
 }
 
@@ -68,7 +61,7 @@ td.info-table-name {
 }
 
 #master-info-div, #dateloc-form-cancel, #datetime-form-group, #error,
-#compass-rose {
+.compass-rose {
     display: none;
 }
 
@@ -109,6 +102,10 @@ h3 {
     color: white;
 }
 
+.compass-rose {
+    cursor: pointer;
+}
+
 svg.star-circle {
     padding-top: 15px;
 }
@@ -117,3 +114,6 @@ p.definition {
     font-size: 110%;
 }
 
+.item-surround {
+    cursor: pointer;
+}

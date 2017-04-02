@@ -503,7 +503,7 @@ var renderSkyObject = function(params) {
                                 .attr('d', function(d){
                                     skyPath.pointRadius(params.radius < 4 ? 4 : params.radius);
                                     return skyPath(d); })
-                                .attr('class', params.classPrefix + '-surround')
+                                .attr('class', params.classPrefix + '-surround item-surround')
                                 .style('opacity', 0);
 
                 addInfoMouseOverAndClick(surroundingCircle, d, params.itemLabel);

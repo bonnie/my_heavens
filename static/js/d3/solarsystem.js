@@ -182,6 +182,7 @@ var drawMoon = function(mode) {
   var moon = skyObjects.append("path")
       .datum({type: "Sphere"})
       .attr("id", "moon-sphere")
+      .attr('class', 'item-surround')
       .attr("d", function(d) { return moonPath(d); })
       .attr('fill', 'white')
       .attr('opacity', 0.1);

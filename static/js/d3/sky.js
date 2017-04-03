@@ -115,7 +115,10 @@ var rotateSky = function(lambda, phi) {
 
         };
       })
-
+      .on('start', function() {
+        // disable reveal checkboxes
+        revealCheckboxes.attr('disabled', 'disabled');
+      })
       .on('end', function() {
 
             // finally, draw constellations and redraw the stars with labels on top of them
@@ -124,7 +127,8 @@ var rotateSky = function(lambda, phi) {
             // defined in d3-main.js
             drawSkyObjects();
 
-            // debugger;
+            // re-enable reveal checkboxes
+            revealCheckboxes.removeAttr('disabled');
 
         });
 

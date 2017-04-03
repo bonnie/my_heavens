@@ -9,7 +9,7 @@ var datetimeRadio, changetimeRadio, datetimeInput, errorDiv, datelocInfoDiv,
     datelocChangeBtn, showStarsBtn, datelocForm, datelocInfoTable,
     datelocFormCancel, masterInfoDiv, celestialDivInstructions,
     celestialInfoHeader, datelocInfoHeader, compassRose, datelocFormInputs,
-    starfieldDiv, celestialDefDiv, definableTerms;
+    starfieldDiv, celestialDefDiv, definableTerms, revealCheckboxes;
 
 // global for skyRadius
 var skyRadius;
@@ -30,9 +30,6 @@ var processFormInputs = function(latlng) {
 
     // clear previous errors
     errorDiv.empty().hide();
-
-    // hide starfield controls and info divs
-    masterInfoDiv.hide();
 
     // erase info from the date/location table
     datelocInfoTable.empty();
@@ -72,9 +69,6 @@ var processFormInputs = function(latlng) {
 
 // when form is submitted
 var getLocTimeData = function(locTime) {
-
-    // clear previous planets
-    // $('#star-field').empty();
 
     // d3.request needs data in a query string format
     var data = 'lat=' + locTime.lat;
@@ -171,6 +165,7 @@ $(document).ready(function() {
 
     eclipticToggle = $('#ecliptic-toggle');
     planetToggle = $('#planet-toggle');
+    revealCheckboxes = $('.reveal')
 
     planetWarning = $('#planet-warning');
 

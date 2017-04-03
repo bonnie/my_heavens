@@ -57,21 +57,18 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
   // controls //
   //////////////
 
-  // re-enable the "show stars" button
-  $('#show-stars').removeAttr('disabled');
-
-  // populate date/location info window
+  // show and populate date/location info window
+  $('#dateloc-info').show()
   populateDatelocInfo(dateLocData);
 
-  // TODO: clear the celestial info div and re-add instructions
+  // clear the celestial info div and re-add instructions
   celestialInfoTable.empty();
   celestialInfoHeader.html(celestialDivInstructions);
 
-  // show the controls and info divs
-  masterInfoDiv.show();
-
   // attach 'reveal planets' button to the revealPlanets function
   planetToggle.on('click', revealPlanets);
+
+  masterInfoDiv.show();
 
 };
 

@@ -317,10 +317,8 @@ var drawSkyAndStars = function(error, starDataResult) {
 
     drawSkyObjects();
 
-    // show ecliptic toggle button and attach event listener
-    $('#starfield-controls').show()
+    // attach event listener to ecliptic checkbox
     eclipticToggle.on('click', toggleEcliptic);
-
 
 };
 

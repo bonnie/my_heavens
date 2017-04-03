@@ -1,9 +1,11 @@
 // adapted from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_sidenav
 
 function openNav() {
-    document.getElementById("main-sidenav").style.width = "150px";
+    $('#main-sidenav').css('width', '150px');
+    $('#main-sidenav').css('height', '150px');
 }
 
 function closeNav() {
-    document.getElementById("main-sidenav").style.width = "0";
+    $('#main-sidenav').css('width', '0');
+    $('#main-sidenav').css('height', '0');
 }

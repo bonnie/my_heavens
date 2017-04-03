@@ -1,0 +1,16 @@
+/* css for the home div */
+
+#home {
+    background-image: url('/static/images/skycircle.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center; 
+    background-size: cover;
+    height: 100%;
+    width: 100%;
+}
+
+h1.home {
+    font-family: 'Forum', cursive;
+    text-align: center;
+}

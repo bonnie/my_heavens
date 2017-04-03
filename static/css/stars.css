@@ -1,3 +1,8 @@
+/* start with the div hidden */
+#star-map {
+    display: none;
+}
+
 /* let overflow constellations spill into margins */
 svg {
     overflow: visible;

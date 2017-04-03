@@ -13,16 +13,17 @@
     border-radius: 10px;
 }
 
-.sidenav a {
+.sidenav span.tab-link {
     padding: 8px 8px 0px 12px;
-    text-decoration: none;
+    font-family: 'Forum', cursive;
     font-size: 20px;
     color: #818181;
     display: block;
-    transition: 0.5s
+    transition: 0.5s;
+    cursor: pointer;
 }
 
-.sidenav a:hover, .offcanvas a:focus{
+.sidenav span.tab-link:hover, .offcanvas span.tab-link:focus{
     color: #f1f1f1;
 }
 
@@ -30,8 +31,12 @@
     position: absolute;
     top: 0;
     right: 10px;
-    font-size: 20px;
+    font-size: 25px;
     margin-left: 50px;
+    font-family: 'Forum', cursive;
+    text-decoration: none;
+    font-size: 20px;
+    color: #818181;
 }
 
 .collapse-sidenav {

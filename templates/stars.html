@@ -1,73 +1,53 @@
-{% extends 'base.html' %}
-{% block title %}My Heavens Star Chart{% endblock %}
+<div id='star-map' class='container-fluid tab-div'>
+  <div class='row'>
+    <div id='star-field' class='col-xs-12 col-md-6 col-lg-8'>
 
-{% block head %}
-  <link href="https://fonts.googleapis.com/css?family=Cinzel+Decorative" rel="stylesheet"> 
-{% endblock %}
-
-{% block content %}
-    <div class='row'>
-      <div id='star-field' class='col-xs-12 col-md-6 col-lg-8'>
-
-      </div>
-      <div id='controls' class='col-xs-12 col-md-6 col-lg-4'>
-        <div id='dateloc-form' class='info'>
-          <h3>Where and when?</h3>
-          <div class='form-group' id='location-form-group'>
-            <input type='text' class='form-control' id='city-input' placeholder='Enter a location'>
-          </div>
-
-          <div class='radio'>
-            <label><input id='now-time' type='radio' name='datetime' value='now' checked='checked'>Now</label>
-          </div>
-          <div class='radio'>
-            <label><input id='change-time' type='radio' name='datetime' value='not-now'>Other time</label>
-          </div>
-          <div id='datetime-form-group' class='form-group'>
-              <div class='input-group date'>
-                  <input type='datetime-local' id='datetime-input' class='form-control'>
-              </div>
-          </div>
-          <button id='show-stars' class='btn'>Show me the stars!</button>
-          <button id='dateloc-form-cancel' class='btn'>Cancel</button>
-          <div class='alert alert-danger' role='alert' id='error'></div>
+    </div>
+    <div id='controls' class='col-xs-12 col-md-6 col-lg-4'>
+      <div id='dateloc-form' class='info'>
+        <h3>Where and when?</h3>
+        <div class='form-group' id='location-form-group'>
+          <input type='text' class='form-control' id='city-input' placeholder='Enter a location'>
         </div>
-        <div id='master-info-div'>
-          <div id='dateloc-info' class='info'>
-            <div class='info-header'></div>
-            <table class='table table-responsive table-condensed info-table'></table>
-            <div class='text-center'><button id='dateloc-change-btn' class='btn'>Change</button></div>
-          </div>
-          <div id='starfield-controls' class='info'>
-            <div class="checkbox">
-              <label><input type="checkbox" class='reveal' value="" id='ecliptic-toggle'>Reveal</label> <span class='term'>ecliptic</span>
+
+        <div class='radio'>
+          <label><input id='now-time' type='radio' name='datetime' value='now' checked='checked'>Now</label>
+        </div>
+        <div class='radio'>
+          <label><input id='change-time' type='radio' name='datetime' value='not-now'>Other time</label>
+        </div>
+        <div id='datetime-form-group' class='form-group'>
+            <div class='input-group date'>
+                <input type='datetime-local' id='datetime-input' class='form-control'>
             </div>
-            <div class="checkbox">
-              <label><input type="checkbox" class='reveal' value="" id='planet-toggle' disabled='disabled'>Highlight planets</label> <span id='planet-warning'>(No time/place selected)</span>
-            </div>
+        </div>
+        <button id='show-stars' class='btn'>Show me the stars!</button>
+        <button id='dateloc-form-cancel' class='btn'>Cancel</button>
+        <div class='alert alert-danger' role='alert' id='error'></div>
+      </div>
+      <div id='master-info-div'>
+        <div id='dateloc-info' class='info'>
+          <div class='info-header'></div>
+          <table class='table table-responsive table-condensed info-table'></table>
+          <div class='text-center'><button id='dateloc-change-btn' class='btn'>Change</button></div>
+        </div>
+        <div id='starfield-controls' class='info'>
+          <div class="checkbox">
+            <label><input type="checkbox" class='reveal' value="" id='ecliptic-toggle'>Reveal</label> <span class='term'>ecliptic</span>
           </div>
-          <div id='celestial-info' class='info'>
-            <div class='info-header'>
-              <h4 id='celestial-div-instructions' class='text-center'>Click a sky object for more information.</h4>
-            </div>
-            <table class='table table-responsive table-condensed info-table'></table>
+          <div class="checkbox">
+            <label><input type="checkbox" class='reveal' value="" id='planet-toggle' disabled='disabled'>Highlight planets</label> <span id='planet-warning'>(No time/place selected)</span>
           </div>
-          <div id='celestial-definitions' class='info'><h4 id='celestial-term-instructions' class='text-center'>Click a word for the definition.</h4>
+        </div>
+        <div id='celestial-info' class='info'>
+          <div class='info-header'>
+            <h4 id='celestial-div-instructions' class='text-center'>Click a sky object for more information.</h4>
           </div>
+          <table class='table table-responsive table-condensed info-table'></table>
+        </div>
+        <div id='celestial-definitions' class='info'><h4 id='celestial-term-instructions' class='text-center'>Click a word for the definition.</h4>
         </div>
       </div>
     </div>
-{% endblock %}
-
-{% block scripts %}
-  <script type='text/javascript' src='/static/js/star-page-control.js'></script>
-  <script type='text/javascript' src='/static/js/geocode.js'></script>
-  <script type='text/javascript' src='/static/js/d3/sky.js'></script>
-  <script type='text/javascript' src='/static/js/d3/constellations.js'></script>
-  <script type='text/javascript' src='/static/js/d3/stars.js'></script>
-  <script type='text/javascript' src='/static/js/d3/solarsystem.js'></script>
-  <script type='text/javascript' src='/static/js/d3/d3-main.js'></script>
-  <script type='text/javascript' src='/static/js/d3/compass-rose.js'></script>
-  <script src='https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces'
-        async defer></script>
-{% endblock %}
+  </div>
+</div>

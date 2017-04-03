@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Heavens</title>
+  <script src='https://d3js.org/d3.v4.min.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.min.js"></script>
+  <script src='https://code.jquery.com/jquery.js'></script>
+
+  <link rel='stylesheet'
+        href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+  <link href="https://fonts.googleapis.com/css?family=Forum|Lato|Cinzel+Decorative" rel="stylesheet"> 
+  <link href="/static/css/sidenav.css" rel="stylesheet"> 
+  <link rel='stylesheet' href='/static/css/main.css'>
+  <link rel='stylesheet' href='/static/css/home.css'>
+  <link rel='stylesheet' href='/static/css/stars.css'>
+  <link rel='stylesheet' href='/static/css/glossary.css'>
+  <link rel='stylesheet' href='/static/css/about.css'>
+
+
+</head>
+<body>
+
+    <!-- side nav bar -->
+    <div id="main-sidenav" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <span class='tab-link' href="/">Home</span>
+      <span class='tab-link' href="/stars.html">Star&nbsp;Map</span>
+      <span class='tab-link' href="/glossary.html">Glossary</span>
+      <span class='tab-link' href="/about.html">About</span>
+    </div>
+
+    <span id='hamburger' class='collapse-sidenav' onclick="openNav()">&#9776;</span>
+    <!-- end side nav bar -->
+
+    <!-- "tabs" -->
+    {% include 'home.html' %}
+    {% include 'stars.html' %}
+    {% include 'glossary.html' %}
+    {% include 'about.html' %}
+    <!-- end tabs -->
+
+    <script type='text/javascript' 
+          src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js'></script>
+    <script type='text/javascript' src='/static/js/sidenav.js'></script>
+    <script src='https://maps.googleapis.com/maps/api/js?key={{ google_key }}&libraries=places&callback=initPlaces' async defer></script>
+
+    <!-- scripts for individual tabs -->
+    {% include 'chart_scripts.html' %}
+
+</body>
+</html>

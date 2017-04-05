@@ -1,5 +1,7 @@
 // functions for navigation
 
+"use strict";
+
 // event listener
 $('.tab-link').on('click', function() {
     closeNav();
@@ -9,11 +11,34 @@ $('.tab-link').on('click', function() {
 function switchTab(tab) {
     // hide all other tabs but the requested one
 
+    // debugger;
+
     // replace spaces
     tab = tab === 'Star&nbsp;Map' ? 'star-map' : tab.toLowerCase();
 
     // hide all tabs
-    $('.tab-div').hide()
+    $('.tab-div').hide();
+
+    // move the dateloc form, if necessary
+    if (tab == 'home' || tab == 'star-map') {
+
+        // define where the dateloc form needs to move
+        var oldtab = tab == 'home' ? 'star-map' : 'home';
+
+        // gather the existing contents
+        var datelocFormContents = datelocForm.detach();
+
+        // stick 'em in the other tab
+        datelocFormContents.appendTo('#' + tab + ' .dateloc-form-container');
+
+        // if it's the home tab, hide the cancel button; otherwise show it
+        if (tab == 'home') {
+            datelocFormCancel.hide();
+        } else {
+            datelocFormCancel.show();
+        }
+
+    }
 
     // show requested tab
     $('#' + tab).show()

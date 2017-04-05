@@ -1,9 +1,31 @@
 <div id='home' class='container-fluid tab-div'>
   <div class='row'>
-    <div class='col-xs-12'>
+    <div class='col-xs-12 entry-form'>
 
-    <h1 class='home'>My Heavens</h1>
+      <h1 class='home'>My Heavens</h1>
+      <div class='dateloc-form-container'>
+        <div id='dateloc-form' class='info'>
+          <h3>Where and when?</h3>
+          <div class='form-group' id='location-form-group'>
+            <input type='text' class='form-control' id='city-input' placeholder='Enter a location'>
+          </div>
 
+          <div class='radio'>
+            <label><input id='now-time' type='radio' name='datetime' value='now' checked='checked'>Now</label>
+          </div>
+          <div class='radio'>
+            <label><input id='change-time' type='radio' name='datetime' value='not-now'>Other time</label>
+          </div>
+          <div id='datetime-form-group' class='form-group'>
+              <div class='input-group date'>
+                  <input type='datetime-local' id='datetime-input' class='form-control'>
+              </div>
+          </div>
+          <button id='show-stars' class='btn'>Show me the stars!</button>
+          <button id='dateloc-form-cancel' class='btn'>Cancel</button>
+          <div class='alert alert-danger' role='alert' id='error'></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -21,7 +21,10 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
 
   // success function for planet data from planets.json
 
-  // TODO: catch error where server is down and connection is refused
+    // switch to the star-map tab, if we're not already there
+    if (showStarsBtn.parents('#home') !== []) {
+        switchTab('star-map')
+    }
 
     // clear previous errors and warnings
     // errorDiv, warnDiv, and formGroups defined in star-page-control.js

@@ -131,3 +131,10 @@ git checkout -b regression d8852c1696ea14df7eba72c26135d662394edaf1
 The problem still existed. So I re-seeded the db using an old seed file.
 Everything was back in the right place. I re-seeded using current seed file.
 Everything was still in the right place. What happened?? F*** if I know.
+
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+
+Issue: separate out "tabs" for code organization, but can't do nested includes. 
+
+(hacky) solution: use extend to include dateloc form code in home.html and stars.html

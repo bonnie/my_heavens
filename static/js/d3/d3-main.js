@@ -101,6 +101,8 @@ var getSkyRadius = function() {
     //
     // uses global jquery obj starfieldDiv
 
+    return 400;
+
     var ht = $(window).height() / 2;
     var wd = starfieldDiv.width() / 2;
 

@@ -135,6 +135,15 @@ Everything was still in the right place. What happened?? F*** if I know.
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
 
-Issue: separate out "tabs" for code organization, but can't do nested includes. 
+Issue: separate out "tabs" for code organization, want to include date / location form in two tabs, but can't do nested includes in jinja. 
 
-(hacky) solution: use extend to include dateloc form code in home.html and stars.html
+solution: use jquery detach to take the form from the dom and stick it into the
+other tab upon switching
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+created favicon.ico with 
+
+http://www.favicon.cc/
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+

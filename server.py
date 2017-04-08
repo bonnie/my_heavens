@@ -21,7 +21,10 @@ def display_chart():
 
     Stars will be filled in with js"""
 
-    return render_template("main.html", google_key=GOOGLE_KEY)
+    return render_template("main.html", 
+                                google_key=GOOGLE_KEY,
+                                sorted_terms=sorted(DEFINITIONS.keys()),
+                                terms=DEFINITIONS)
 
 @app.route('/terms.json')
 def return_terms():

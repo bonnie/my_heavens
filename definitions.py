@@ -16,7 +16,7 @@ DEFINITIONS = {
       'definition': 'The ecliptic marks the apparent path of the sun in the sky against the background of stars, as the earth orbits the sun. Since the solar system is all roughly in the same plane, all planets and the moon will be found on or near the ecliptic.'
     },
     'compass': {
-      'term': 'Why are the compass markings reversed?',
+      'term': 'Why are East and West reversed?',
       'wikipedia': None,
       'definition': 'On a map looking toward earth, west is clockwise from north, but on this map looking at the sky, east is clockwise from north. Think about holding this map over your head: if north is behind your head and south is in front, then east will be to the left and west to the right.'
     },

@@ -2,9 +2,6 @@
 
 'use strict';
 
-// variable for the compass ring that shows on mouseover to indicate clickability
-var compassRing;
-
 var rotateString = function(theta, compCent) {
     // return svg rotate translation for theta around the compass center
     return 'rotate(' + theta + ',' + compCent + ',' + compCent + ')';
@@ -20,12 +17,14 @@ var translateText = function(i, compCent) {
     return 'translate(' + x + ',' + y + ')';
 };
 
-var transitionCompassRing = function(opacity) {
-    // show/hide the compass ring on mouse over
+var transitionCompassRing = function(elements, fillColor) {
+    // change fill color in array of elements on mouse over
 
-    compassRing.transition()
-        .duration(400)
-        .style("opacity", opacity);
+    for (var i=0; i<elements.length; i++) {
+        elements[i].transition()
+            .duration(200)
+            .style("fill", fillColor);
+    }
 
 }
 
@@ -33,6 +32,8 @@ var drawCompass = function() {
     // draw the rose
     // use globals skyRadius and svgContatiner
         
+    var fillColor = '#bbb';
+
     // important dimenstions for the compass
     var compassSize = skyRadius / 5;
     var compCent = compassSize / 2;
@@ -51,31 +52,43 @@ var drawCompass = function() {
                   [compNub, compNub],
                   [compCent, compCent]];
 
-    var compassLetters = [{text: 'W', baseAlign: 'middle', anchor: 'start'},
+    var compassLetterInfo = [{text: 'W', baseAlign: 'middle', anchor: 'start'},
                       {text: 'S', baseAlign: 'before-edge', anchor: 'middle'},
                       {text: 'E', baseAlign: 'middle', anchor: 'end'},
                       {text: 'N', baseAlign: 'after-edge', anchor: 'middle'}];
 
+    // for tracking what color needs to be changed on mouseover
+    var filledElements = Array();
+
     for (var i=0;i < 4;i++) {
-        compassRoseGrp.append('polygon')
+        var compassSpike = compassRoseGrp.append('polygon')
                     .datum(polyPoints)
                     .attr("points",function(d) {return d.join(" ");})
                     // .attr('stroke', 'white')
                     // .attr('stroke-width', 1)
-                    .attr('fill', 'white')
+                    .attr('fill', fillColor)
                     .attr('transform', rotateString(i * 90, compCent));
+        filledElements.push(compassSpike);
 
-        compassRoseGrp.append('text')
-                    .datum(compassLetters[i])
+        var compassLetter = compassRoseGrp.append('text')
+                    .datum(compassLetterInfo[i])
                     .text(function(d) {return d.text;})
                     .attr('x', 0)
                     .attr('y', 0)
                     .attr('transform', translateText(i, compCent))
                     .attr('text-anchor', function(d) {return d.anchor;})
                     .attr('alignment-baseline', function(d) {return d.baseAlign;})
-                    .attr('fill', 'white')
+                    .attr('fill', fillColor)
                     .attr('class', 'compass-letter');
+        filledElements.push(compassLetter);
     }
+
+    // add a ring to make the group more cohesive for mousever and click
+    var compassRing = compassRoseGrp.append('circle')
+                    .attr('cx', compassSize / 2)
+                    .attr('cy', compassSize / 2)
+                    .attr('r', compassSize)
+                    .attr('opacity', 0)
 
     // move the rose into position
     var xShift = skyRadius * 2 - compassSize;
@@ -83,19 +96,9 @@ var drawCompass = function() {
     var roseTranslation = 'translate(' + xShift + ',' + yShift + ')';
     compassRoseGrp.attr('transform', roseTranslation);
 
-    // add a ring to make the group more cohesive for mousever and click
-    compassRing = compassRoseGrp.append('circle')
-                    .attr('cx', xShift + compassSize / 2)
-                    .attr('cy', yShift + compassSize / 2)
-                    .attr('r', compassSize)
-                    .attr('opacity', 0)
-    //                 .attr('fill-opacity', 0)
-    //                 .attr('stroke', 'white')
-    //                 .attr('stroke-width', '2')
-    //                 .attr('id', 'compass-rose-ring')
-
-    // compassRing.on('mouseover', function() { transitionCompassRing(1); })
-    // compassRing.on('mouseout', function() { transitionCompassRing(0); })
+    // create effects
+    compassRoseGrp.on('mouseover', function() { transitionCompassRing(filledElements, 'white'); })
+    compassRoseGrp.on('mouseout', function() { transitionCompassRing(filledElements, fillColor); })
     compassRoseGrp.on('click', function() { populateDefinition('compass'); })
 
     // finally, define the global variable so this can be shown/hidden from 

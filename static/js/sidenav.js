@@ -31,11 +31,14 @@ function switchTab(tab) {
         // stick 'em in the other tab
         datelocFormContents.appendTo('#' + tab + ' .dateloc-form-container');
 
-        // if it's the home tab, hide the cancel button; otherwise show it
+        // if it's the home tab, hide the cancel button and show the form; 
+        // show the cancel button in the star-map tab but hide the form
         if (tab == 'home') {
             datelocFormCancel.hide();
+            datelocForm.show();
         } else {
             datelocFormCancel.show();
+            datelocForm.hide();
         }
 
     }

@@ -4,6 +4,17 @@
 
     <h1 class='home'>Glossary</h1>
 
+    {% for term in sorted_terms %}
+        {% if term != 'compass' %}
+            <div class='term-div'>
+                <div class='glossary-term'>
+                    <h3>{{ term }}</h3>
+                </div>
+                <div class='definition'>{{ terms[term]['definition'] }}</div>
+            </div>
+        {% endif %}
+    {% endfor %}
+
     </div>
   </div>
 </div>

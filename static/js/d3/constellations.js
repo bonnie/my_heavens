@@ -154,30 +154,15 @@ var drawConstellations = function() {
             // constellation label //
             /////////////////////////
 
-            var boundsObj = isVisible(constLineMultiLine) ? constLineMultiLine : constBoundsPolygon;
-
-            // get better positioning for the constellation labels along the edges
-            // TODO: do a better job of positioning, esp for constellation off the middle right, 
-            // and also, for example, hydra (curled around bottom, but label is quite far away) 
-            // on Berkeley April 2, 2017 at 12:00 AM 
-            // TODO: separate out into a function.
-            var bounds = skyPath.bounds(boundsObj);
-            var minX = bounds[0][0];
-            var minY = bounds[0][1];
-            var maxX = bounds[1][0];
-            var maxY = bounds[1][1];
-            var padding = 20;
-
-            var y = (minY < skyRadius) ? maxY + padding : minY - padding;
-            var x = (maxX > 3 * skyRadius / 4) ? minX : (minX + maxX) / 2;
-            var textAnchor = (maxX < skyRadius) ? 'start' : 'end';
+            var labelPos = getLabelPosition(constLineMultiLine, constBoundsPolygon)
 
             // text for constellation name label
             var constLabel = thisConst.append('text')
                 .text(d.name)
                 .attr('class', 'constellation-label sky-label')
-                .attr('x', x)
-                .attr('y', y);
+                .attr('x', labelPos.x)
+                .attr('y', labelPos.y)
+                .attr('text-anchor', labelPos.textAnchor);
 
             // if (d.name === 'Octans') {
             //     debugger;
@@ -185,3 +170,31 @@ var drawConstellations = function() {
         }
     });
 };
+
+var getLabelPosition = function(constLineMultiLine, constBoundsPolygon) {
+    // return an object with x, y, and textAnchor keys for positioning
+    // constellation labels, based on constLineMultiLine and constBoundsPolygon
+
+    // to store return data
+    var labelPosition = {}
+
+    // if you can see the lines, place the label relative to the lines; 
+    // otherwise place relative to the bounds polygon
+    var boundsObj = isVisible(constLineMultiLine) ? constLineMultiLine : constBoundsPolygon;
+
+    // TODO: do a better job of positioning, for example, hydra (curled around 
+    // bottom, but label is quite far away) on Berkeley April 2, 2017 at 
+    // 12:00 AM 
+    var bounds = skyPath.bounds(boundsObj);
+    var minX = bounds[0][0];
+    var minY = bounds[0][1];
+    var maxX = bounds[1][0];
+    var maxY = bounds[1][1];
+    var padding = 20;
+
+    labelPosition.y = (minY < skyRadius) ? maxY + padding : minY - padding;
+    labelPosition.x = (maxX > 3 * skyRadius / 4) ? minX : (minX + maxX) / 2;
+    labelPosition.textAnchor = (maxX < skyRadius) ? 'start' : 'end';
+
+    return labelPosition;
+}

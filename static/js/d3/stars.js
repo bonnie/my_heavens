@@ -24,6 +24,4 @@ var drawStars = function(mode) {
 
     renderSkyObjectList(starParams);
 
-    // show the compass rose
-    compassRose.show();
 };

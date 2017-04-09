@@ -35,8 +35,6 @@ var drawSky = function(skyData) {
 
     // create the projection for the sphere of the sky
     skyProjection = d3.geoOrthographic()
-        .scale(skyRadius)
-        .translate([skyRadius, skyRadius])
         .clipAngle(90)
         .precision(0.1)
         // .rotate(([0, 360 - 37, 0]));

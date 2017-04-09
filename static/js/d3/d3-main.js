@@ -24,10 +24,11 @@
 ///////////////////////////
 
 // globals to use across functions
-var sunMoonRadius, planetInfoDiv, svgContainer, svgDefs, skyBackground;
+var sunMoonRadius, planetInfoDiv, svgContainer, svgDefs, skyBackground, skyCircle;
 var skySphere, skyProjection, skyPath, skyObjects, skyTransform, eclipticPath;
 var starData, constData, planetData, sunData, moonData, dateLocData;
 var planetHighlights; // for the identifier circles for the planets
+var compassRoseGrp;
 
 
 ////////////////
@@ -36,45 +37,30 @@ var planetHighlights; // for the identifier circles for the planets
 
 $(document).ready(function() {
 
-    // calculate the sky radius based on the window size
-    skyRadius = getSkyRadius();
-
     // start by drawing svg, as a placeholder
     var svgBodySelection = d3.select('#star-field');
 
     // make a place to draw the stars
     // svgContainer is globally scoped
     svgContainer = svgBodySelection.append('svg')
-                                    .attr('width', 2.25 * skyRadius)
-                                    .attr('height', 2 * skyRadius + 30) // account for 15 padding top and bottom
                                     .attr('class', 'star-circle');
 
+    // make a background for the sky 
+    skyBackground = svgContainer.append('circle')
+                                .attr('stroke-width', 3)
+                                .attr('stroke-color', 'black')
+                                .attr('id', 'sky-background');
 
-    var addSkyCircle = function(obj) {
-        return obj.append('circle')
-                   .attr('cx', skyRadius)
-                   .attr('cy', skyRadius)
-                   .attr('r', skyRadius)
-    }
-
-    // draw the compass
-    drawCompass();
 
     // for svg definitions
     svgDefs = svgContainer.append("defs")
-
-    // make a background for the sky 
-    skyBackground = addSkyCircle(svgContainer).attr('stroke-width', 3)
-                                              .attr('stroke-color', 'black')
-                                              .attr('id', 'sky-background');
-
 
     // make a clip path so points don't appear off the edge of the sky
     var skyClipPath = svgDefs.append('svg:clipPath')
                              .attr('id', 'sky-clip')
 
-    addSkyCircle(skyClipPath).attr('id', 'sky-clip-path')
-
+    skyCircle = skyClipPath.append('circle')
+                           .attr('id', 'sky-clip-path')
 
     // define the sky gradient just once, not every time we print the sky background
     // used in drawSkyBackground in solarsystem.js
@@ -94,14 +80,47 @@ $(document).ready(function() {
             radialGradient.append("stop")
                 .attr("offset", "100%")
                 .attr("stop-color", "#191970");
+
 });
+
+
+var svgSetDimensions = function() {
+    // redraw the svg if the sky radius has changed
+    //
+    // uses globals skyRadius, svgContainer, skyCircle, compassRoseGrp, 
+    //    skyProjection, 
+
+    // calculate the sky radius based on the window size
+    skyRadius = getSkyRadius();
+
+    svgContainer.attr('width', 2.25 * skyRadius)
+                .attr('height', 2 * skyRadius + 30); // account for 15 padding top and bottom
+
+    skyCircle.attr('cx', skyRadius)
+               .attr('cy', skyRadius)
+               .attr('r', skyRadius)
+
+    skyBackground.attr('cx', skyRadius)
+               .attr('cy', skyRadius)
+               .attr('r', skyRadius)
+
+    // the d3 sky sphere
+    if (skyProjection !== undefined) {
+        skyProjection.scale(skyRadius)
+            .translate([skyRadius, skyRadius])
+    }
+
+    // finally, draw constellations and redraw the stars with labels on top of them
+    $('#all-sky-objects').empty();
+    drawSkyObjects();
+    drawCompass();
+
+}
 
 var getSkyRadius = function() {
     // return sky radius based on the available width / height
     //
     // uses global jquery obj starfieldDiv
-
-    return 400;
 
     var ht = $(window).height() / 2;
     var wd = starfieldDiv.width() / 2;

@@ -14,3 +14,8 @@ h1.home {
     font-family: 'Forum', cursive;
     text-align: center;
 }
+
+#home #dateloc-form {
+    max-width: 500px;
+    margin: 0px auto;
+}

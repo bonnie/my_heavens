@@ -2,6 +2,8 @@
 
 'use strict';
 
+var compassRoseGrp;
+
 var rotateString = function(theta, compCent) {
     // return svg rotate translation for theta around the compass center
     return 'rotate(' + theta + ',' + compCent + ',' + compCent + ')';
@@ -30,8 +32,14 @@ var transitionCompassRing = function(elements, fillColor) {
 
 var drawCompass = function() {
     // draw the rose
-    // use globals skyRadius and svgContatiner
+    // use globals skyRadius and svgContainer
+    // sets global compassRoseGrp
         
+    // remove compass if it already exists
+    if (compassRoseGrp !== undefined) {
+        compassRoseGrp.remove();
+    }
+
     var fillColor = '#bbb';
 
     // important dimenstions for the compass
@@ -43,7 +51,7 @@ var drawCompass = function() {
         .x(function(d) { return d[0]; })
         .y(function(d) { return d[1]; });
 
-    var compassRoseGrp = svgContainer.append('g')
+    compassRoseGrp = svgContainer.append('g')
             .attr('id', 'compass-rose')
             .attr('class', 'compass-rose');
 

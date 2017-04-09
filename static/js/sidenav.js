@@ -20,7 +20,7 @@ function switchTab(tab) {
     $('.tab-div').hide();
 
     // move the dateloc form, if necessary
-    if (tab == 'home' || tab == 'star-map') {
+    if (tab === 'home' || tab === 'star-map') {
 
         // define where the dateloc form needs to move
         var oldtab = tab == 'home' ? 'star-map' : 'home';
@@ -45,6 +45,12 @@ function switchTab(tab) {
 
     // show requested tab
     $('#' + tab).show()
+
+    // (re)set the svg dimensions if necessary
+    if (tab === 'star-map' && skyRadius !== getSkyRadius()) {
+        svgSetDimensions();
+    }
+
 }
 
 // openNav and closeNav adapted from

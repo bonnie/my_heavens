@@ -65,7 +65,7 @@ td.info-table-name {
     opacity: 0.7;
 }
 
-#dateloc-form-cancel, #datetime-form-group, #dateloc-info, #error, .compass-rose {
+#dateloc-form-cancel, #datetime-form-group, #dateloc-info, #error {
     display: none;
 }
 

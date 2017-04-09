@@ -81,6 +81,9 @@ $(document).ready(function() {
                 .attr("offset", "100%")
                 .attr("stop-color", "#191970");
 
+    // resize the svg on window resize
+    $(window).resize(svgSetDimensions);
+
 });
 
 

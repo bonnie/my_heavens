@@ -8,6 +8,10 @@ svg {
     overflow: visible;
 }
 
+svg.star-circle {
+    padding-top: 15px;
+}
+
 /* make sure our constellation groups recognize mouseover events */
 g.constellation-group {
     pointer-events: all;
@@ -25,7 +29,7 @@ g.constellation-group {
     fill-opacity: 0;
 }
 
-/* info divs */
+/* info labels */
 text.sky-label {
     pointer-events: none; /* let mouse events pass through */
     opacity:0;
@@ -56,66 +60,9 @@ div.info {
     pointer-events: none;
 }
 
-td.info-table-name {
-    font-weight: 700;
-}
-
 #planet-warning {
     font-style: italic;
     opacity: 0.7;
-}
-
-#dateloc-form-cancel, #datetime-form-group, #dateloc-info, #error {
-    display: none;
-}
-
-.info-table {
-    margin-bottom: 10px;
-}
-
-.btn {
-    color: black;
-}
-
-/* to make form inputs not so darn bright */
-input.form-control {
-    background-color: #333;
-    color: #eee;
-}
-
-input[type:radio] {
-    background-color: #333;
-}
-
-
-body {
-    font-family: 'Lato', sans-serif;
-    background-image: url('/static/images/assault.png');
-    color: #bbb;
-}
-
-h3 {
-    font-family: 'Forum', cursive;
-    font-size: 200%;
-    margin-top: 10px;
-    margin-bottom: 5px;
-}
-
-.compass-letter {
-    font-family: 'Cinzel Decorative', cursive;
-    color: white;
-}
-
-.compass-rose {
-    cursor: pointer;
-}
-
-svg.star-circle {
-    padding-top: 15px;
-}
-
-p.definition {
-    font-size: 110%;
 }
 
 .item-surround {

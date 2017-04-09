@@ -1,0 +1,42 @@
+body {
+    font-family: 'Lato', sans-serif;
+    background-image: url('/static/images/assault.png');
+    color: #bbb;
+}
+
+h3 {
+    font-family: 'Forum', cursive;
+    font-size: 200%;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+#dateloc-form-cancel, #datetime-form-group, #dateloc-info, #error {
+    display: none;
+}
+
+td.info-table-name {
+    font-weight: 700;
+}
+
+.info-table {
+    margin-bottom: 10px;
+}
+
+.btn {
+    color: black;
+}
+
+/* to make form inputs not so darn bright */
+input.form-control {
+    background-color: #333;
+    color: #eee;
+}
+
+input[type:radio] {
+    background-color: #333;
+}
+
+p.definition {
+    font-size: 110%;
+}

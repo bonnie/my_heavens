@@ -6,7 +6,6 @@
 var isInverted = function(poly) {
     // determine if a polygon is inverted on the sky sphere
 
-
     // I tried doing this using d3.geoArea(poly) and skyPath.area(poly) --
     // neither of them worked consistently across all constellations. 
     //
@@ -19,7 +18,6 @@ var isInverted = function(poly) {
     var totalScreenArea = Math.pow(2 * skyRadius, 2);
 
     return screenArea / totalScreenArea > 3/4;
-
 
 };
 
@@ -65,88 +63,91 @@ var drawConstellations = function() {
         // constellation bounds //
         //////////////////////////
 
-        // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
-        if (d.bound_verts.length > 0) {
 
-            var constBoundsPolygon = {
+        // special split serpens gets a multipolygon; all else get polygons
+        var geoType = d.bound_verts.length > 1 ? 'MultiPolygon' : 'Polygon';
+        var boundVerts = d.bound_verts.length > 1 ? [d.bound_verts] : d.bound_verts
+
+
+        var constBoundsPolygon = {
+            geometry: {
+                type: geoType,
+                coordinates: boundVerts
+            },
+            type: 'Feature'
+        };
+
+        // if (d.name === 'Octans') {
+        //     debugger;
+        // }
+
+
+        // make sure we're getting the actual bounds polygon, and not the inverse
+        if (isInverted(constBoundsPolygon)) {
+
+            // TODO: make this into a function to avoid so much repeated code
+
+            var reversedBounds = []
+            for (var i=0; i<d.bound_verts.length; i++) {
+                reversedBounds.push(d.bound_verts[i].slice().reverse());
+            }
+
+            reversedBounds = d.bound_verts.length > 1 ? [reversedBounds] : reversedBounds
+
+            constBoundsPolygon = {
                 geometry: {
-                    type: 'Polygon',
-                    coordinates: [d.bound_verts] // because of potential holes, this needs to be an array of arrays of arrays of points
+                    type: geoType,
+                    coordinates: reversedBounds
                 },
                 type: 'Feature'
             };
-
-            // if (d.name === 'Octans') {
-            //     debugger;
-            // }
-
-
-            // make sure we're getting the actual bounds polygon, and not the inverse
-            if (isInverted(constBoundsPolygon)) {
-
-                // TODO: make this into a function to avoid so much repeated code
-
-                constBoundsPolygon = {
-                    geometry: {
-                        type: 'Polygon',
-                        coordinates: [d.bound_verts.slice().reverse()] // because of potential holes, this needs to be an array of arrays of arrays of points
-                    },
-                    type: 'Feature'
-                };
-     
-            }
-
-            // don't bother drawing constellation if it's not visible
-            // isVisible is defined in sky.js
-            var boundsViz = isVisible(constBoundsPolygon);
-
-            if (boundsViz && isInverted(constBoundsPolygon)) {
-
-            // sometimes circumpolar constellations that aren't showing are
-            // inverted with their bounds forwards or backwards
-            // example: octans at rotation -228.63065300575627 -37.8715926
-
-            // TODO: understand better what's going on here and/or record error on server via ajax
-
-                // console.log('constellation ' + d.name + ' inverted in both directions. Skipping.')
-                boundsViz = false;
-
-            } 
-
-            if (boundsViz) {
-
-                var constBounds = thisConst.append('path')
-                                    .datum(constBoundsPolygon)
-                                    .attr('class', 'constellation-bounds')
-                                    .attr('d', function(d) { return skyPath(d); });
-            } else {
-                // this constellation isn't showing; remove it
-                thisConst.remove();
-            }
+ 
         }
 
-        if (boundsViz) {
+        // don't bother drawing constellation if it's not visible
+        // isVisible is defined in sky.js
+        var boundsViz = isVisible(constBoundsPolygon);
+
+        if (boundsViz && isInverted(constBoundsPolygon)) {
+
+        // sometimes circumpolar constellations that aren't showing are
+        // inverted with their bounds forwards or backwards
+        // example: octans at rotation -228.63065300575627 -37.8715926
+
+        // TODO: understand better what's going on here and/or record error on server via ajax
+
+            // console.log('constellation ' + d.name + ' inverted in both directions. Skipping.')
+            boundsViz = false;
+
+        } 
+
+        if (!boundsViz) {
+            // this constellation isn't showing; remove it
+            thisConst.remove();
+
+        } else {
+
+            var constBounds = thisConst.append('path')
+                                .datum(constBoundsPolygon)
+                                .attr('class', 'constellation-bounds')
+                                .attr('d', function(d) { return skyPath(d); });
 
             /////////////////////////
             // constellation lines //
             /////////////////////////
 
-            // TODO: find a better way of dealing with serpens/serpens cauda/serpens caput
-            if (d.line_groups.length > 0) {
+            var constLineMultiLine = {
+                geometry: {
+                    type: 'MultiLineString',
+                    coordinates: d.line_groups
+                },
+                type: 'Feature'
+            };
 
-                var constLineMultiLine = {
-                    geometry: {
-                        type: 'MultiLineString',
-                        coordinates: d.line_groups
-                    },
-                    type: 'Feature'
-                };
-
-                var constLines = thisConst.append('path')
-                                    .datum(constLineMultiLine)
-                                    .attr('class', 'constellation-line')
-                                    .attr('d', function(d) { return skyPath(d); });
-            }
+            var constLines = thisConst.append('path')
+                                .datum(constLineMultiLine)
+                                .attr('class', 'constellation-line')
+                                .attr('d', function(d) { return skyPath(d); });
 
 
             /////////////////////////
@@ -178,12 +179,9 @@ var drawConstellations = function() {
                 .attr('x', x)
                 .attr('y', y);
 
+            // if (d.name === 'Octans') {
+            //     debugger;
+            // }
         }
-
-        // if (d.name === 'Octans') {
-        //     debugger;
-        // }
-
-
     });
 };

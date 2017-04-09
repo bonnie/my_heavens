@@ -240,8 +240,6 @@ var populateInfoDiv = function(d) {
         addCelestialTableRow('Will set at', d.nextSet);
     }
 
-    addDefinitionOnclick();
-
 };
 
 var addInfoDivHeader = function(infoHeaderDiv, header, subHeader) {

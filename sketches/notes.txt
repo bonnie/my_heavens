@@ -146,4 +146,13 @@ created favicon.ico with
 http://www.favicon.cc/
 
 *~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+http://stackoverflow.com/questions/8459204/adding-event-listeners-to-current-and-future-elements-with-a-particular-class
 
+helpful in making sure terms within term definitions got clickable-linked
+
+
+*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~*~
+
+serpens!!! did not change db, as constellations are fixed and will not change. 
+Made special code path (on server) for serpens. Messy, but works. Did not seem 
+worth it to structure db around stupid serpens. 

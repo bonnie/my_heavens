@@ -146,9 +146,11 @@ var addDefinitionOnclick = function() {
     // add the on click listener for the clickable-terms, which come and go from
     // the page frequently. 
 
-    $('.term').on('click', function() { 
+    $('#celestial-data').on('click', '.term', function() {
         var term = $(this).html().toLowerCase();
-        populateDefinition(term); });
+        populateDefinition(term);
+    });
+
 
 }
 

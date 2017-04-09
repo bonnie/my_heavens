@@ -19,13 +19,15 @@
             <label><input type="checkbox" class='reveal' value="" id='planet-toggle' disabled='disabled'>Highlight planets</label> <span id='planet-warning'>(No time/place selected)</span>
           </div>
         </div>
-        <div id='celestial-info' class='info'>
-          <div class='info-header'>
-            <h4 id='celestial-div-instructions' class='text-center'>Click a sky object for more information.</h4>
+        <div id='celestial-data'>
+          <div id='celestial-info' class='info'>
+            <div class='info-header'>
+              <h4 id='celestial-div-instructions' class='text-center'>Click a sky object for more information.</h4>
+            </div>
+            <table class='table table-responsive table-condensed info-table'></table>
           </div>
-          <table class='table table-responsive table-condensed info-table'></table>
-        </div>
-        <div id='celestial-definitions' class='info'><h4 id='celestial-term-instructions' class='text-center'>Click a word for the definition.</h4>
+          <div id='celestial-definitions' class='info'><h4 id='celestial-term-instructions' class='text-center'>Click a word for the definition.</h4>
+          </div>
         </div>
       </div>
     </div>

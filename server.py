@@ -54,4 +54,4 @@ if __name__ == '__main__':
     # Use the DebugToolbar
     # DebugToolbarExtension(app)
 
-    app.run(port=5005)
+    app.run(port=5010)

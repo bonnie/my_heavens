@@ -163,7 +163,7 @@ class ConstBoundVertex(db.Model):
 ##############################################################################
 # Helper functions
 
-def connect_to_db(app, db_uri='postgresql:///star_chart'):
+def connect_to_db(app, db_uri='postgresql:///star_charts_flat'):
     """Connect the database to our Flask app."""
 
     # Configure to use our PostgreSQL database

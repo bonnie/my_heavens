@@ -6,4 +6,46 @@ html {
 body {
     height: 100%;
     width: 100%;
+    font-family: 'Lato', sans-serif;
+}
+
+h3 {
+    font-family: 'Forum', cursive;
+    font-size: 200%;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.daymode, .daymode a {
+    color: #bbb;
+    fill: #bbb;
+}
+
+.nightmode, .nightmode a {
+    color: #a53529;
+    fill: #a53529;
+}
+
+.daymode div.info {
+    border: 2px solid #bbb;
+}
+
+.nightmode div.info {
+    border: 2px solid #a53529;
+}
+
+.daymode button {
+    background-color: #bbb;
+}
+
+.nightmode button {
+    background-color: #a53529;
+}
+
+.daymode a:hover, .daymode .term:hover{
+    color: white;
+}
+
+.nightmode a:hover, .nightmode .term:hover {
+    color: #e24f3f;
 }

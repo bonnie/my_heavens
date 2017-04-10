@@ -1,14 +1,5 @@
 body {
-    font-family: 'Lato', sans-serif;
     background-image: url('/static/images/assault.png');
-    color: #bbb;
-}
-
-h3 {
-    font-family: 'Forum', cursive;
-    font-size: 200%;
-    margin-top: 10px;
-    margin-bottom: 5px;
 }
 
 #dateloc-form-cancel, #datetime-form-group, #dateloc-info, #error {

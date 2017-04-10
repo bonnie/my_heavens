@@ -56,8 +56,8 @@ function switchTab(tab) {
 // openNav and closeNav adapted from
 // https://www.w3schools.com/howto/tryit.asp?filename=tryhow_js_sidenav
 function openNav() {
-    $('#main-sidenav').css('width', '150px');
-    $('#main-sidenav').css('height', '150px');
+    $('#main-sidenav').css('width', '200px');
+    $('#main-sidenav').css('height', '200px');
 }
 
 function closeNav() {

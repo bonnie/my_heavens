@@ -151,6 +151,24 @@ var addDefinitionOnclick = function() {
         populateDefinition(term);
     });
 
+}
+
+var toggleNightMode = function() {
+
+    // close the sidenav
+    closeNav();
+
+    var changeFrom, changeTo;
+
+    if ($('.nightmode').length > 0) {
+        changeFrom = 'nightmode';
+        changeTo = 'daymode';
+    } else {
+        changeFrom = 'daymode';
+        changeTo = 'nightmode';
+    }
+
+    $('.' + changeFrom).removeClass(changeFrom).addClass(changeTo);
 
 }
 

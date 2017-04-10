@@ -22,15 +22,16 @@
   <link rel="icon" href="/static/images/favicon.ico?" type="image/x-icon">
 
 </head>
-<body>
+<body class='daymode'>
 
     <!-- side nav bar -->
     <div id="main-sidenav" class="sidenav">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-      <span class='tab-link' href="/">Home</span>
-      <span class='tab-link' href="/stars.html">Star&nbsp;Map</span>
-      <span class='tab-link' href="/glossary.html">Glossary</span>
-      <span class='tab-link' href="/about.html">About</span>
+      <span class='menu-item tab-link' href="/">Home</span>
+      <span class='menu-item tab-link' href="/stars.html">Star&nbsp;Map</span>
+      <span class='menu-item tab-link' href="/glossary.html">Glossary</span>
+      <span class='menu-item tab-link' href="/about.html">About</span>
+      <span class='menu-item nightmode-option' onclick="toggleNightMode()">Night Mode</span>
     </div>
 
     <span id='hamburger' class='collapse-sidenav' onclick="openNav()">&#9776;</span>

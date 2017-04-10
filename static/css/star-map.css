@@ -33,7 +33,6 @@ g.constellation-group {
 text.sky-label {
     pointer-events: none; /* let mouse events pass through */
     opacity:0;
-    fill: #fff;
 }
 
 text.constellation-label {
@@ -42,7 +41,6 @@ text.constellation-label {
 }
 
 .term:hover {
-    color: #fff;
     cursor: pointer;
 }
 
@@ -51,7 +49,6 @@ text.constellation-label {
 }
 
 div.info {
-    border: 2px solid #bbb;
     padding: 10px;
     margin: 10px;
 }

@@ -146,7 +146,7 @@ var addDefinitionOnclick = function() {
     // add the on click listener for the clickable-terms, which come and go from
     // the page frequently. 
 
-    $('#celestial-data').on('click', '.term', function() {
+    $('#controls').on('click', '.term', function() {
         var term = $(this).html().toLowerCase();
         populateDefinition(term);
     });
@@ -161,9 +161,11 @@ var toggleNightMode = function() {
     var changeFrom, changeTo;
 
     if ($('.nightmode').length > 0) {
+        $('.nightmode-option').html('Enable Night Mode');
         changeFrom = 'nightmode';
         changeTo = 'daymode';
     } else {
+        $('.nightmode-option').html('Disable Night Mode');
         changeFrom = 'daymode';
         changeTo = 'nightmode';
     }

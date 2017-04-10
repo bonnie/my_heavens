@@ -49,3 +49,39 @@ h3 {
 .nightmode a:hover, .nightmode .term:hover {
     color: #e24f3f;
 }
+
+.daymode .table>tbody>tr>td {
+    border-top: 1px solid #bbb;
+}
+
+.nightmode .table>tbody>tr>td {
+    border-top: 1px solid #a53529;
+}
+
+.daymode input.form-control, .daymode .pac-container{
+    background-color: #333;
+    color: #eee;
+}
+
+.nightmode input.form-control, .nightmode .pac-container {
+    background-color: black;
+    border: 1px solid #333;
+}
+
+/* google autocomplete */
+.daymode .pac-item-query {
+    color: #eee;
+}
+
+.nightmode .pac-item-query {
+    color: #a53529;
+}
+
+.daymode .pac-item:hover, .daymode .pac-item-selected {
+    background-color: #555;
+}
+
+.nightmode .pac-item:hover, .nightmode .pac-item-selected {
+    background-color: #333;
+}
+/* end google autocomplete styling */

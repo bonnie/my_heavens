@@ -1,4 +1,4 @@
-"""Flask web server for star charts app
+"""Flask web server for my heavens app
 
     Copyright (c) 2017 Bonnie Schulkin
 

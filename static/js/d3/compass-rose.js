@@ -40,7 +40,7 @@ var drawCompass = function() {
         compassRoseGrp.remove();
     }
 
-    // var fillColor = '#bbb';
+    var fillColor = '#bbb';
 
     // important dimenstions for the compass
     var compassSize = skyRadius / 5;
@@ -74,7 +74,7 @@ var drawCompass = function() {
                     .attr("points",function(d) {return d.join(" ");})
                     // .attr('stroke', 'white')
                     // .attr('stroke-width', 1)
-                    // .attr('fill', fillColor)
+                    .attr('fill', fillColor)
                     .attr('class', 'compass-spike daymode')
                     .attr('transform', rotateString(i * 90, compCent));
         filledElements.push(compassSpike);
@@ -87,7 +87,7 @@ var drawCompass = function() {
                     .attr('transform', translateText(i, compCent))
                     .attr('text-anchor', function(d) {return d.anchor;})
                     .attr('alignment-baseline', function(d) {return d.baseAlign;})
-                    // .attr('fill', fillColor)
+                    .attr('fill', fillColor)
                     .attr('class', 'compass-letter daymode');
         filledElements.push(compassLetter);
     }
@@ -106,8 +106,8 @@ var drawCompass = function() {
     compassRoseGrp.attr('transform', roseTranslation);
 
     // create effects
-    compassRoseGrp.on('mouseover', function() { transitionCompassRing(filledElements, 'mouseover'); })
-    compassRoseGrp.on('mouseout', function() { transitionCompassRing(filledElements, 'mouseout'); })
+    compassRoseGrp.on('mouseover', function() { transitionCompassRing(filledElements, 'white'); })
+    compassRoseGrp.on('mouseout', function() { transitionCompassRing(filledElements, fillColor); })
     compassRoseGrp.on('click', function() { populateDefinition('compass'); })
 
     // finally, define the global variable so this can be shown/hidden from 

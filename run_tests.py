@@ -22,6 +22,8 @@ organization). It also holds common constants.
 
 """
 
+# TODO: use Travis for continuous integration
+
 import unittest
 from model import db, connect_to_db 
 from server import app

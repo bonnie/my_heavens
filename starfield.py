@@ -267,7 +267,6 @@ class StarField(object):
         # set attributes for sun and moon for later use
         if pla.name == 'Sun':
             self.sun = pla
-            print "sun alt/az in get_planet_data: {}/{}".format(pla.alt, pla.az)
 
         if pla.name == 'Moon':
             self.moon = pla
@@ -315,10 +314,6 @@ class StarField(object):
         # otherwise it's in between
         next_new = ephem.next_new_moon(self.ephem.date)
         next_full = ephem.next_full_moon(self.ephem.date)
-
-        print "now {}".format(self.ephem.date)
-        print "next_new {}".format(next_new)
-        print "next_full {}".format(next_full)
 
         if next_new < next_full:
             growth = 'waning'

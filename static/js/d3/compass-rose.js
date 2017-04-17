@@ -37,13 +37,15 @@ var translateText = function(i, compCent) {
     return 'translate(' + x + ',' + y + ')';
 };
 
-var transitionCompassRing = function(elements, fillColor) {
+var transitionCompassRing = function(elements, mouseIn) {
     // change fill color in array of elements on mouse over
+    // mouseIn is true for mouseover, false for mouseout
+
+    var oldClass = mouseIn ? 'compass' : 'compass-hover';
+    var newClass = mouseIn ? 'compass-hover' : 'compass';
 
     for (var i=0; i<elements.length; i++) {
-        elements[i].transition()
-            .duration(200)
-            .style("fill", fillColor);
+        elements[i].classed(oldClass, false).classed(newClass, true);
     }
 
 }
@@ -58,8 +60,6 @@ var drawCompass = function() {
         compassRoseGrp.remove();
     }
 
-    var fillColor = '#bbb';
-
     // important dimenstions for the compass
     var compassSize = skyRadius / 5;
     var compCent = compassSize / 2;
@@ -71,7 +71,7 @@ var drawCompass = function() {
 
     compassRoseGrp = svgContainer.append('g')
             .attr('id', 'compass-rose')
-            .attr('class', 'compass-rose');
+            .attr('class', 'compass compass-rose');
 
     var polyPoints = [[compCent, compCent],
                   [compCent, 0],
@@ -92,8 +92,8 @@ var drawCompass = function() {
                     .attr("points",function(d) {return d.join(" ");})
                     // .attr('stroke', 'white')
                     // .attr('stroke-width', 1)
-                    .attr('fill', fillColor)
-                    .attr('class', 'compass-spike daymode')
+                    // .attr('fill', fillColor)
+                    .attr('class', 'compass compass-spike')
                     .attr('transform', rotateString(i * 90, compCent));
         filledElements.push(compassSpike);
 
@@ -105,8 +105,8 @@ var drawCompass = function() {
                     .attr('transform', translateText(i, compCent))
                     .attr('text-anchor', function(d) {return d.anchor;})
                     .attr('alignment-baseline', function(d) {return d.baseAlign;})
-                    .attr('fill', fillColor)
-                    .attr('class', 'compass-letter daymode');
+                    // .attr('fill', fillColor)
+                    .attr('class', 'compass compass-letter');
         filledElements.push(compassLetter);
     }
 
@@ -124,8 +124,8 @@ var drawCompass = function() {
     compassRoseGrp.attr('transform', roseTranslation);
 
     // create effects
-    compassRoseGrp.on('mouseover', function() { transitionCompassRing(filledElements, 'white'); })
-    compassRoseGrp.on('mouseout', function() { transitionCompassRing(filledElements, fillColor); })
+    compassRoseGrp.on('mouseover', function() { transitionCompassRing(filledElements, true); })
+    compassRoseGrp.on('mouseout', function() { transitionCompassRing(filledElements, false); })
     compassRoseGrp.on('click', function() { populateDefinition('compass'); })
 
     // finally, define the global variable so this can be shown/hidden from 

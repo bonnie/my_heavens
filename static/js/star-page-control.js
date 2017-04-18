@@ -194,9 +194,8 @@ var toggleNightMode = function() {
     $('.' + changeFrom).removeClass(changeFrom).addClass(changeTo);
 
     // some things can't be controlled by css alone; need redrawing
-    // redrawStars defined in stars.js
-    redrawStars();
-
+    // redrawSkyObjects defined in d3-main.js
+    redrawSkyObjects();
 }
 
 $(document).ready(function() {

@@ -133,10 +133,15 @@ var svgSetDimensions = function() {
     }
 
     // finally, draw constellations and redraw the stars with labels on top of them
-    $('#all-sky-objects').empty();
-    drawSkyObjects();
+    redrawSkyObjects();
     drawCompass();
 
+}
+
+var redrawSkyObjects = function() {
+    // erase and redraw the sky
+    $('#all-sky-objects').empty();
+    drawSkyObjects();
 }
 
 var getSkyRadius = function() {

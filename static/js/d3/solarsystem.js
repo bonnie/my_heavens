@@ -198,11 +198,10 @@ var drawMoon = function(mode) {
 
   // create the moon sphere
   var moon = skyObjects.append("path")
-      .datum({type: "Sphere"})
-      .attr("id", "moon-sphere")
+      .datum({type: 'Sphere'})
+      .attr('id', 'moon-sphere')
       .attr('class', 'item-surround')
       .attr("d", function(d) { return moonPath(d); })
-      .attr('fill', 'white')
       .attr('opacity', 0.1);
 
 
@@ -219,7 +218,7 @@ var drawMoon = function(mode) {
   skyObjects.append('path')
       .datum(litHemisphere)
       .attr("d", function(d) { return moonPath(d); })
-      .attr('fill', 'white')
+      // .attr('fill', 'white')
       .attr('class', 'lit-moon');
 
   var moonLabel = skyObjects.append('text')

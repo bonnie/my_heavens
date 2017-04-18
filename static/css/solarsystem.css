@@ -1,0 +1,11 @@
+/* start: night/day mode */
+
+.daymode .lit-moon {
+    fill: #fff;
+}
+
+.nightmode .lit-moon {
+    fill: #a53529;
+}
+
+/* end: night/day mode */

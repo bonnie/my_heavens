@@ -17,10 +17,11 @@
     along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* adapted from 
+/* (loosely) adapted from 
 http://www.csscheckbox.com/css-radio-button/39898/ultra-minimal-green-and-grey/ */
 
-input[type=radio].css-radio-checkbox {
+/* generally hiding default html */
+input[type=radio].css-input, input[type=checkbox].css-input {
     position:absolute;
     z-index:-1000;
     left:-1000px;
@@ -33,25 +34,8 @@ input[type=radio].css-radio-checkbox {
     border:0;
 }
 
-input[type=radio].css-radio-checkbox + label.css-radio-label {
-    padding-left:17px;
-    min-height:12px;
-    max-height:12px;
-    display:inline-block;
-    line-height:14px;
-    background-repeat:no-repeat;
-    background-position: 0 0;
-    font-size:14px;
-    vertical-align:middle;
-    cursor:pointer;
-}
-
-input[type=radio].css-radio-checkbox:checked + label.css-radio-label {
-    background-position: 0 -12px;
-}
-
-label.css-radio-label {
-    background-image:url('/static/images/radio.png');
+/* label requirements */
+label.css-label {
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -59,3 +43,105 @@ label.css-radio-label {
     -ms-user-select: none;
     user-select: none;
 }
+
+/* radio buttons */
+input[type=radio].css-radio + label.css-radio-label {
+    padding-left:17px;
+    min-height:14px;
+    max-height:14px;
+    display:inline-block;
+    line-height:14px;
+    font-size:14px;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+div.css-radio-box {
+    display: inline-block;
+    background-color: #777;
+    border-radius: 50%;
+    height: 12px;
+    width: 12px;
+    margin-top: -1px;
+    margin-bottom: -1px;
+    margin-right: 2px;
+}
+
+.daymode input[type=radio].css-radio:checked + label.css-radio-label div.css-radio-box {
+    background-color: #59b300;
+}
+
+.nightmode input[type=radio].css-radio:checked + label.css-radio-label div.css-radio-box {
+    background-color: #e24f3f;
+}
+
+/* end: radio buttons */
+
+/* checkboxes */
+
+input[type=checkbox].css-checkbox + label.css-checkbox-label {
+    min-height:14px;
+    max-height:14px;
+    display:inline-block;
+    line-height:14px;
+    font-size:14px;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+div.css-checkbox-box {
+    display: inline-block;
+    border-radius: 15%;
+    height: 12px;
+    margin-right: 2px;
+}
+
+div.css-checkbox-container {
+    width: 24px;
+}
+
+.daymode div.css-checkbox-container {
+    background-color: #333;
+}
+
+.nightmode div.css-checkbox-container {
+    background-color: #290908;
+}
+
+div.css-checkbox-slider {
+    width: 12px;
+    margin-left: 0;
+    margin-right: 12px;
+}
+
+.daymode div.css-checkbox-slider {
+    background-color: #ccc;
+}
+
+.nightmode div.css-checkbox-slider {
+    background-color: #333;
+}
+
+.daymode input[type=checkbox].css-checkbox:checked + label.css-checkbox-label div.css-checkbox-slider {
+    background-color: #59b300;
+}
+
+.nightmode input[type=checkbox].css-checkbox:checked + label.css-checkbox-label div.css-checkbox-slider {
+    background-color: #a53529;
+}
+
+input[type=checkbox].css-checkbox:checked + label.css-checkbox-label div.css-checkbox-slider {
+    margin-left: 12px;
+    margin-right: 0;
+}
+
+label.css-checkbox-label {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* end: checkboxes */

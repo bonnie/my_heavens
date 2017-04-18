@@ -29,11 +29,25 @@
           <div class='text-center'><button id='dateloc-change-btn' class='btn'>Change</button></div>
         </div>
         <div id='starfield-controls' class='info'>
-          <div class="checkbox">
-            <label><input type="checkbox" class='reveal' value="" id='ecliptic-toggle'>Reveal</label> <span class='term'>ecliptic</span>
+          <div class='checkbox'>
+            <input type='checkbox' class='reveal css-checkbox css-input' value='' id='ecliptic-toggle'>
+            <label for='ecliptic-toggle' class='css-checkbox-label css-label'>
+              <div class='css-checkbox-container css-checkbox-box'>
+                <div class='css-checkbox-slider css-checkbox-box'></div>    
+              </div>
+              Reveal
+            </label>
+            <span class='term'>ecliptic</span>
           </div>
-          <div class="checkbox">
-            <label><input type="checkbox" class='reveal' value="" id='planet-toggle' disabled='disabled'>Highlight planets</label> <span id='planet-warning'>(No time/place selected)</span>
+          <div class='checkbox'>
+            <input type='checkbox' class='reveal css-checkbox css-input' value='' id='planet-toggle' disabled='disabled'>
+            <label for='planet-toggle' class='css-checkbox-label css-label'>
+              <div class='css-checkbox-container css-checkbox-box'>
+                <div class='css-checkbox-slider css-checkbox-box'></div>    
+              </div>
+              Highlight planets
+            </label>
+            <span id='planet-warning'>(No time/place selected)</span>
           </div>
         </div>
         <div id='celestial-data'>

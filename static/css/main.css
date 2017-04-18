@@ -26,6 +26,8 @@ body {
     height: 100%;
     width: 100%;
     font-family: 'Lato', sans-serif;
+    background-image: url('/static/images/assault.png');
+    background-color: #1a1a1a;
 }
 
 h3 {

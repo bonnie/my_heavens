@@ -17,10 +17,6 @@
     along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 */
 
-body {
-    background-image: url('/static/images/assault.png');
-}
-
 #dateloc-form-cancel, #datetime-form-group, #dateloc-info, #error {
     display: none;
 }

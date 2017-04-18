@@ -1,0 +1,61 @@
+/*
+    Copyright (c) 2017 Bonnie Schulkin
+
+    This file is part of My Heavens.
+
+    My Heavens is free software: you can redistribute it and/or modify it under
+    the terms of the GNU Affero General Public License as published by the Free
+    Software Foundation, either version 3 of the License, or (at your option)
+    any later version.
+
+    My Heavens is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
+    for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/* adapted from 
+http://www.csscheckbox.com/css-radio-button/39898/ultra-minimal-green-and-grey/ */
+
+input[type=radio].css-radio-checkbox {
+    position:absolute;
+    z-index:-1000;
+    left:-1000px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    height:1px;
+    width:1px;
+    margin:-1px;
+    padding:0;
+    border:0;
+}
+
+input[type=radio].css-radio-checkbox + label.css-radio-label {
+    padding-left:17px;
+    min-height:12px;
+    max-height:12px;
+    display:inline-block;
+    line-height:14px;
+    background-repeat:no-repeat;
+    background-position: 0 0;
+    font-size:14px;
+    vertical-align:middle;
+    cursor:pointer;
+}
+
+input[type=radio].css-radio-checkbox:checked + label.css-radio-label {
+    background-position: 0 -12px;
+}
+
+label.css-radio-label {
+    background-image:url('/static/images/radio.png');
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}

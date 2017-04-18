@@ -25,3 +25,21 @@
 .compass-rose {
     cursor: pointer;
 }
+
+/* start: night / day mode */
+.daymode .compass {
+    fill: #bbb;
+}
+
+.daymode .compass-hover {
+    fill: #fff;
+}
+
+.nightmode .compass {
+    fill: #a53529;
+}
+
+.nightmode .compass-hover {
+    fill: #e24f3f;
+}
+/* end: night / day mode */

@@ -1,0 +1,19 @@
+/* start: night/day mode */
+
+.daymode .sky-background.day-sky {
+    fill: #4169E1;
+}
+
+.daymode .sky-background.night-sky {
+    fill: url(#radial-gradient);
+}
+
+.nightmode .sky-background.day-sky {
+    fill: #290908;
+}
+
+.nightmode .sky-background.night-sky {
+    fill: #000;
+}
+
+/* end: night/day mode */

@@ -43,3 +43,10 @@ var drawStars = function(mode) {
     renderSkyObjectList(starParams);
 
 };
+
+var redrawStars = function() {
+    // for redrawing stars upon changing to / from night mode
+
+    $('.star-group').remove()
+    drawStars();
+}

@@ -44,3 +44,8 @@ input[type:radio] {
 p.definition {
     font-size: 110%;
 }
+
+#planet-warning {
+    font-style: italic;
+    opacity: 0.7;
+}

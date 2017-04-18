@@ -67,7 +67,8 @@ $(document).ready(function() {
     skyBackground = svgContainer.append('circle')
                                 .attr('stroke-width', 3)
                                 .attr('stroke-color', 'black')
-                                .attr('id', 'sky-background');
+                                .attr('id', 'sky-background')
+                                .attr('class', 'sky-background');
 
 
     // for svg definitions
@@ -528,8 +529,16 @@ var renderSkyObject = function(params) {
                                 .attr('d', function(d){
                                     skyPath.pointRadius(d.properties.radius);
                                     return skyPath(d); })
-                                .attr('fill', d.color)
                                 .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
+
+            // color according to star color in day mode; night mode color in night mode
+            if ($('body').hasClass('daymode')) {
+                itemCircle.attr('fill', d.color)
+            } else {
+                // nightModeColor defined in star-page-control.js
+                itemCircle.attr('fill', nightModeColor)
+            }
+
 
 
             if (params.mode !== 'transition' && d.name !== null) {

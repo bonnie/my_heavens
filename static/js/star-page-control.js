@@ -34,6 +34,10 @@ var skyRadius;
 // global for terms dictionary
 var termDict;
 
+// for night mode colors
+var nightModeColor = '#a53529';
+// var nightModeHighlightColor = '#e24f3f';
+
 var displayError = function(error) {
 
     errorDiv.show();
@@ -188,6 +192,10 @@ var toggleNightMode = function() {
     }
 
     $('.' + changeFrom).removeClass(changeFrom).addClass(changeTo);
+
+    // some things can't be controlled by css alone; need redrawing
+    // redrawStars defined in stars.js
+    redrawStars();
 
 }
 

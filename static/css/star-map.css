@@ -31,23 +31,6 @@ svg.star-circle {
     padding-top: 15px;
 }
 
-/* make sure our constellation groups recognize mouseover events */
-g.constellation-group {
-    pointer-events: all;
-}
-
-.constellation-bounds {
-    stroke: #009;
-    stroke-width: 1;
-    fill-opacity: 0;
-}
-
-.constellation-line {
-    stroke: #333;
-    stroke-width: 2;
-    fill-opacity: 0;
-}
-
 /* info labels */
 text.sky-label {
     pointer-events: none; /* let mouse events pass through */
@@ -74,11 +57,6 @@ div.info {
 
 .star, .planet, .lit-moon, .planet-highlight {
     pointer-events: none;
-}
-
-#planet-warning {
-    font-style: italic;
-    opacity: 0.7;
 }
 
 .item-surround {

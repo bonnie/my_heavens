@@ -22,17 +22,27 @@
 'use strict';
 
 
-function printSkyBackground(sunInSky) {
-    // print the sky background as light blue or a dark gradient, depending on 
-    // whether the sun is in the sky 
-    // sunInSky is a boolean indicating whether sun is visible or not
+function updateSkyBackground(sunInSky) {
+    // determine sky background color based on whether sun is in sky and night
+    // mode is enabled
 
-    // uses global skyBackground and element #radial-gradient from d3-main.js
+    // sunInSky is a boolean indicating whether the sun is in the sky
+    // colors are all taken care of by css, for ease of switching between 
+    // night mode and day mode.
 
-    // will be gradient or light blue depending on whether it's daytime
-    var daySkyColor = '#4169E1';
-    var skyFill = sunInSky ? daySkyColor : "url(#radial-gradient)";
-    skyBackground.style("fill", skyFill);
+    var oldClass = sunInSky ? 'night-sky' : 'day-sky';
+    var newClass = sunInSky ? 'day-sky' : 'night-sky';
+
+    svgContainer.select('.sky-background')
+                .classed(oldClass, false)
+                .classed(newClass, true);
+
+
+    // if (sunInSky) {
+    //     $('.sky-background').addClass('day-sky').removeClass('night-sky');
+    // } else {
+    //     $('.sky-background').addClass('night-sky').removeClass('day-sky');
+    // }
 
 }
 
@@ -71,7 +81,7 @@ var drawSky = function(skyData) {
     };
 
     // print the background
-    printSkyBackground();
+    updateSkyBackground();
 
     // for zooming, make a group for all the contents of the skySphere
     // globally scoped

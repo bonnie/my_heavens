@@ -1,0 +1,35 @@
+/* make sure our constellation groups recognize mouseover events */
+g.constellation-group {
+    pointer-events: all;
+}
+
+.constellation-line {
+    fill-opacity: 0;
+}
+
+.constellation-bounds {
+    stroke-width: 1;
+    fill-opacity: 0;
+}
+
+/* start: night/day mode */
+
+.daymode .constellation-bounds {
+    stroke: #009;
+}
+
+.nightmode .constellation-bounds {
+    stroke: #333;
+}
+
+.daymode .constellation-line {
+    stroke-width: 2;
+    stroke: #333;
+}
+
+.nightmode .constellation-line {
+    stroke-width: 1;
+    stroke: #a53529;
+}
+
+/* end: night/day mode */

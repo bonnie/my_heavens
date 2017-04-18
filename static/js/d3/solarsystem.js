@@ -238,7 +238,7 @@ var drawSun = function(mode) {
 
   var sunPoint = renderSingleSkyObject(sunParams);
   var sunInSky = isVisible(sunPoint);
-  printSkyBackground(sunInSky, mode);
+  updateSkyBackground(sunInSky, mode);
 
 };
 

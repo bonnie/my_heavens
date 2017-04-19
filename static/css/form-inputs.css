@@ -20,6 +20,9 @@
 /* (loosely) adapted from 
 http://www.csscheckbox.com/css-radio-button/39898/ultra-minimal-green-and-grey/ */
 
+/* TODO: integrate this: http://www.css3.com/implementing-custom-checkboxes-and-radio-buttons-with-css3/
+*/
+
 /* hide default html inputs */
 input[type=radio].css-input, input[type=checkbox].css-input {
     display: none;

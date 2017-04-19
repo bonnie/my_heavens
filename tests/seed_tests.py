@@ -34,19 +34,17 @@ from run_tests import TESTDATA_DIR, DbTestCase
 class SeedTestsWithoutDb(TestCase):
     """Test the 'helper' functions that don't need the database."""
 
-    def test_hrs_to_degrees_pos(self):
-        """Test translation of RA in hours to degrees for positive RA"""
+    def test_get_degrees_from_hours_and_invert_pos(self):
+        """Test translation of RA in hours to inverted degrees for positive RA"""
 
-        deg = seed.get_degrees_from_hours(3)
-        self.assertEqual(deg, 90)
+        deg = seed.get_degrees_from_hours_and_invert(6)
+        self.assertEqual(deg, 270)
 
+    def test_get_degrees_from_hours_and_invert_zero(self):
+        """Test translation of RA in hours to inverted degrees for zero RA"""
 
-    def test_hrs_to_degrees_pos(self):
-        """Test translation of RA in hours to degrees for zero RA"""
-
-        deg = seed.get_degrees_from_hours(0)
-        self.assertEqual(deg, 0)
-
+        deg = seed.get_degrees_from_hours_and_invert(0)
+        self.assertEqual(deg, 360)
 
     def test_open_datafile(self):
         """Test the function that locates and opens the file."""
@@ -57,13 +55,11 @@ class SeedTestsWithoutDb(TestCase):
         # check that it's a csv with the appropriate number of columns
         self.assertEqual(len(first_line_tokens), 14)
 
-
     def test_get_color_fullyknown(self):
         """Test getting a color for a known spectral class."""
 
         color = seed.get_color('B2III SB    ')
         self.assertEqual(color, '#9fb4ff')
-
 
     def test_get_color_letterknown(self):
         """Test getting a color for a spectral class only whose letter is known."""
@@ -74,13 +70,11 @@ class SeedTestsWithoutDb(TestCase):
         O9_colors = ['#9bb0ff', '#a4b9ff', '#9eb1ff', '#a4baff']
         self.assertIn(color, O9_colors)
 
-
     def test_get_color_unknown(self):
         """Test getting a color for a spectral class only whose letter is known."""
 
         color = seed.get_color('Am...       ')
         self.assertEqual(color, '#ffffff')
-
 
     def test_get_name_and_constellation_name(self):
         """Test extracting the name and constellation for stars with an explicit name.""" 
@@ -92,7 +86,6 @@ class SeedTestsWithoutDb(TestCase):
         self.assertEqual(name, 'Antares')
         self.assertEqual(const, 'SCO')
 
-
     def test_get_name_and_constellation_bfname(self):
         """Test extracting the name and constellation for stars with out an explicit name.""" 
 
@@ -103,7 +96,6 @@ class SeedTestsWithoutDb(TestCase):
         self.assertEqual(name, 'Xi Ori')
         self.assertEqual(const, 'ORI')
 
-
     def test_get_name_and_constellation_bfname_no_leading_number(self):
         """Test extracting the name and constellation for stars without an explicit name; BF data has no leading number.""" 
 
@@ -113,7 +105,6 @@ class SeedTestsWithoutDb(TestCase):
         name, const = seed.get_name_and_constellation(star_info)
         self.assertEqual(name, 'Del2Tel')
         self.assertEqual(const, 'TEL')
-
 
     def test_get_name_and_constellation_noname(self):
         """Test extracting the name and constellation for stars without an explicit name.""" 
@@ -133,30 +124,31 @@ class SeedTestsWithDb(DbTestCase):
     dbTestCase
     """
 
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(SeedTestsWithDb, cls).setUpClass()
+
+        # a bounds vertex for orion
+        cls.bv_ra = 271.750
+        cls.bv_dec = 21.500
+
     def test_get_bounds_vertex_not_exists(self):
         """Test code to detect an existing constellation bounds vertex."""
 
-        # bounds vertex for Orion
-        ra = 1.2086413796706992
-        dec = 0.27052603405912107
-
-        new_vertex = seed.get_bounds_vertex(ra, dec)
+        new_vertex = seed.get_bounds_vertex(self.bv_ra, self.bv_dec)
         self.assertIsInstance(new_vertex, BoundVertex)        
-
 
     def test_get_bounds_vertex_exists(self):
         """Test code to detect an existing constellation bounds vertex."""
 
-        # bounds vertex for Orion
-        ra = 1.2086413796706992
-        dec = 0.27052603405912107
-
         # create the vertex in the db
-        vertex = BoundVertex(ra=ra, dec=dec)
+        vertex = BoundVertex(ra=self.bv_ra, dec=self.bv_dec)
         db.session.add(vertex)
         db.session.commit
 
-        matched_vertex = seed.get_bounds_vertex(ra, dec)
+        matched_vertex = seed.get_bounds_vertex(self.bv_ra, self.bv_dec)
         self.assertIsInstance(matched_vertex, BoundVertex)
 
 
@@ -172,7 +164,6 @@ class SeedConstellationTests(DbTestCase):
         super(SeedConstellationTests, cls).setUpClass()
         seed.load_constellations(TESTDATA_DIR)
 
-
     def test_load_constellations(self):
         """Test code to load constellations into db."""
 
@@ -183,7 +174,6 @@ class SeedConstellationTests(DbTestCase):
         orion = Constellation.query.filter_by(const_code='ORI').one()
         self.assertEqual(orion.const_code, 'ORI')
         self.assertEqual(orion.name, 'Orion')
-
 
     def test_load_const_boundaries(self):
         """Test code to load the constellation boundaries into the database."""
@@ -210,7 +200,6 @@ class SeedStarTests(DbTestCase):
         seed.load_constellations(TESTDATA_DIR)
         seed.load_stars(TESTDATA_DIR)
 
-
     def test_star_data(self):
         """Test code to load stars into the databse."""
 
@@ -220,7 +209,6 @@ class SeedStarTests(DbTestCase):
         self.assertEqual(float(rigel.magnitude), 0.18)
         self.assertEqual(rigel.spectrum, 'B8Ia')
         self.assertEqual(rigel.color, '#b6ceff')
-
 
     def test_degree_range(self):
         """Make sure all the ra and decs in the db are in degree range."""
@@ -239,7 +227,7 @@ class SeedStarTests(DbTestCase):
         code.
         """
 
-        ra_in_deg = seed.get_degrees_from_hours(ra)
+        ra_in_deg = seed.get_degrees_from_hours_and_invert(ra)
         star = seed.get_matching_star(ra_in_deg, dec, mag)
 
         self.assertIsInstance(star, Star)
@@ -256,7 +244,6 @@ class SeedStarTests(DbTestCase):
 
         self.matching_star_test(ra, dec, mag, 'Betelgeuse')
 
-
     def test_get_matching_star_no_mag(self):
         """Test finding a matching star by RA, dec when there's no mag match"""
 
@@ -266,7 +253,6 @@ class SeedStarTests(DbTestCase):
         mag = 4.60
 
         self.matching_star_test(ra, dec, mag, 'Bet Mon')
-
 
     def test_get_matching_star_brightest(self):
         """Test finding a matching star by RA, dec when there's more than one match"""

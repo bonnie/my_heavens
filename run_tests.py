@@ -22,13 +22,10 @@ organization). It also holds common constants.
 
 """
 
-# TODO: use Travis for continuous integration
-
 import unittest
 from model import db, connect_to_db 
 from server import app
 from seed import load_seed_data
-
 
 TESTDB_URI = 'postgresql:///star_tests'
 TESTDATA_DIR = 'tests/test_data'
@@ -89,10 +86,10 @@ class DbTestCase(MarginTestCase):
 if __name__ == '__main__':
 
     # import the tests
-    from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
-        SeedConstellationTests, SeedStarTests, SeedConstLineTests
-    # from tests.starfield_tests import StarFieldTestsWithoutDb, \
-    #     StarFieldStarDataTests, StarFieldConstellationDataTests
+    # from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
+    #     SeedConstellationTests, SeedStarTests, SeedConstLineTests
+    from tests.starfield_tests import StarFieldTestsWithoutDb, \
+        StarFieldStarDataTests, StarFieldConstellationDataTests
     # from tests.flask_tests import FlaskTests, FlaskTestsWithDb
 
     # run the tests

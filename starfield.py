@@ -19,6 +19,7 @@
 
 """
 
+import os
 import math
 from math import sin, cos, atan2
 from datetime import datetime
@@ -31,10 +32,7 @@ from time_functions import to_utc
 from colors import PLANET_COLORS_BY_NAME
 
 # it takes some time to initialize this, so do it once when the file loads
-# and don't do it during testing where it's not necessary
-import sys
-if sys.argv[0] != 'run_tests.py':
-    TZW = tzwhere.tzwhere()
+TZW = tzwhere.tzwhere()
 
 # to determine which non-star objects to find
 PLANETS = [ephem.Mercury, ephem.Venus, ephem.Mars,
@@ -62,7 +60,7 @@ DEBUG = False
 def deg_to_rad(angle):
     """Return angle (in degrees) translated into radians"""
 
-    return angle / 180 * math.pi
+    return float(angle) / 180 * math.pi
 
 
 def rad_to_deg(angle):

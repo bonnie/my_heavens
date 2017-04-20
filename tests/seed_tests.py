@@ -20,16 +20,21 @@
 """
 
 from unittest import TestCase
+import os
 
 # be able to import from parent dir
 import sys
 sys.path.append('..')
 
-import seed
-from model import db, Constellation, Star, BoundVertex, \
-                  ConstBoundVertex, ConstLineGroup, ConstLineVertex
 from run_tests import TESTDATA_DIR, DbTestCase
 
+# don't init the tzwhere variable; it takes a lot of time and it's not necessary
+# here
+os.environ['TZW_INIT'] = "False"
+
+from model import db, Constellation, Star, BoundVertex, \
+                  ConstBoundVertex, ConstLineGroup, ConstLineVertex
+import seed
 
 class SeedTestsWithoutDb(TestCase):
     """Test the 'helper' functions that don't need the database."""

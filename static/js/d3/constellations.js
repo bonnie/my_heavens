@@ -199,10 +199,6 @@ var getLabelPosition = function(constLineMultiLine, constBoundsPolygon) {
     // if you can see the lines, place the label relative to the lines; 
     // otherwise place relative to the bounds polygon
     var boundsObj = isVisible(constLineMultiLine) ? constLineMultiLine : constBoundsPolygon;
-
-    // TODO: do a better job of positioning, for example, hydra (curled around 
-    // bottom, but label is quite far away) on Berkeley April 2, 2017 at 
-    // 12:00 AM 
     var bounds = skyPath.bounds(boundsObj);
     var minX = bounds[0][0];
     var minY = bounds[0][1];

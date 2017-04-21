@@ -33,10 +33,6 @@ td.info-table-name {
     color: black;
 }
 
-input[type:radio] {
-    background-color: #333;
-}
-
 p.definition {
     font-size: 110%;
 }

@@ -51,8 +51,8 @@ input[type=radio].css-radio + label.css-radio-label {
 }
 
 div.css-radio-box {
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.4);
     display: inline-block;
-    background-color: #777;
     border-radius: 50%;
     height: 12px;
     width: 12px;
@@ -61,12 +61,28 @@ div.css-radio-box {
     margin-right: 2px;
 }
 
-.daymode input[type=radio].css-radio:checked + label.css-radio-label div.css-radio-box {
+.daymode div.css-radio-box {
+    background-color: #444;
+}
+
+div.css-radio-inset {
+    visibility: hidden;
+    border-radius: 50%;
+    margin: 3px;
+    height: 6px;
+    width: 6px;
+}
+
+.daymode div.css-radio-inset {
     background-color: #59b300;
 }
 
-.nightmode input[type=radio].css-radio:checked + label.css-radio-label div.css-radio-box {
-    background-color: #e24f3f;
+.nightmode div.css-radio-inset {
+    background-color: #a53529;
+}
+
+input[type=radio].css-radio:checked + label.css-radio-label div.css-radio-inset {
+    visibility: visible;
 }
 
 /* end: radio buttons */
@@ -84,6 +100,7 @@ input[type=checkbox].css-checkbox + label.css-checkbox-label {
 }
 
 div.css-checkbox-box {
+    box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.4);
     display: inline-block;
     border-radius: 15%;
     height: 12px;
@@ -98,11 +115,13 @@ div.css-checkbox-container {
     background-color: #333;
 }
 
-.nightmode div.css-checkbox-container {
+.nightmode div.css-checkbox-container, div.css-radio-box {
     background-color: #290908;
 }
 
 div.css-checkbox-slider {
+    margin: 1px 0;
+    height: 10px;
     width: 12px;
     margin-left: 0;
     margin-right: 12px;

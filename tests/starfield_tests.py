@@ -326,19 +326,25 @@ class StarFieldTestsWithoutDb(MarginTestCase):
     def get_rise_set_times_test(self, stf, obj, expected_rise, expected_set):
         """Generic test to get the rise / set times."""
 
-        trise, tset = stf.get_rise_set_times(obj)
+        trise, tset = stf.get_rise_set_times(obj(stf.ephem))
         self.assertEqual(trise, expected_rise)
         self.assertEqual(tset, expected_set)
 
     def test_sf_moon_riseset(self):
         """Test rise and set times for moon for sf starfield."""
 
+        trise = '8:40 AM'
+        tset = '9:43 PM'
 
+        self.get_rise_set_times_test(SF_STF, ephem.Moon, trise, tset)
 
     def test_johannesburg_moon_riseset(self):
         """Test rise and set times for moon for johannesburg starfield."""
 
+        trise = '8:37 AM'
+        tset = '9:30 PM'
 
+        self.get_rise_set_times_test(J_STF, ephem.Moon, trise, tset)
 
     #########################################################
     # individual planet data tests
@@ -356,8 +362,11 @@ class StarFieldTestsWithoutDb(MarginTestCase):
 
         pdata = stf.get_planet_data(planet)
 
-        self.assertEqual(pdata['ra'], expected_ra)
-        self.assertEqual(pdata['dec'], expected_dec)
+        # how much 'slop' we'll allow before deciding it's the wrong answer
+        margin = 0.0001
+
+        self.assertWithinMargin(pdata['ra'], expected_ra, margin)
+        self.assertWithinMargin(pdata['dec'], expected_dec, margin)
 
     def test_sf_mars_data(self):
         """Test position of mars for SF, visible at test datetime."""

@@ -18,7 +18,7 @@
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
 from run_tests import SF_STF, J_STF, DbTestCase
-
+from stars import get_stars
 
 # Rigel
 R_RA = 1.372

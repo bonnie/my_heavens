@@ -572,9 +572,39 @@ class StarFieldTestsWithoutDb(MarginTestCase):
     def moon_rotation_test(self, stf, expected_rotation):
         """Generic test for moon rotation."""
 
+        growth, phase_phrase = stf.get_moon_phase_phrase()
+        rotation = stf.calculate_moon_angle(growth)
+        self.assertWithinMargin(rotation, expected_rotation, 0.00001)
 
-        rotation = stf.calculate_moon_angle(waxwan)
+    def waning_moon_rotation_test(self, lat, lng, expected_rotation):
+        """Generic test for a waning datetime.
 
+        (different from standard test datetime for this file)"""
+
+        wan_datetime = datetime(2017, 2, 15, 21, 0, 0)
+        wan_timestring = datetime.strftime(wan_datetime, BOOTSTRAP_DTIME_FORMAT)
+        stf = StarField(lat=lat, lng=lng, localtime_string=wan_timestring)
+        self.moon_rotation_test(stf, expected_rotation)
+
+    def test_sf_waxing_moon_rotation(self):
+        """Test rotation of moon for sf when moon is waxing."""
+
+        self.moon_rotation_test(SF_STF, 383.33266920101795)
+
+    def test_johannesburg_waxing_moon_rotation(self):
+        """Test rotation of moon for johannesburg when moon is waxing."""
+
+        self.moon_rotation_test(J_STF, 321.4308005282016)
+
+    def test_sf_waning_moon_rotation(self):
+        """Test rotation of moon for sf when moon is waning."""
+
+        self.waning_moon_rotation_test(SF_LAT, SF_LNG, -26.004438784074594)
+
+    def test_johannesburg_waning_moon_rotation(self):
+        """Test rotation of moon for johannesburg when moon is waning."""
+
+        self.waning_moon_rotation_test(J_LAT, J_LNG, 57.972361308833435)
 
     #########################################################
     # sky rotation tests

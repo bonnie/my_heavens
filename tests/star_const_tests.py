@@ -17,7 +17,8 @@
     # You should have received a copy of the GNU Affero General Public License
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
-from run_tests import SF_STF, J_STF
+from run_tests import SF_STF, J_STF, DbTestCase
+
 
 # Rigel
 R_RA = 1.372
@@ -37,8 +38,8 @@ class StarDataTests(DbTestCase):
     def setUpClass(cls):
         """Stuff to do once before running all class test methods."""
 
-        super(StarFieldStarDataTests, cls).setUpClass()
-        super(StarFieldStarDataTests, cls).load_test_data()
+        super(StarDataTests, cls).setUpClass()
+        super(StarDataTests, cls).load_test_data()
         cls.stf = SF_STF
         cls.stars = cls.stf.get_stars()
         cls.example_star = cls.stars[0]
@@ -84,8 +85,8 @@ class ConstellationDataTests(DbTestCase):
     # def setUpClass(cls):
     #     """Stuff to do once before running all class test methods."""
 
-    #     super(StarFieldConstellationDataTests, cls).setUpClass()
-    #     super(StarFieldConstellationDataTests, cls).load_test_data()
+    #     super(ConstellationDataTests, cls).setUpClass()
+    #     super(ConstellationDataTests, cls).load_test_data()
     #     cls.ori = Constellation.query.filter_by(const_code='ORI').one()
     #     cls.tel = Constellation.query.filter_by(const_code='TEL').one()
     #     cls.expected_const_keys = set(['bound_verts', 'line_groups', 'code', 'name'])

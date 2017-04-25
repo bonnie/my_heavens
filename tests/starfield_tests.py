@@ -31,7 +31,27 @@ sys.path.append('..')
 from run_tests import MarginTestCase, DbTestCase
 from model import Constellation
 from starfield import deg_to_rad, rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
-from run_tests import SF_LAT, SF_LNG, SF_STF, J_LAT, J_LNG, J_STF, TEST_DATETIME
+
+# common starfields for starfield_tests.py and star_const_tests.py
+
+MAX_MAG = 5
+
+# 9pm on March 1, 2017 (local time)
+TEST_DATETIME = datetime(2017, 3, 1, 21, 0, 0)
+TEST_DATETIME_STRING = datetime.strftime(TEST_DATETIME, BOOTSTRAP_DTIME_FORMAT)
+
+# test lat/lngs: johannesburg
+J_LAT = -26.2041
+J_LNG = 28.0473
+J_STF = StarField(lat=J_LAT, lng=J_LNG, max_mag=MAX_MAG, 
+                  localtime_string=TEST_DATETIME_STRING)
+
+# test lat/lngs: sf
+SF_LAT = 37.7749
+SF_LNG = -122.4194
+SF_STF = StarField(lat=SF_LAT, lng=SF_LNG, max_mag=MAX_MAG, 
+                    localtime_string=TEST_DATETIME_STRING)
+
 
 # acceptable margin when comparing floats
 MARGIN = 0.005

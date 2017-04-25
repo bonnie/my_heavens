@@ -609,3 +609,30 @@ class StarFieldTestsWithoutDb(MarginTestCase):
     #########################################################
     # sky rotation tests
     #########################################################
+
+    def test_sky_rotation_format(self):
+        """Test the format of the sky rotation output."""
+
+        sky_rotation = SF_STF.get_sky_rotation()
+        self.assertIsInstance(sky_rotation, dict)
+        self.assertEqual(set(sky_rotation.keys()), set(['lambda', 'phi']))
+        self.assertIsInstance(sky_rotation['lambda'], float)
+        self.assertIsInstance(sky_rotation['phi'], float)
+
+    def sky_rotation_test(self, stf, expected_lambda, expected_phi):
+        """Generic test for sky rotation."""
+
+        sky_rotation = stf.get_sky_rotation()
+        self.assertWithinMargin(sky_rotation['lambda'], expected_lambda, 0.00001)
+        self.assertWithinMargin(sky_rotation['phi'], expected_phi, 0.00001)
+
+    def test_sf_sky_rotation(self):
+        """Test sky rotation for san francisco starfield."""
+
+        self.sky_rotation_test(SF_STF, 112.76234354938829, 0 - SF_LAT)
+
+    def test_johannesburg_sky_rotation(self):
+        """Test sky rotation for johannesburg starfield."""
+
+        self.sky_rotation_test(J_STF, 112.81837654938823, 0 - J_LAT)
+   

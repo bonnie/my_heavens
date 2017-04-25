@@ -29,6 +29,11 @@ TESTDB_URI = 'postgresql:///star_tests'
 TESTDATA_DIR = 'tests/test_data'
 MAX_MAG = 5
 
+# for both planets and stars -- needed for both starfield and star_const tests
+COORDS_KEY_SET = set(['ra', 'dec'])
+SKYOBJECT_KEY_SET = COORDS_KEY_SET | set(['color', 'magnitude', 'name',
+    'distance', 'celestialType', 'distanceUnits', 'constellation'])
+
 class MarginTestCase(unittest.TestCase):
     """Parent class for tests that need a margin assertion"""
 
@@ -38,7 +43,6 @@ class MarginTestCase(unittest.TestCase):
         TODO: make custom exception here."""
 
         margin = abs(actual - expected)
-
         self.assertTrue(margin < allowed_margin)
 
 
@@ -87,8 +91,8 @@ if __name__ == '__main__':
     # import the tests
     # from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
     #     SeedConstellationTests, SeedStarTests, SeedConstLineTests
-    # from tests.starfield_tests import StarFieldTestsWithoutDb
-    from tests.star_const_tests import StarDataTests, ConstellationDataTests
+    from tests.starfield_tests import StarFieldTestsWithoutDb
+    # from tests.star_const_tests import StarDataTests, ConstellationDataTests
     # from tests.flask_tests import FlaskTests, FlaskTestsWithDb
 
     # run the tests

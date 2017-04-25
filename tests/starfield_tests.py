@@ -28,7 +28,8 @@ import ephem
 import sys
 sys.path.append('..')
 
-from run_tests import MarginTestCase, DbTestCase, MAX_MAG
+from run_tests import MarginTestCase, DbTestCase, MAX_MAG, COORDS_KEY_SET, \
+                        SKYOBJECT_KEY_SET
 from model import Constellation
 from starfield import deg_to_rad, rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
 
@@ -53,10 +54,6 @@ SF_STF = StarField(lat=SF_LAT, lng=SF_LNG, max_mag=MAX_MAG,
 MARGIN = 0.005
 
 # expected data sets
-CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium'])
-COORDS_KEY_SET = set(['ra', 'dec'])
-SKYOBJECT_KEY_SET = COORDS_KEY_SET | set(['color', 'magnitude', 'name',
-    'distance', 'celestialType', 'distanceUnits', 'constellation'])
 PLANET_KEY_SET = SKYOBJECT_KEY_SET | set(['size', 'prevRise', 'phase', 'nextSet'])
 SUN_KEY_SET = PLANET_KEY_SET
 MOON_KEY_SET = PLANET_KEY_SET | set(['colong', 'rotation'])

@@ -17,8 +17,14 @@
     # You should have received a copy of the GNU Affero General Public License
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
-from run_tests import DbTestCase, MAX_MAG
+from run_tests import DbTestCase, MAX_MAG, COORDS_KEY_SET, SKYOBJECT_KEY_SET
 from stars import get_stars
+
+# expected star dict keys
+STAR_KEY_SET = SKYOBJECT_KEY_SET | set(['specClass', 'absMagnitude'])
+
+# expected constellations
+CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium'])
 
 # Rigel
 R_RA = 1.372
@@ -43,26 +49,23 @@ class StarDataTests(DbTestCase):
         cls.stars = get_stars(MAX_MAG)
         cls.example_star = cls.stars[0]
 
-
     def test_star_count(self):
         """Test the star count for the star field."""
 
         # we expect 55 stars for the test data set, San Francisco, TEST_DATETIME
         self.assertEqual(len(self.stars), 55)
 
+    def test_star_data_type(self):
+        """Test the that the example star is a dict."""
 
-    # def test_star_data_type(self):
-    #     """Test the that the example star is a dict."""
+        self.assertIsInstance(self.example_star, dict)
 
-    #     self.assertIsInstance(self.example_star, dict)
+    def test_star_keys(self):
+        """Test the keys of the star dict of the first item in self.stars."""
 
-
-    # def test_star_keys(self):
-    #     """Test the keys of the star dict of the first item in self.stars."""
-
-    #     star_keys = set(self.example_star.keys())
-    #     expected_keys = SKYOBJECT_KEY_SET
-    #     self.assertEqual(star_keys, expected_keys)
+        star_keys = set(self.example_star.keys())
+        expected_keys = SKYOBJECT_KEY_SET
+        self.assertEqual(star_keys, expected_keys)
 
 
     # def test_max_magnitude(self):

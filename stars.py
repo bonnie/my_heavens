@@ -20,7 +20,6 @@
 
 from model import db, Star, Constellation
 
-
 def get_stars(max_mag):
     """Return list of star dicts for the given maximum magnitude.
 

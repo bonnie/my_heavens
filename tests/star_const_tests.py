@@ -17,6 +17,16 @@
     # You should have received a copy of the GNU Affero General Public License
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
+from run_tests import SF_STF, J_STF
+
+# Rigel
+R_RA = 1.372
+R_DEC = -0.143
+
+# Alpha Tel
+AT_RA = 4.851
+AT_DEC = -0.801
+
 class StarFieldStarDataTests(DbTestCase):
     """Test calculations for stfield star data
 

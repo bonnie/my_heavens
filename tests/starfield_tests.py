@@ -31,15 +31,10 @@ sys.path.append('..')
 from run_tests import MarginTestCase, DbTestCase
 from model import Constellation
 from starfield import deg_to_rad, rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
-
-MAX_MAG = 5
+from run_tests import SF_LAT, SF_LNG, SF_STF, J_LAT, J_LNG, J_STF, TEST_DATETIME
 
 # acceptable margin when comparing floats
 MARGIN = 0.005
-
-# 9pm on March 1, 2017 (local time)
-TEST_DATETIME = datetime(2017, 3, 1, 21, 0, 0)
-TEST_DATETIME_STRING = datetime.strftime(TEST_DATETIME, BOOTSTRAP_DTIME_FORMAT)
 
 # expected data sets
 CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium'])
@@ -52,31 +47,6 @@ MOON_KEY_SET = PLANET_KEY_SET | set(['colong', 'rotation'])
 
 # expected planets for star field settings 
 BRIGHT_PLANET_NAMES_SET = set(['Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn'])
-
-# test lat/lngs: johannesburg
-J_LAT = -26.2041
-J_LNG = 28.0473
-J_LAT_RAD = -0.45734782252184614
-J_LNG_RAD = 0.4895177312946056
-J_STF = StarField(lat=J_LAT, lng=J_LNG, max_mag=MAX_MAG, 
-                  localtime_string=TEST_DATETIME_STRING)
-
-# test lat/lngs: sf
-SF_LAT = 37.7749
-SF_LNG = -122.4194
-SF_LAT_RAD = 0.659296379611606
-SF_LNG_RAD = 4.14656370886364
-SF_STF = StarField(lat=SF_LAT, lng=SF_LNG, max_mag=MAX_MAG, 
-                    localtime_string=TEST_DATETIME_STRING)
-
-# Rigel
-R_RA = 1.372
-R_DEC = -0.143
-
-# Alpha Tel
-AT_RA = 4.851
-AT_DEC = -0.801
-
 
 class StarFieldTestsWithoutDb(MarginTestCase):  
     """Test calculations to retrieve star and constellation data.

@@ -523,19 +523,19 @@ class StarFieldTestsWithoutDb(MarginTestCase):
         phrase = 'waning crescent: 0.2'
         self.phase_phrase_test(sf_datetime, phrase)
 
-    # def test_waxing_gibbous(self):
-    #     """Test moon phase phrase for waxing gibbous."""
+    def test_waxing_gibbous(self):
+        """Test moon phase phrase for waxing gibbous."""
 
-    #     sf_datetime = datetime(2017, 3, 1, 21, 0, 0)
-    #     phrase = 'waxing gibbous: 15.8'
-    #     self.phase_phrase_test(sf_datetime, phrase)
+        sf_datetime = datetime(2017, 2, 5, 21, 0, 0)
+        phrase = 'waxing gibbous: 72.6'
+        self.phase_phrase_test(sf_datetime, phrase)
 
-    # def test_waning_gibbous(self):
-    #     """Test moon phase phrase for waning gibbous."""
+    def test_waning_gibbous(self):
+        """Test moon phase phrase for waning gibbous."""
 
-    #     sf_datetime = datetime(2017, 3, 1, 21, 0, 0)
-    #     phrase = 'waning gibbous: 15.8'
-    #     self.phase_phrase_test(sf_datetime, phrase)
+        sf_datetime = datetime(2017, 2, 15, 21, 0, 0)
+        phrase = 'waning gibbous: 73.9'
+        self.phase_phrase_test(sf_datetime, phrase)
 
     def test_first_quarter(self):
         """Test moon phase phrase for first quarter."""

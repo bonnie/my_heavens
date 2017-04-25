@@ -27,6 +27,7 @@ from seed import load_seed_data
 
 TESTDB_URI = 'postgresql:///star_tests'
 TESTDATA_DIR = 'tests/test_data'
+MAX_MAG = 5
 
 class MarginTestCase(unittest.TestCase):
     """Parent class for tests that need a margin assertion"""

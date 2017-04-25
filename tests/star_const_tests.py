@@ -17,7 +17,7 @@
     # You should have received a copy of the GNU Affero General Public License
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
-from run_tests import SF_STF, J_STF, DbTestCase
+from run_tests import DbTestCase, MAX_MAG
 from stars import get_stars
 
 # Rigel
@@ -40,8 +40,7 @@ class StarDataTests(DbTestCase):
 
         super(StarDataTests, cls).setUpClass()
         super(StarDataTests, cls).load_test_data()
-        cls.stf = SF_STF
-        cls.stars = cls.stf.get_stars()
+        cls.stars = get_stars(MAX_MAG)
         cls.example_star = cls.stars[0]
 
 

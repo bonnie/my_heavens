@@ -28,13 +28,9 @@ import ephem
 import sys
 sys.path.append('..')
 
-from run_tests import MarginTestCase, DbTestCase
+from run_tests import MarginTestCase, DbTestCase, MAX_MAG
 from model import Constellation
 from starfield import deg_to_rad, rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
-
-# common starfields for starfield_tests.py and star_const_tests.py
-
-MAX_MAG = 5
 
 # 9pm on March 1, 2017 (local time)
 TEST_DATETIME = datetime(2017, 3, 1, 21, 0, 0)

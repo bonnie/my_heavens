@@ -91,8 +91,8 @@ if __name__ == '__main__':
     # import the tests
     # from tests.seed_tests import SeedTestsWithoutDb, SeedTestsWithDb, \
     #     SeedConstellationTests, SeedStarTests, SeedConstLineTests
-    from tests.starfield_tests import StarFieldTestsWithoutDb
-    # from tests.star_const_tests import StarDataTests, ConstellationDataTests
+    # from tests.starfield_tests import StarFieldTestsWithoutDb
+    from tests.star_const_tests import StarDataTests, ConstellationDataTests
     # from tests.flask_tests import FlaskTests, FlaskTestsWithDb
 
     # run the tests

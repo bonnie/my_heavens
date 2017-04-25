@@ -64,17 +64,16 @@ class StarDataTests(DbTestCase):
         """Test the keys of the star dict of the first item in self.stars."""
 
         star_keys = set(self.example_star.keys())
-        expected_keys = SKYOBJECT_KEY_SET
+        expected_keys = STAR_KEY_SET
         self.assertEqual(star_keys, expected_keys)
 
+    def test_max_magnitude(self):
+        """Test that no star's magnitude exceeds the maximum magnitude."""
 
-    # def test_max_magnitude(self):
-    #     """Test that no star's magnitude exceeds the maximum magnitude."""
+        mags_over_max = [ star['magnitude'] for star in self.stars 
+                          if star['magnitude'] > MAX_MAG ]
 
-    #     mags_over_max = [ star['magnitude'] for star in self.stars 
-    #                       if star['magnitude'] > self.stf.max_mag ]
-
-    #     self.assertEqual(mags_over_max, [])
+        self.assertEqual(mags_over_max, [])
 
 
 class ConstellationDataTests(DbTestCase):

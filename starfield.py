@@ -295,7 +295,7 @@ class StarField(object):
         """
 
         # the tolerance for exact moon phases new, full, quarter
-        tolerance = 0.01
+        tolerance = 0.05
 
         try:
             moon = self.moon
@@ -320,7 +320,7 @@ class StarField(object):
             growth = 'waxing'
 
         # is it a quarter?
-        if abs(moon.phase - 50) < 0.01:
+        if abs(moon.phase - 50) < tolerance:
             if growth == 'waxing':
                 return 'first quarter'
             if growth == 'waning':

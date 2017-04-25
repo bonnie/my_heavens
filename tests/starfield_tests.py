@@ -457,7 +457,6 @@ class StarFieldTestsWithoutDb(MarginTestCase):
         self.assertIsInstance(mdata['colong'], float)
         self.assertIsInstance(mdata['rotation'], float)
 
-
     def moon_data_test(self, stf, ra, dec, phase, colong, rotation, trise, tset):
         """Generic test for moon data."""
 
@@ -469,7 +468,6 @@ class StarFieldTestsWithoutDb(MarginTestCase):
         self.assertEqual(mdata['rotation'], rotation)
         self.assertEqual(mdata['prevRise'], trise)
         self.assertEqual(mdata['nextSet'], tset)
-
 
     def test_sf_moon_data(self):
         """Test moon data for San Francisco."""
@@ -485,7 +483,6 @@ class StarFieldTestsWithoutDb(MarginTestCase):
 
         self.moon_data_test(SF_STF, ra, dec, phase, colong, rotation, trise, tset)
 
-
     def test_johannesburg_moon_data(self):
         """Test moon data for Johannesburg"""
 
@@ -500,11 +497,73 @@ class StarFieldTestsWithoutDb(MarginTestCase):
 
         self.moon_data_test(J_STF, ra, dec, phase, colong, rotation, trise, tset)
 
-
     #########################################################
     # moon phase phrase tests
     #########################################################
 
+    def phase_phrase_test(self, sf_datetime, expected_phrase):
+        """Generic test for testing moon phase phrase."""
+
+        sf_timestring = datetime.strftime(sf_datetime, BOOTSTRAP_DTIME_FORMAT)
+        stf = StarField(lat=SF_LAT, lng=SF_LNG, localtime_string=sf_timestring)
+        phase_phrase = stf.get_moon_phase_phrase()
+        self.assertEqual(phase_phrase, expected_phrase)
+
+    def test_waxing_crescent(self):
+        """Test moon phase phrase for waxing crescent."""
+
+        sf_datetime = datetime(2017, 3, 1, 21, 0, 0)
+        phrase = 'waxing crescent: 15.8'
+        self.phase_phrase_test(sf_datetime, phrase)
+
+    def test_waning_crescent(self):
+        """Test moon phase phrase for waning crescent."""
+
+        sf_datetime = datetime(2017, 2, 25, 21, 0, 0)
+        phrase = 'waning crescent: 0.2'
+        self.phase_phrase_test(sf_datetime, phrase)
+
+    # def test_waxing_gibbous(self):
+    #     """Test moon phase phrase for waxing gibbous."""
+
+    #     sf_datetime = datetime(2017, 3, 1, 21, 0, 0)
+    #     phrase = 'waxing gibbous: 15.8'
+    #     self.phase_phrase_test(sf_datetime, phrase)
+
+    # def test_waning_gibbous(self):
+    #     """Test moon phase phrase for waning gibbous."""
+
+    #     sf_datetime = datetime(2017, 3, 1, 21, 0, 0)
+    #     phrase = 'waning gibbous: 15.8'
+    #     self.phase_phrase_test(sf_datetime, phrase)
+
+    def test_first_quarter(self):
+        """Test moon phase phrase for first quarter."""
+
+        sf_datetime = datetime(2017, 2, 3, 20, 0, 0)
+        phrase = 'first quarter'
+        self.phase_phrase_test(sf_datetime, phrase)
+
+    def test_third_quarter(self):
+        """Test moon phase phrase for third quarter."""
+
+        sf_datetime = datetime(2017, 2, 18, 12, 0, 0)
+        phrase = 'third quarter'
+        self.phase_phrase_test(sf_datetime, phrase)
+
+    def test_full_moon(self):
+        """Test moon phase phrase for full moon."""
+
+        sf_datetime = datetime(2017, 2, 10, 20, 0, 0)
+        phrase = 'full moon'
+        self.phase_phrase_test(sf_datetime, phrase)
+
+    def test_new_moon(self):
+        """Test moon phase phrase for new moon."""
+
+        sf_datetime = datetime(2017, 2, 26, 10, 0, 0)
+        phrase = 'new moon'
+        self.phase_phrase_test(sf_datetime, phrase)
 
     #########################################################
     # moon rotation tests

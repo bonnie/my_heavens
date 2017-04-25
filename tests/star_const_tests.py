@@ -27,7 +27,7 @@ R_DEC = -0.143
 AT_RA = 4.851
 AT_DEC = -0.801
 
-class StarFieldStarDataTests(DbTestCase):
+class StarDataTests(DbTestCase):
     """Test calculations for stfield star data
 
     tearDownClass method inherited without change from DbTestCase
@@ -74,7 +74,7 @@ class StarFieldStarDataTests(DbTestCase):
     #     self.assertEqual(mags_over_max, [])
 
 
-class StarFieldConstellationDataTests(DbTestCase):
+class ConstellationDataTests(DbTestCase):
     """Test calculations for star and constellation data at a time and place.
 
     tearDownClass method inherited without change from DbTestCase

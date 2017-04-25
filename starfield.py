@@ -290,6 +290,11 @@ class StarField(object):
     def get_moon_phase_phrase(self):
         """Get a phrase (e.g. waxing crescent) to describe the moon phase.
 
+        Returns a tuple (waxwan, full_phrase) -- both strings.
+
+        waxwan is simply the first word in the phrase, for use in determing
+        rotation.
+
         This function is more efficient if self.moon has already been set, but
         will set it if not.
         """
@@ -305,10 +310,10 @@ class StarField(object):
 
         # take care of new and full
         if moon.phase < tolerance:
-            return 'new moon'
+            return '', 'new moon'
 
         if 100 - moon.phase < tolerance:
-            return 'full moon'
+            return '', 'full moon'
 
         # otherwise it's in between
         next_new = ephem.next_new_moon(self.ephem.date)
@@ -322,9 +327,9 @@ class StarField(object):
         # is it a quarter?
         if abs(moon.phase - 50) < tolerance:
             if growth == 'waxing':
-                return 'first quarter'
+                return growth, 'first quarter'
             if growth == 'waning':
-                return 'third quarter'
+                return growth, 'third quarter'
 
         # most likely: an in between state
         if moon.phase < 50:
@@ -332,7 +337,9 @@ class StarField(object):
         else:
             phase = 'gibbous'
 
-        return '{} {}: {:.1f}'.format(growth, phase, moon.phase)
+        full_phrase = '{} {}: {:.1f}'.format(growth, phase, moon.phase)
+
+        return growth, full_phrase
 
     def calculate_moon_angle(self, waxwan):
         """Calculate the rotation angle of the phased moon for displaying in d3.
@@ -378,20 +385,6 @@ class StarField(object):
         moon_rotation = moon_rotation_to_horiz + moon.az
 
         # adjust depending on phase 
-
-        # TODO: this doesn't work for berkeley on
-        # March 27, 2017 at 12:00 PM or christchurch on March 28, 2017 at 12:00
-        # PM (moon is barely crescent, waning, close to new moon, 0.1%) -- the
-        # moon is 180 deg flipped from it should be. Why? 
-
-        # this slim waxing crescent is is 90 deg from where it should be: 
-        # Berkeley April 26, 2017 at 7:00 AM
-
-        # 180 deg flipped waning crescent: Berkeley May 25, 2017 at 7:00 AM
-
-        # ~ 180 deg flipped Berkeley June 23, 2017 at 8:00 PM, but
-        # NOT flipped Berkeley June 23, 2017 at 7:00 PM
-
         if waxwan == 'waxing' or waxwan == 'first':
             moon_rotation = moon_rotation + math.pi
 
@@ -416,11 +409,11 @@ class StarField(object):
         moon_data['colong'] = rad_to_deg(self.moon.colong)
 
         # moon gets descriptive phase info
-        moon_data['phase'] = self.get_moon_phase_phrase()
+        waxwan, full_phrase = self.get_moon_phase_phrase()
+        moon_data['phase'] = full_phrase
 
         # calculate rotation of the moon disk on d3 dislay
         # waxing / waning (first word in phase phrase) is important to this
-        waxwan = moon_data['phase'].split()[0]
         moon_rotation_in_deg = self.calculate_moon_angle(waxwan)
         moon_data['rotation'] = moon_rotation_in_deg
 

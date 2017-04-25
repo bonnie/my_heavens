@@ -506,7 +506,7 @@ class StarFieldTestsWithoutDb(MarginTestCase):
 
         sf_timestring = datetime.strftime(sf_datetime, BOOTSTRAP_DTIME_FORMAT)
         stf = StarField(lat=SF_LAT, lng=SF_LNG, localtime_string=sf_timestring)
-        phase_phrase = stf.get_moon_phase_phrase()
+        growth, phase_phrase = stf.get_moon_phase_phrase()
         self.assertEqual(phase_phrase, expected_phrase)
 
     def test_waxing_crescent(self):
@@ -568,6 +568,12 @@ class StarFieldTestsWithoutDb(MarginTestCase):
     #########################################################
     # moon rotation tests
     #########################################################
+
+    def moon_rotation_test(self, stf, expected_rotation):
+        """Generic test for moon rotation."""
+
+
+        rotation = stf.calculate_moon_angle(waxwan)
 
 
     #########################################################

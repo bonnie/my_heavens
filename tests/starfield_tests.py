@@ -30,7 +30,6 @@ sys.path.append('..')
 
 from run_tests import MarginTestCase, DbTestCase, MAX_MAG, COORDS_KEY_SET, \
                         SKYOBJECT_KEY_SET
-from model import Constellation
 from starfield import deg_to_rad, rad_to_deg, StarField, BOOTSTRAP_DTIME_FORMAT
 
 # 9pm on March 1, 2017 (local time)

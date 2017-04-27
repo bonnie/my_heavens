@@ -29,7 +29,7 @@ STAR_KEY_SET = SKYOBJECT_KEY_SET | set(['specClass', 'absMagnitude'])
 CONST_KEY_SET = set(['bound_verts', 'line_groups', 'code', 'name'])
 
 # expected constellations
-CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium'])
+CONST_LIST_SET = set(['Orion', 'Monoceros', 'Telescopium', 'Serpens', 'Ophiuchus'])
 
 # Rigel
 R_RA = 1.372
@@ -40,7 +40,7 @@ AT_RA = 4.851
 AT_DEC = -0.801
 
 class StarDataTests(DbTestCase):
-    """Test calculations for stfield star data
+    """Test calculations for star data
 
     tearDownClass method inherited without change from DbTestCase
     """
@@ -57,8 +57,8 @@ class StarDataTests(DbTestCase):
     def test_star_count(self):
         """Test the star count for the star field."""
 
-        # we expect 55 stars for the test data set, San Francisco, TEST_DATETIME
-        self.assertEqual(len(self.stars), 55)
+        # we expect 55 stars for the test data set
+        self.assertEqual(len(self.stars), 111)
 
     def test_star_data_type(self):
         """Test the that the example star is a dict."""
@@ -82,7 +82,7 @@ class StarDataTests(DbTestCase):
 
 
 class ConstellationDataTests(DbTestCase):
-    """Test calculations for star and constellation data at a time and place.
+    """Test calculations of constellation data.
 
     tearDownClass method inherited without change from DbTestCase
     """
@@ -93,8 +93,8 @@ class ConstellationDataTests(DbTestCase):
 
         super(ConstellationDataTests, cls).setUpClass()
         super(ConstellationDataTests, cls).load_test_data()
-        cls.ori = Constellation.query.filter_by(const_code='ORI').one()
-        cls.tel = Constellation.query.filter_by(const_code='TEL').one()
+        cls.ori = Constellation.query.get('ORI')
+        cls.tel = Constellation.query.get('TEL')
 
     #########################################################
     # Constellation Line Groups
@@ -155,12 +155,12 @@ class ConstellationDataTests(DbTestCase):
         # check that th last vertex is a repeat of the first
         self.assertEqual(verts[0], verts[-1])
 
-    def test_sf_ori_bound_verts(self):
+    def test_ori_bound_verts(self):
         """Test bound vertices for Orion."""
 
         self.const_bound_verts_test(self.ori, 29)
 
-    def test_sf_tel_bound_verts(self):
+    def test_tel_bound_verts(self):
         """Test bound vertices for Tel."""
 
         self.const_bound_verts_test(self.tel, 6)
@@ -194,27 +194,6 @@ class ConstellationDataTests(DbTestCase):
         self.assertEqual(len(example_line_vertex), 2)
 
 
-    def get_const_data_test(self, const, expected_type, expected_name):
-        """Generic function for getting constellation data"""
-
-        const_data = get_const_data(const)
-
-        self.assertIsInstance(const_data, expected_type)
-
-        if expected_type == dict:
-            self.assertEqual(const_data['name'], expected_name)
-
-    def test_get_const_sf_ori(self):
-        """Test data returned for orion."""
-
-        self.get_const_data_test(self.ori, dict, 'Orion')
-
-    def test_get_const_sf_tel(self):
-        """Test data returned for telescopium."""
-
-        self.get_const_data_test(self.tel, dict, 'Telescopium')
-
-
     #########################################################
     # Constellation List
     #########################################################
@@ -237,5 +216,65 @@ class ConstellationDataTests(DbTestCase):
         # get the list of names with a set comprehension
         const_names = set(const['name'] for const in consts)
 
-        self.assertEqual(len(consts), 3)
+        self.assertEqual(len(consts), 5)
         self.assertEqual(const_names, CONST_LIST_SET)
+
+class SerpensConstellationDataTests(DbTestCase):
+    """Test calculations for the problem child constellation: Serpens.
+
+    tearDownClass method inherited without change from DbTestCase
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        """Stuff to do once before running all class test methods."""
+
+        super(SerpensConstellationDataTests, cls).setUpClass()
+        super(SerpensConstellationDataTests, cls).load_test_data()
+        consts = get_constellations()
+        for const in consts:
+            if const['code'] == 'SER':
+                cls.serpens_data = const
+                break
+
+    def test_serpens_bound_verts_two_areas(self):
+        """Test bound vertices for our problem child."""
+
+        bound_verts = self.serpens_data['bound_verts']
+        self.assertEqual(len(bound_verts), 2)
+
+    def test_serpens_first_bound_verts_length(self):
+        """Test the length of the first bound verts group."""
+
+        bvset1 = self.serpens_data['bound_verts'][0]
+        self.assertEqual(len(bvset1), 16)
+
+    def test_serpens_first_bound_verts_length(self):
+        """Test the length of the second bound verts group."""
+
+        bvset2 = self.serpens_data['bound_verts'][1]
+        self.assertEqual(len(bvset2), 26)
+
+    def test_serpens_bound_vert_format(self):
+        """Test that the first bound vertex is a two item list."""
+
+        vertex = self.serpens_data['bound_verts'][0][0]
+        self.assertEqual(len(vertex), 2)
+
+    def test_serpens_line_groups_length(self):
+        """Test the length of the line groups list."""
+
+        linegroups = self.serpens_data['line_groups']
+        self.assertEqual(len(linegroups), 1)
+
+    def test_serpens_line_group_length(self):
+        """Test the length of the line group list."""
+
+        line_group = self.serpens_data['line_groups'][0]
+        self.assertEqual(len(line_group), 18)
+
+    def test_serpens_line_vertex_format(self):
+        """Test that the first line vertex is a two item list."""
+
+        line_vertex = self.serpens_data['line_groups'][0][0]
+        self.assertEqual(len(line_vertex), 2)

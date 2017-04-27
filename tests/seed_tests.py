@@ -172,7 +172,7 @@ class SeedConstellationTests(DbTestCase):
         """Test code to load constellations into db."""
 
         # see how many constellations got added
-        self.assertEqual(Constellation.query.count(), 3)
+        self.assertEqual(Constellation.query.count(), 7)
 
         # see whether the info made it into the right columns
         orion = Constellation.query.filter_by(const_code='ORI').one()

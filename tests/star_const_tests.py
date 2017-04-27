@@ -249,7 +249,7 @@ class SerpensConstellationDataTests(DbTestCase):
         bvset1 = self.serpens_data['bound_verts'][0]
         self.assertEqual(len(bvset1), 16)
 
-    def test_serpens_first_bound_verts_length(self):
+    def test_serpens_second_bound_verts_length(self):
         """Test the length of the second bound verts group."""
 
         bvset2 = self.serpens_data['bound_verts'][1]

@@ -67,6 +67,15 @@ class StarFieldTestsWithoutDb(MarginTestCase):
     """
 
     #########################################################
+    # repr
+    #########################################################
+
+    def test_repr(self):
+        """Test the repr method."""
+
+        self.assertIsInstance(repr(SF_STF), str)
+
+    #########################################################
     # degrees -> radians (and reverse) utility functions
     #########################################################
 

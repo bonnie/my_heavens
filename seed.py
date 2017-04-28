@@ -18,6 +18,7 @@
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 import csv
 import re
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -29,6 +30,9 @@ from colors import COLOR_BY_SPECTRAL_CLASS
 
 # for debugging output. False by default unless running the script directly.
 DEBUG = False
+
+# print destination. Will change for testing
+STDOUT = sys.stdout
 
 # to be able to distinguish between data dir for testing
 DATADIR = 'seed_data'
@@ -70,10 +74,9 @@ def announce(action):
     """Give feedback on where in the script we are."""
 
     if DEBUG:
-        print
-        print '*'*20
-        print action
-        print '*'*20
+        STDOUT.write('\n' + '*'*20)
+        STDOUT.write(action + '\n')
+        STDOUT.write('*'*20 + '\n')
 
 
 def get_degrees_from_hours_and_invert(ra_in_hrs):
@@ -94,10 +97,6 @@ def get_color(spectral_class):
     if match:
         sc_a = match.group(1)
         sc_b = match.group(2)
-
-        # unrecognized base spectrum
-        if sc_a not in COLOR_BY_SPECTRAL_CLASS:
-            return DEFAULT_COLOR
 
         # missing secondary spectrum
         if not sc_b or sc_b not in COLOR_BY_SPECTRAL_CLASS[sc_a]:
@@ -195,12 +194,7 @@ def load_const_boundaries(datadir):
     last_const = None
 
     for boundline in boundfile:
-        try:
-            ra_in_hrs, dec, const = boundline.strip().split()
-        except:
-            if DEBUG:
-                print "bad line in boundfile: [{}]".format(boundline)
-            continue
+        ra_in_hrs, dec, const = boundline.strip().split()
 
         # translate ra into degrees and invert for d3
         ra_in_deg = get_degrees_from_hours_and_invert(ra_in_hrs)
@@ -226,7 +220,7 @@ def load_const_boundaries(datadir):
     db.session.commit()
 
 
-def load_stars(datadir):
+def load_stars(datadir, print_milestone=5000):
     """Load star data from csv into the database."""
 
     announce('loading stars')
@@ -239,8 +233,8 @@ def load_stars(datadir):
 
             # display progress
             line_num += 1
-            if line_num % 5000 == 0:
-                print line_num, 'stars'
+            if line_num % print_milestone == 0:
+                STDOUT.write('{} stars\n'.format(line_num))
 
             # skip really dim stars
             magnitude = float(starline['Mag'].strip())
@@ -304,13 +298,13 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
             try:
                 star = query.one()
                 if DEBUG:
-                    print "matched {} {} without magnitude".format(const, name)
+                    STDOUT.write("matched {} {} without magnitude\N".format(const, name))
 
             except NoResultFound:
 
                 error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
-                print error.format(const, name, ra_in_deg, dec_in_deg, mag)
-                print "exiting..."
+                STDOUT.write(error.format(const, name, ra_in_deg, dec_in_deg, mag) + '\n')
+                STDOUT.write("exiting...")
                 exit()
 
     except MultipleResultsFound:
@@ -318,7 +312,7 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
         # just go with the brightest star that matches the coordinates
         star = query.order_by(Star.magnitude).first()
         if DEBUG:
-            print "matched {} {} with brightest star in region".format(const, name)
+            STDOUT.write("matched {} {} with brightest star in region\n".format(const, name))
 
     return star
 
@@ -397,10 +391,10 @@ if __name__ == '__main__':
     # if we're running it directly, we probably want to see debug
     DEBUG = True
 
-    print 'dropping tables...'
+    STDOUT.write('dropping tables...\n')
     db.drop_all()
 
-    print 'creating tables...'
+    STDOUT.write('creating tables...\n')
     db.create_all()
 
     load_seed_data(DATADIR)

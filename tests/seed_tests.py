@@ -20,23 +20,51 @@
 
 from unittest import TestCase
 import os
+from StringIO import StringIO
 
 # be able to import from parent dir
 import sys
 sys.path.append('..')
 
 from run_tests import TESTDATA_DIR, DbTestCase
-
-# don't init the tzwhere variable; it takes a lot of time and it's not necessary
-# here
-os.environ['TZW_INIT'] = "False"
-
 from model import db, Constellation, Star, BoundVertex, \
                   ConstBoundVertex, ConstLineGroup, ConstLineVertex
 import seed
 
 class SeedTestsWithoutDb(TestCase):
     """Test the 'helper' functions that don't need the database."""
+
+    def setUp(self):
+        """Set up by redirecting stdout to string."""
+
+        seed.STDOUT = StringIO()
+
+    def tearDown(self):
+        """Tear down by closing the string IO."""
+
+        seed.STDOUT.close()
+
+    def test_file_error_case(self):
+        """Test opening a nonexistent file."""
+
+        none_file = seed.open_datafile(TESTDATA_DIR, 'nonexistent_file')
+        self.assertIsNone(none_file)
+
+    def test_announce_nodebug(self):
+        """Test announcing current status with debug off."""
+
+        seed.DEBUG = False
+        seed.announce('test')
+        output = seed.STDOUT.getvalue()
+        self.assertNotIn('test', output)
+
+    def test_announce_debug(self):
+        """Test announcing current status with debug on."""
+
+        seed.DEBUG = True
+        seed.announce('test')
+        output = seed.STDOUT.getvalue()
+        self.assertIn('test', output)
 
     def test_get_degrees_from_hours_and_invert_pos(self):
         """Test translation of RA in hours to inverted degrees for positive RA"""
@@ -75,10 +103,10 @@ class SeedTestsWithoutDb(TestCase):
         self.assertIn(color, O9_colors)
 
     def test_get_color_unknown(self):
-        """Test getting a color for a spectral class only whose letter is known."""
+        """Test getting a color for a spectral class that doesn't parse."""
 
         color = seed.get_color('Am...       ')
-        self.assertEqual(color, '#ffffff')
+        self.assertEqual(color, seed.DEFAULT_COLOR)
 
     def test_get_name_and_constellation_name(self):
         """Test extracting the name and constellation for stars with an explicit name.""" 
@@ -119,6 +147,16 @@ class SeedTestsWithoutDb(TestCase):
         name, const = seed.get_name_and_constellation(star_info)
         self.assertEqual(name, None)
         self.assertEqual(const, 'ORI')        
+
+    def test_get_name_and_constellation_nobf(self):
+        """Test extracting the name and constellation for stars without BF data.""" 
+
+        star_info = {'ProperName': ' ',
+                     'BayerFlamsteed': ''}
+
+        name, const = seed.get_name_and_constellation(star_info)
+        self.assertEqual(name, None)
+        self.assertEqual(const, None)        
 
 
 class SeedTestsWithDb(DbTestCase):
@@ -201,8 +239,17 @@ class SeedStarTests(DbTestCase):
         """Stuff to do once before running all class test methods."""
 
         super(SeedStarTests, cls).setUpClass()
+        seed.STDOUT = StringIO()        
         seed.load_constellations(TESTDATA_DIR)
-        seed.load_stars(TESTDATA_DIR)
+        star_announce_interval = 10
+        seed.load_stars(TESTDATA_DIR, star_announce_interval)
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down by closing the string IO."""
+
+        super(SeedStarTests, cls).tearDownClass()
+        seed.STDOUT.close()
 
     def test_star_data(self):
         """Test code to load stars into the databse."""

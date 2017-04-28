@@ -298,7 +298,7 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
             try:
                 star = query.one()
                 if DEBUG:
-                    STDOUT.write("matched {} {} without magnitude\N".format(const, name))
+                    STDOUT.write("matched {} {} without magnitude\n".format(const, name))
 
             except NoResultFound:
 

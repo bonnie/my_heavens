@@ -301,7 +301,7 @@ class SeedStarTests(DbTestCase):
         # Beta Mon
         ra = 6.480278
         dec = -7.0333
-        mag = 4.60
+        mag = 8.60
 
         self.matching_star_test(ra, dec, mag, 'Bet Mon')
 
@@ -314,6 +314,15 @@ class SeedStarTests(DbTestCase):
         mag = 4.95
 
         self.matching_star_test(ra, dec, mag, 'Del1Tel')
+
+    def test_get_matching_star_nomatch(self):
+        """Test finding a matching star when there's no match"""
+
+        ra = 18
+        dec = -22
+        mag = 0
+
+        self.assertRaises(SystemExit, self.matching_star_test, ra, dec, mag, None)
 
 
 class SeedConstLineTests(DbTestCase):

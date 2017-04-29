@@ -328,8 +328,9 @@ class StarField(object):
         if abs(moon.phase - 50) < tolerance:
             if growth == 'waxing':
                 return growth, 'first quarter'
-            if growth == 'waning':
-                return growth, 'third quarter'
+
+            # otherwise it's waning: third quarter
+            return growth, 'third quarter'
 
         # most likely: an in between state
         if moon.phase < 50:

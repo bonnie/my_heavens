@@ -31,9 +31,6 @@ from colors import COLOR_BY_SPECTRAL_CLASS
 # for debugging output. False by default unless running the script directly.
 DEBUG = False
 
-# print destination. Will change for testing
-STDOUT = sys.stdout
-
 # to be able to distinguish between data dir for testing
 DATADIR = 'seed_data'
 
@@ -74,9 +71,10 @@ def announce(action):
     """Give feedback on where in the script we are."""
 
     if DEBUG:
-        STDOUT.write('\n' + '*'*20)
-        STDOUT.write(action + '\n')
-        STDOUT.write('*'*20 + '\n')
+        print
+        print '*' * 20
+        print action
+        print '*' * 20
 
 
 def get_degrees_from_hours_and_invert(ra_in_hrs):
@@ -220,7 +218,7 @@ def load_const_boundaries(datadir):
     db.session.commit()
 
 
-def load_stars(datadir, print_milestone=5000):
+def load_stars(datadir):
     """Load star data from csv into the database."""
 
     announce('loading stars')
@@ -233,8 +231,8 @@ def load_stars(datadir, print_milestone=5000):
 
             # display progress
             line_num += 1
-            if line_num % print_milestone == 0:
-                STDOUT.write('{} stars\n'.format(line_num))
+            if DEBUG and line_num % 5000 == 0:
+                print '{} stars'.format(line_num)
 
             # skip really dim stars
             magnitude = float(starline['Mag'].strip())
@@ -298,13 +296,14 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
             try:
                 star = query.one()
                 if DEBUG:
-                    STDOUT.write("matched {} {} without magnitude\n".format(const, name))
+                    print "matched {} {} without magnitude".format(const, name)
 
             except NoResultFound:
 
-                error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
-                STDOUT.write(error.format(const, name, ra_in_deg, dec_in_deg, mag) + '\n')
-                STDOUT.write("exiting...")
+                if DEBUG:
+                    error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
+                    print error.format(const, name, ra_in_deg, dec_in_deg, mag)
+                    print "exiting..."
                 exit()
 
     except MultipleResultsFound:
@@ -312,7 +311,7 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
         # just go with the brightest star that matches the coordinates
         star = query.order_by(Star.magnitude).first()
         if DEBUG:
-            STDOUT.write("matched {} {} with brightest star in region\n".format(const, name))
+            print "matched {} {} with brightest star in region".format(const, name)
 
     return star
 
@@ -391,10 +390,10 @@ if __name__ == '__main__':
     # if we're running it directly, we probably want to see debug
     DEBUG = True
 
-    STDOUT.write('dropping tables...\n')
+    print 'dropping tables...'
     db.drop_all()
 
-    STDOUT.write('creating tables...\n')
+    print 'creating tables...'
     db.create_all()
 
     load_seed_data(DATADIR)

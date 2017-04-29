@@ -1,0 +1,27 @@
+# .coveragerc to control coverage.py
+[run]
+branch = true
+omit = 
+    ./env/*
+    ./sidereal/*
+    ./run_tests.py
+    ./tests/*
+
+[paths]
+source = .
+
+[report]
+# Regexes for lines to exclude from consideration
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain about missing debug-only code:
+    if DEBUG
+
+    # Don't complain if non-runnable code isn't run:
+    if __name__ == .__main__.:
+
+    # show missing lines
+    show_missing = true
+

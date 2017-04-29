@@ -4,15 +4,15 @@
 
     # This file is part of My Heavens.
 
-    # My Heavens is free software: you can redistribute it and/or modify it under
-    # the terms of the GNU Affero General Public License as published by the Free
-    # Software Foundation, either version 3 of the License, or (at your option)
-    # any later version.
+    # My Heavens is free software: you can redistribute it and/or modify it
+    # under the terms of the GNU Affero General Public License as published by
+    # the Free Software Foundation, either version 3 of the License, or (at your
+    # option) any later version.
 
     # My Heavens is distributed in the hope that it will be useful, but WITHOUT
     # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-    # FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License
-    # for more details.
+    # FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public
+    # License for more details.
 
     # You should have received a copy of the GNU Affero General Public License
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
@@ -20,7 +20,6 @@
 
 from unittest import TestCase
 import os
-from StringIO import StringIO
 
 # be able to import from parent dir
 import sys
@@ -34,37 +33,11 @@ import seed
 class SeedTestsWithoutDb(TestCase):
     """Test the 'helper' functions that don't need the database."""
 
-    def setUp(self):
-        """Set up by redirecting stdout to string."""
-
-        seed.STDOUT = StringIO()
-
-    def tearDown(self):
-        """Tear down by closing the string IO."""
-
-        seed.STDOUT.close()
-
     def test_file_error_case(self):
         """Test opening a nonexistent file."""
 
         none_file = seed.open_datafile(TESTDATA_DIR, 'nonexistent_file')
         self.assertIsNone(none_file)
-
-    def test_announce_nodebug(self):
-        """Test announcing current status with debug off."""
-
-        seed.DEBUG = False
-        seed.announce('test')
-        output = seed.STDOUT.getvalue()
-        self.assertNotIn('test', output)
-
-    def test_announce_debug(self):
-        """Test announcing current status with debug on."""
-
-        seed.DEBUG = True
-        seed.announce('test')
-        output = seed.STDOUT.getvalue()
-        self.assertIn('test', output)
 
     def test_get_degrees_from_hours_and_invert_pos(self):
         """Test translation of RA in hours to inverted degrees for positive RA"""
@@ -239,17 +212,8 @@ class SeedStarTests(DbTestCase):
         """Stuff to do once before running all class test methods."""
 
         super(SeedStarTests, cls).setUpClass()
-        seed.STDOUT = StringIO()        
         seed.load_constellations(TESTDATA_DIR)
-        star_announce_interval = 10
-        seed.load_stars(TESTDATA_DIR, star_announce_interval)
-
-    @classmethod
-    def tearDownClass(cls):
-        """Tear down by closing the string IO."""
-
-        super(SeedStarTests, cls).tearDownClass()
-        seed.STDOUT.close()
+        seed.load_stars(TESTDATA_DIR)
 
     def test_star_data(self):
         """Test code to load stars into the databse."""
@@ -301,7 +265,7 @@ class SeedStarTests(DbTestCase):
         # Beta Mon
         ra = 6.480278
         dec = -7.0333
-        mag = 8.60
+        mag = 4.60
 
         self.matching_star_test(ra, dec, mag, 'Bet Mon')
 
@@ -323,7 +287,6 @@ class SeedStarTests(DbTestCase):
         mag = 0
 
         self.assertRaises(SystemExit, self.matching_star_test, ra, dec, mag, None)
-
 
 class SeedConstLineTests(DbTestCase):
     """Test seeding constellation lines into the database.

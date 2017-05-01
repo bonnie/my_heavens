@@ -110,9 +110,9 @@ class ConstLineVertex(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return "<ConstLineVertex id=%s const_code=%s star_id>" % (
+        return "<ConstLineVertex id=%s const_line_group_id=%s star_id=%s>" % (
                                             self.const_line_vertex_id,
-                                            self.const_code, 
+                                            self.const_line_group_id, 
                                             self.star_id)
 
 

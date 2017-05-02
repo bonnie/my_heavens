@@ -314,11 +314,6 @@ var drawSkyObjects = function() {
 
 };
 
-var getRadiusFromMag = function(d) {
-    // magnitude is proportional to radius, with a top radius related to skyRadius
-    return Math.min(3.2, (5 - d.magnitude) * 0.5);
-};
-
 var opacityTransition = function(p) {
     // do an opacity transition with the specified params
     //

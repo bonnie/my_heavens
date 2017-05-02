@@ -206,9 +206,25 @@ var getLabelPosition = function(constLineMultiLine, constBoundsPolygon) {
     var maxY = bounds[1][1];
     var padding = 20;
 
-    labelPosition.y = (minY < skyRadius) ? maxY + padding : minY - padding;
-    labelPosition.x = (maxX > 3 * skyRadius / 4) ? minX : (minX + maxX) / 2;
-    labelPosition.textAnchor = (maxX < skyRadius) ? 'start' : 'end';
+    labelPosition.textAnchor = 'middle'
+
+    if (minX < skyRadius) {
+        labelPosition.x = maxX;
+        labelPosition.textAnchor = 'start';
+    } else {
+        labelPosition.x = minX;
+        labelPosition.textAnchor = 'end';
+    }
+
+    // labelPosition.y = (minY < skyRadius) ? maxY + padding : minY - padding;  
+
+    labelPosition.y = (minY + maxY) / 2;
+    if (maxY > 3 * skyRadius / 2) {
+        labelPosition.x = (maxX + minX) / 2;
+        labelPosition.y = minY - padding;
+    } else if (maxY < 2 * skyRadius / 8) {
+        labelPosition.y = maxY + padding;
+    }
 
     return labelPosition;
 }

@@ -1,9 +1,17 @@
 language: python
 python:
   - "2.7"
-  
+
 # command to install dependencies
 install: "pip install -r requirements.txt"
 
 # command to run tests
 script: python run_tests.py
+
+# database
+services:
+  - postgresql
+
+# create db
+before_script:
+  - psql -c 'create database star_tests;' -U postgres

@@ -131,10 +131,20 @@ var populateDatelocInfo = function(datelocInfo) {
     // uses global addInfoTableRow from d3-main.js
 
     var placeString = autocomplete.getPlace().name.split(',')[0];
-    var datetimeString = datelocInfo.dateString + ' at ' + datelocInfo.timeString;
-    addInfoDivHeader(datelocInfoHeader, placeString, datetimeString);
-    addDatelocTableRow('Latitude', datelocInfo.lat);
-    addDatelocTableRow('Longitude', datelocInfo.lng);
+    addInfoDivHeader(datelocInfoHeader, placeString);
+    var rowString = '<tr>';
+    rowString += '<td>' + datelocInfo.dateString + ' at ' + datelocInfo.timeString + '</td>';
+    rowString += '<td class="text-right">' + datelocInfo.lat + ' / ' + datelocInfo.lng + '</td>';
+    rowString += '</tr>';
+
+    datelocInfoTable.append(rowString);
+
+
+    // var datelocString = datelocInfo.dateString + ' at ' + datelocInfo.timeString;
+    // datelocString += '<br><br>' + datelocInfo.lat + ' / ' + datelocInfo.lng
+    // addInfoDivHeader(datelocInfoHeader, placeString, datelocString);
+    // addDatelocTableRow('Latitude', datelocInfo.lat);
+    // addDatelocTableRow('Longitude', datelocInfo.lng);
 
 };
 

@@ -89,18 +89,9 @@ var rotateSky = function(lambda, phi) {
     // rotate the sky for the lambda (based on latitude) and 
     // phi (based on longitude / time)
 
-    // uses global skyProjection, lambda, phi
+    // uses global skyProjection
 
     // console.log('rotating to', lambda, phi);
-
-    // planet rings are going to be removed during transition
-    // do it deliberately here first]
-    // TODO: this doesn't work. Reveal planets hides them after this code runs, and doesn't toggle the button.
-    // if (planetsRevealed === true) {
-    //     planetsRevealed = false;
-    //     planetRevealBox.html('Reveal planets');
-    // }
-
 
     // calculate duration based on distance to go
     var oldRotation = skyProjection.rotate();
@@ -111,7 +102,6 @@ var rotateSky = function(lambda, phi) {
 
 
     // adapted from http://bl.ocks.org/KoGor/5994960
-    // TODO: make less choppy -- maybe don't redraw everything, just transform it...?
     d3.transition()
       .duration(durTime)
       .ease(d3.easeLinear)

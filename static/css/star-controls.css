@@ -25,12 +25,18 @@ td.info-table-name {
     font-weight: 700;
 }
 
+h5.info-header {
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
 .info-table {
     margin-bottom: 10px;
 }
 
 .btn {
     color: black;
+    margin-bottom: 5px;
 }
 
 p.definition {

@@ -42,7 +42,7 @@ var addInfoDivHeader = function(infoHeaderDiv, header, subHeader) {
 
     infoHeaderDiv.empty();
 
-    var headerClass = ' class="text-center" ';
+    var headerClass = ' class="text-center info-header" ';
     infoHeaderDiv.append('<h3' + headerClass + '>' + header + '</h3>');
 
     if (subHeader !== null && subHeader !== undefined) {
@@ -56,9 +56,9 @@ var addCelestialTableRow = function(rowName, rowValue) {
     addInfoTableRow(celestialInfoTable, rowName, rowValue);
 };
 
-var addDatelocTableRow = function(rowName, rowValue) {
-    addInfoTableRow(datelocInfoTable, rowName, rowValue);
-};
+// var addDatelocTableRow = function(rowName, rowValue) {
+//     addInfoTableRow(datelocInfoTable, rowName, rowValue);
+// };
 
 var addInfoTableRow = function(infoTable, rowName, rowValue) {
     // add a row to the info table (celestialInfoTable)

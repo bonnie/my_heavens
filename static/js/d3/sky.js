@@ -89,7 +89,7 @@ var rotateSky = function(lambda, phi) {
     // rotate the sky for the lambda (based on latitude) and 
     // phi (based on longitude / time)
 
-    // uses global skyProjection, 
+    // uses global skyProjection, lambda, phi
 
     // console.log('rotating to', lambda, phi);
 
@@ -120,6 +120,10 @@ var rotateSky = function(lambda, phi) {
         return function(t) {
           skyProjection.rotate(rotation(t));
 
+          // to keep from drawing unnecessary objects
+          var tempPhi = rotation(t)[0];
+          var tempLambda = rotation(t)[1];
+
           // at every stage, clear the sky and start over
           $('#all-sky-objects').empty();
 
@@ -127,10 +131,10 @@ var rotateSky = function(lambda, phi) {
           if (eclipticToggle.is(':checked')) { drawEcliptic(); }
 
           // draw the background and sun/moon/planets without labels
-          drawSolarSystem('transition');
+          drawSolarSystem('transition', tempLambda, tempPhi);
 
           // draw stars without labels and only bright stars (for faster transition)
-          drawStars('transition');
+          drawStars('transition', tempLambda, tempPhi);
         };
       })
       .on('start', function() {

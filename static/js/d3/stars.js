@@ -28,7 +28,7 @@ var setGlobalStarDataAndDraw = function(starDataResult) {
     drawStars();
 };
 
-var drawStars = function(mode) {
+var drawStars = function(mode, lambda, phi) {
     // draw the stars on the sphere of the sky
     // mode is a string that can either be omitted or set to 'transition'
     // It will be 'transition' when animating, to make animations faster
@@ -38,7 +38,9 @@ var drawStars = function(mode) {
     var starParams = {listData: starData,
                       classPrefix: 'star',
                       radiusFunction: getRadiusFromMag,
-                      mode: mode};
+                      mode: mode,
+                      lambda: lambda,
+                      phi: phi};
 
     renderSkyObjectList(starParams);
 
@@ -49,4 +51,10 @@ var redrawStars = function() {
 
     $('.star-group').remove()
     drawStars();
+}
+
+var moveStars = function() {
+    svgContainer.select('.star-group').each(function(d) {
+        d3.select(this).attr('transform', function(d) {skyTransform(d.ra, d.dec)});
+    });
 }

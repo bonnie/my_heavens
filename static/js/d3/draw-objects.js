@@ -29,6 +29,8 @@ var renderSkyObjectList = function(params) {
     //      classPrefix (e.g. star)
     //      mode (e.g. transition)
     //      radiusFunction (e.g. function(d) {return (5 - d.magnitude) * 0.5})
+    //      lambda (angle by which dec is rotated)
+    //      phi (angle by which ra is rotated)
 
     // uses global skyObjects
 
@@ -86,6 +88,8 @@ var renderSingleSkyObject = function(params) {
     //      classPrefix (e.g. sun)
     //      mode (e.g. transition)
     //      radius (eg sunMoonRadius)
+    //      lambda (angle by which dec is rotated)
+    //      phi (angle by which ra is rotated)
 
     // uses global skyObjects
 
@@ -125,12 +129,22 @@ var renderSkyObject = function(params) {
     //      d (data object, expected to have ra, dec, magnitude, name, color)
     //      radiusFunction (radius function for this object)
     //      itemLabel (svg text element for object label)
+    //      lambda (angle by which dec is rotated)
+    //      phi (angle by which ra is rotated)
+
+    // for easier reference
+    var d = params.d;
+
+    // determine whether the obj is visible
+    // var lambda_viz = d.dec < params.lambda + 180
+    // var phi_viz = params.phi - 180 < d.ra || d.ra < params.phi + 180
+
 
     // don't bother drawing dim items during transition
     if (params.mode !== 'transition' || params.d.magnitude < 2.5) {
+    // if (params.mode !== 'transition' || (lambda_viz && phi_viz)) {
 
-        // for easier reference
-        var d = params.d;
+        // console.log('accepting ' + d.ra + ', ' + d.dec)
 
         var itemPoint = {
             geometry: {
@@ -158,6 +172,7 @@ var renderSkyObject = function(params) {
                                 .attr('d', function(d) {
                                     skyPath.pointRadius(d.properties.radius);
                                     return skyPath(d); })
+                                .attr('data', {'radius': params.radius});
 
             // don't bother with opacity  and class during transition
             if (params.mode !== 'transition') {
@@ -191,5 +206,8 @@ var renderSkyObject = function(params) {
             return itemPoint;
         }
     }
+    // } else {
+    //     console.log('rejecting ' + d.ra + ', ' + d.dec);
+    // }
 
 };

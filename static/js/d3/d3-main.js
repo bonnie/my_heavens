@@ -341,7 +341,7 @@ var drawSkyAndStars = function(error, starDataResult) {
         return;
     }
 
-    console.log(starDataResult);
+    // console.log(starDataResult);
 
     /////////////////////
     // handle warnings //
@@ -406,23 +406,25 @@ var renderSkyObjectList = function(params) {
 
     // uses global skyObjects
 
-    // keep a running count of visible objects -- for noting whether there are
-    // planets visible. 
-    var visibleItemCount = 0;
-
-    // One label that just gets repurposed depending on moused-over item,
-    // since we're never going to be showing more than one item label at once
-    var itemLabel = skyObjects.append('text')
-        .attr('class', params.classPrefix + '-label sky-label');
-
-    var groupClass = params.classPrefix + '-group';
-
     // add the item groups
     var items = skyObjects.selectAll('g.' + groupClass)
                             .data(params.listData)
                             .enter()
                             .append('g')
-                            .attr('class', groupClass);
+
+    if (params.mode !== 'transition') {
+        // keep a running count of visible objects -- for noting whether there are
+        // planets visible. 
+        var visibleItemCount = 0;
+
+        // One label that just gets repurposed depending on moused-over item,
+        // since we're never going to be showing more than one item label at once
+        var itemLabel = skyObjects.append('text')
+            .attr('class', params.classPrefix + '-label sky-label');
+
+        var groupClass = params.classPrefix + '-group';
+        items.attr('class', groupClass);
+    }
 
     // add sub-elements for each star
     items.each(function(d) {
@@ -431,16 +433,22 @@ var renderSkyObjectList = function(params) {
                      mode: params.mode,
                      d: d,
                      radius: params.radiusFunction(d),
-                     classPrefix: params.classPrefix,
-                     itemLabel: itemLabel};
+                     classPrefix: params.classPrefix 
+        };
 
-        if (renderSkyObject(objParams) !== undefined) {
+        if (params.mode !== 'transition') {
+            objParams.itemLabel = itemLabel;
+        }
+
+        var outcome = renderSkyObject(objParams)
+        if (params.mode !=='transition' && outcome !== undefined) {
             visibleItemCount++;
         }
     });
 
-    return visibleItemCount;
-
+    if (params.mode !== 'transition') {
+        return visibleItemCount;
+    }
 };
 
 var renderSingleSkyObject = function(params) {
@@ -463,8 +471,11 @@ var renderSingleSkyObject = function(params) {
     // One label that just gets repurposed depending on moused-over item,
     // since we're never going to be showing more than one item label at once
     // TODO: make function for this for less repitition
-    var itemLabel = itemGroup.append('text')
-        .attr('class', params.classPrefix + '-label sky-label');
+
+    if (params.mode !== 'transition') {
+        var itemLabel = itemGroup.append('text')
+            .attr('class', params.classPrefix + '-label sky-label');
+    }
 
     var objParams = {group: itemGroup,
                      mode: params.mode,
@@ -489,11 +500,12 @@ var renderSkyObject = function(params) {
     //      radiusFunction (radius function for this object)
     //      itemLabel (svg text element for object label)
 
-    // for easier reference
-    var d = params.d;
-
     // don't bother drawing dim items during transition
-    if (params.mode !== 'transition' || d.magnitude < 2.5) {
+    if (params.mode !== 'transition' || params.d.magnitude < 2.5) {
+
+        // for easier reference
+        var d = params.d;
+
         var itemPoint = {
             geometry: {
                 type: 'Point',
@@ -512,29 +524,20 @@ var renderSkyObject = function(params) {
 
         } else {
 
-            // // check for objects that hang off the sphere; clip them
-            // var itemBounds = skyPath.bounds(itemPoint);
-            // for(var i=0; i < 4; i++) {
-            //         var boundPoint = {geometry: {
-            //         type: 'Point',
-            //         coordinates: itemBounds[i] }
-            //         };
-            //     if (!isVisible(boundPoint)) {
-
-
-            //     }
-            // }
-
             // circle to represent item
             // since we're in d3 geo world, this needs to be a path with a point
             // geometry, not an svg circle
             var itemCircle = params.group.append('path')
                                 .datum(itemPoint)
-                                .attr('class', params.classPrefix)
-                                .attr('d', function(d){
+                                .attr('d', function(d) {
                                     skyPath.pointRadius(d.properties.radius);
                                     return skyPath(d); })
-                                .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5);
+
+            // don't bother with opacity  and class during transition
+            if (params.mode !== 'transition') {
+                itemCircle.attr('class', params.classPrefix)
+                          .style('opacity', d.magnitude < 0 ? 1 : (5 - d.magnitude) / 5); 
+            }
 
             // color according to star color in day mode; night mode color in night mode
             if ($('body').hasClass('daymode')) {
@@ -543,8 +546,6 @@ var renderSkyObject = function(params) {
                 // nightModeColor defined in star-page-control.js
                 itemCircle.attr('fill', nightModeColor)
             }
-
-
 
             if (params.mode !== 'transition' && d.name !== null) {
                 // make a fixed-width, larger surrounding circle for the

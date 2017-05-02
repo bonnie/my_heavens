@@ -37,13 +37,6 @@ function updateSkyBackground(sunInSky) {
                 .classed(oldClass, false)
                 .classed(newClass, true);
 
-
-    // if (sunInSky) {
-    //     $('.sky-background').addClass('day-sky').removeClass('night-sky');
-    // } else {
-    //     $('.sky-background').addClass('night-sky').removeClass('day-sky');
-    // }
-
 }
 
 var drawSky = function(skyData) {
@@ -98,7 +91,7 @@ var rotateSky = function(lambda, phi) {
 
     // uses global skyProjection, 
 
-    console.log('rotating to', lambda, phi);
+    // console.log('rotating to', lambda, phi);
 
     // planet rings are going to be removed during transition
     // do it deliberately here first]
@@ -138,7 +131,6 @@ var rotateSky = function(lambda, phi) {
 
           // draw stars without labels and only bright stars (for faster transition)
           drawStars('transition');
-
         };
       })
       .on('start', function() {
@@ -167,11 +159,6 @@ var drawEcliptic = function() {
     // uses global skyObjects, skyPath
     //
     // for reference: https://en.wikipedia.org/wiki/Ecliptic
-
-    // var ecliptic = d3.geoCircle()
-    //     .center([90, 90 - 23.4])
-    //     .radius(90); // sets the circle radius to the specified angle in degrees
-
 
     // ecliptic path goes from equinox to lowest point to equinox to highest
     // point I could do this with a circle, but then there's an ugly ring around

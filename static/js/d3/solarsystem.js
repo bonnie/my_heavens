@@ -60,7 +60,7 @@ var rotateAndDrawSolarSystem = function(error, locationResponse) {
       return;
   }
 
-  console.log(locationResponse);
+  // console.log(locationResponse);
 
   // set global ss data and moon data
   planetData = locationResponse.planets;

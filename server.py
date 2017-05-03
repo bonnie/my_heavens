@@ -27,7 +27,9 @@ from definitions import DEFINITIONS
 
 # display radius
 STARFIELD_RADIUS = 400
-GOOGLE_KEY = os.environ.get('GOOGLE_KEY')
+
+# this google key is restricted to myheavens.space
+GOOGLE_KEY = "AIzaSyDjBfiKVLDCmnG__S4-HC52NLNPANkuBxU"
 
 app = Flask(__name__)
 

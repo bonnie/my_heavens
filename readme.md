@@ -45,16 +45,14 @@ of the stars will not change regardless of the date entered.
 ## Data Sources
 
 #### Star cooridnates, magnitude, distance, spectral type, names, constellations
-
-    [http://astronexus.com/files/downloads/hygfull.csv.gz](http://astronexus.com/files/downloads/hygfull.csv.gz)
+    <http://astronexus.com/files/downloads/hygfull.csv.gz>
 
 #### Mapping constellation abbreviations to names
 
-    <https://ircatalog.gsfc.nasa.gov/constel_names.html>
+<https://ircatalog.gsfc.nasa.gov/constel_names.html>
 
 #### Coordinates of constellation boundaries
-
-    <http://pbarbier.com/constellations/boundaries.html#bnd18>
+<http://pbarbier.com/constellations/boundaries.html#bnd18>
 
 #### Constellation lines
 

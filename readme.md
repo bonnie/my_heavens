@@ -1,6 +1,6 @@
-# My Heavens [![Build Status](https://travis-ci.org/flyrightsister/my_heavens.svg?branch=master)](https://travis-ci.org/flyrightsister/my_heavens)
-
+# My Heavens 
 ### An open-source view of the stars and planets
+[![Build Status](https://travis-ci.org/flyrightsister/my_heavens.svg?branch=master)](https://travis-ci.org/flyrightsister/my_heavens)
 
 ## Contents
 
@@ -206,6 +206,19 @@ Washington). I ultimately decided it wasn't worth structuring the database
 around this oddity (Serpens is the only constellation with two boundary
 polygons, and the constellations are fixed and unchanging), so Serpens has
 its own dedicated code for processing its special configuration.
+
+### Deployment and tzwhere
+
+It turns out the utility I was using for getting a time zone from latitude and
+longitude -- [tzwhere](https://pypi.python.org/pypi/tzwhere) -- is quite memory
+intensive. So memory intensive, in fact that the lowest tier of AWS LightSail
+refuses to run it. In order to run My Heavens successfully on LightSail and not
+have to pay for a higher tier, I switched to
+[geopy](https://pypi.python.org/pypi/geopy/1.11.0) for timezone lookup. 
+
+Unfortunately, geopy is less reliable than tzwhere (since it uses web services),
+so I needed to build in some retries to avoid some travis testing errors (and,
+presumably, actual real world errors too!).
 
 ## Future Development
 

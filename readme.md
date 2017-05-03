@@ -23,7 +23,7 @@ My Heavens is deployed at <http://myheavens.space>. Take a look!
 ## License
 
 My Heavens is licensed under the [GNU Affero General Public
-License](http://www.gnu.org/licenses/)
+License](http://www.gnu.org/licenses/).
 
 ## Overview
 
@@ -38,13 +38,15 @@ definition, as well as a link to more complete information on Wikipedia.
 Finally, since astronomers value night vision, there is a "night mode" which
 limits the color palette to a night-vision friendly red.
 
-One thing the app does not do: take into account proper motion of the stars (the )
+One thing the app does not do: take into account proper motion of the stars
+(that is, the movement of the stars relative to one another). The configuration
+of the stars will not change regardless of the date entered.
 
 ## Data Sources
 
 #### Star cooridnates, magnitude, distance, spectral type, names, constellations
 
-    <http://astronexus.com/files/downloads/hygfull.csv.gz>
+    [http://astronexus.com/files/downloads/hygfull.csv.gz](http://astronexus.com/files/downloads/hygfull.csv.gz)
 
 #### Mapping constellation abbreviations to names
 
@@ -83,7 +85,7 @@ One thing the app does not do: take into account proper motion of the stars (the
     for general page manipulation, and switching between pages (this is a one-
     page app, with different page views managed by JavaScript and CSS)
 
-- **[d3](#d3)
+- **[d3](#d3)**
 
     for projecting stars and constellations onto three-dimensional sky sphere.
     [See below](#d3) for more details
@@ -123,9 +125,9 @@ few of these compared to the thousands of visible stars in the sky.
 ## Testing
 
 As of the time of writing this readme (May 2, 2017), 100% of the Python code is
-covered by unit tests, and a Travis integration runs the tests with every GitHub
-push. 0% of the JavaScript is tested (see [Future Development](#future-
-development)).
+covered by unit tests, and a [Travis](https://travis-ci.org) integration runs
+the tests with every GitHub push. 0% of the JavaScript is tested (see [Future
+Development](#future- development)).
 
 The app was developed using Chrome 57.0.2987.133 (64-bit) on Mac OS X 10.11.5.
 There has been no testing with other browsers or OSes.

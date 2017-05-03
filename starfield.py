@@ -159,10 +159,23 @@ class StarField(object):
         # if lat/lng don't have known time zone, return UTC
         # TODO: make guesses based on longitude: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
         # TODO: inform user if error
+
+        # try a few times before giving up -- sometimes it's just a connection failure
         try:
             self.timezone = GEOCODER.timezone((self.lat, self.lng))
         except GeocoderParseError:
-            self.timezone = pytz.timezone('Etc/UTC')
+            count = 0
+            while count < 5:
+                try:
+                    self.timezone = GEOCODER.timezone((self.lat, self.lng))
+                except:
+                    count += 1
+                else:
+                    break
+
+            # failed five times, I guess this one's a goner
+            if not self.timezone:
+                self.timezone = pytz.timezone('Etc/UTC')
 
     def set_time(self, localtime_string):
         """Sets self.utctime based on the local time and the lat/lng.

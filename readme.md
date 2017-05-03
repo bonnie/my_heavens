@@ -45,22 +45,19 @@ of the stars will not change regardless of the date entered.
 ## Data Sources
 
 #### Star cooridnates, magnitude, distance, spectral type, names, constellations
-    <http://astronexus.com/files/downloads/hygfull.csv.gz>
+<http://astronexus.com/files/downloads/hygfull.csv.gz>
 
 #### Mapping constellation abbreviations to names
-
 <https://ircatalog.gsfc.nasa.gov/constel_names.html>
 
 #### Coordinates of constellation boundaries
 <http://pbarbier.com/constellations/boundaries.html#bnd18>
 
 #### Constellation lines
-
-    <http://observe.phy.sfasu.edu/SFAStarCharts/ExcelCharts/ConstellationLinesAll2002.xls>
+<http://observe.phy.sfasu.edu/SFAStarCharts/ExcelCharts/ConstellationLinesAll2002.xls>
 
 #### Mapping spectral type to hex color
-
-    <http://www.vendian.org/mncharity/dir3/starcolor/UnstableURLs/starcolors.txt>
+<http://www.vendian.org/mncharity/dir3/starcolor/UnstableURLs/starcolors.txt>
 
 
 ## Tech Stack
@@ -80,8 +77,8 @@ of the stars will not change regardless of the date entered.
 
 - **JavaScript/JQuery**
 
-    for general page manipulation, and switching between pages (this is a one-
-    page app, with different page views managed by JavaScript and CSS)
+    for general page manipulation, and switching between pages (this is a
+    one-page app, with different page views managed by JavaScript and CSS)
 
 - **[d3](#d3)**
 
@@ -125,10 +122,10 @@ few of these compared to the thousands of visible stars in the sky.
 As of the time of writing this readme (May 2, 2017), 100% of the Python code is
 covered by unit tests, and a [Travis](https://travis-ci.org) integration runs
 the tests with every GitHub push. 0% of the JavaScript is tested (see [Future
-Development](#future- development)).
+Development](#future-development)).
 
 The app was developed using Chrome 57.0.2987.133 (64-bit) on Mac OS X 10.11.5.
-There has been no testing with other browsers or OSes.
+There has been no testing with other browsers or platforms.
 
 ## Sticking Points
 
@@ -150,8 +147,8 @@ clockwise.
 
 Helpful web sites for this: 
     
-    <https://github.com/d3/d3/issues/2051>
-    <https://bl.ocks.org/mbostock/a7bdfeb041e850799a8d3dce4d8c50c8>
+<https://github.com/d3/d3/issues/2051>
+<https://bl.ocks.org/mbostock/a7bdfeb041e850799a8d3dce4d8c50c8>
 
 ### How to rotate the sky sphere
 
@@ -193,7 +190,7 @@ This was by far the most vexing technical problem of this app, thanks to a
 combination of mathematical obscurity and programmer error. The most helpful
 link for this was a formula from this paper:
 
-    <https://planetarium.madison.k12.wi.us/mooncal/crescent-tilt/Crescent.html>
+<https://planetarium.madison.k12.wi.us/mooncal/crescent-tilt/Crescent.html>
 
 Even with that formula, it took me many, many hours to determine how to rotate
 the moon sphere so that the axis of the phase was properly perpendicular to the

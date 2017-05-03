@@ -28,9 +28,6 @@ from definitions import DEFINITIONS
 # display radius
 STARFIELD_RADIUS = 400
 
-# this google key is restricted to myheavens.space
-GOOGLE_KEY = "AIzaSyDjBfiKVLDCmnG__S4-HC52NLNPANkuBxU"
-
 app = Flask(__name__)
 
 
@@ -41,7 +38,6 @@ def display_chart():
     Stars will be filled in with js"""
 
     return render_template("main.html", 
-                                google_key=GOOGLE_KEY,
                                 sorted_terms=sorted(DEFINITIONS.keys()),
                                 terms=DEFINITIONS)
 

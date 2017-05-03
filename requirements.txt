@@ -11,3 +11,4 @@ pytz==2016.10
 setuptools==35.0.2
 Shapely==1.5.17
 SQLAlchemy==1.1.5
+tzwhere==2.3

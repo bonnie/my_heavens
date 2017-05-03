@@ -171,11 +171,11 @@ class StarField(object):
                 except:
                     count += 1
                 else:
-                    break
+                    # our work here is done
+                    return
 
             # failed five times, I guess this one's a goner
-            if not self.timezone:
-                self.timezone = pytz.timezone('Etc/UTC')
+            self.timezone = pytz.timezone('Etc/UTC')
 
     def set_time(self, localtime_string):
         """Sets self.utctime based on the local time and the lat/lng.

@@ -9,4 +9,3 @@ pyephem==3.7.6.0
 pytz==2016.10
 setuptools==35.0.2
 SQLAlchemy==1.1.5
-tzwhere==2.3

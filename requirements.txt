@@ -1,6 +1,7 @@
 coverage==4.3.4
 Flask==0.12
 Flask-SQLAlchemy==2.1
+geopy==1.11.0
 Jinja2==2.9.5
 pip==9.0.1
 psycopg2==2.6.2

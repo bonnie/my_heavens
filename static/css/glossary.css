@@ -22,15 +22,6 @@
     display: none;
 }
 
-.term-div a {
-    text-decoration: none;
-    color: #bbb;
-}
-
-.term-div a:hover {
-    color: #fff;
-}
-
 .term-div .definition {
     padding-left: 20px;
     padding-bottom: 10px;

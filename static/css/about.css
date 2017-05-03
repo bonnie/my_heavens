@@ -21,3 +21,27 @@
 #about {
     display: none;
 }
+
+h1.about-title {
+    margin-bottom: 20px;
+}
+
+.about-content {
+    margin: 20px auto 0 auto;
+    padding: 10px;
+    width: 80%;
+    border-size: 2px;
+    border-style: solid;
+}
+
+.daymode .about-content {
+    border-color: #bbb;
+}
+
+.nightmode .about-content {
+    border-color: #a53529;
+}
+
+.about-content p {
+    font-size: 125%;
+}

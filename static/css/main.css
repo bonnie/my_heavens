@@ -30,6 +30,10 @@ body {
     background-color: #1a1a1a;
 }
 
+a {
+    text-decoration: underline;
+}
+
 h3 {
     font-family: 'Forum', cursive;
     font-size: 200%;

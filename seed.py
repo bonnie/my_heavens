@@ -96,6 +96,10 @@ def get_color(spectral_class):
         sc_a = match.group(1)
         sc_b = match.group(2)
 
+        # un-matchable spectrum; e.g. F1
+        if sc_a not in COLOR_BY_SPECTRAL_CLASS:
+            return DEFAULT_COLOR
+
         # missing secondary spectrum
         if not sc_b or sc_b not in COLOR_BY_SPECTRAL_CLASS[sc_a]:
             # just pick a random color from this spectral class

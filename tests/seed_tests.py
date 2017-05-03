@@ -75,6 +75,12 @@ class SeedTestsWithoutDb(TestCase):
         O9_colors = ['#9bb0ff', '#a4b9ff', '#9eb1ff', '#a4baff']
         self.assertIn(color, O9_colors)
 
+    def test_get_color_unknown_type(self):
+        """Test getting a color for an unknown spectral type."""
+
+        color = seed.get_color('F1V         ')
+        self.assertEqual(color, seed.DEFAULT_COLOR)
+
     def test_get_color_unknown(self):
         """Test getting a color for a spectral class that doesn't parse."""
 

@@ -23,7 +23,7 @@ from math import sin, cos, atan2
 from datetime import datetime
 from sidereal import sidereal
 import pytz
-# from tzwhere import tzwhere
+from tzwhere import tzwhere
 from geopy import geocoders
 from geopy.exc import GeocoderParseError
 import ephem
@@ -32,8 +32,7 @@ from time_functions import to_utc
 from colors import PLANET_COLORS_BY_NAME
 
 # it takes some time to initialize this, so do it once when the file loads
-# tzwhere uses too much memory for AWS LightSail!! Switching to geopy.
-# TZW = tzwhere.tzwhere()
+TZW = tzwhere.tzwhere()
 
 # for getting timezone from lat/lng
 GEOCODER = geocoders.GoogleV3()
@@ -160,22 +159,8 @@ class StarField(object):
         # TODO: make guesses based on longitude: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
         # TODO: inform user if error
 
-        # try a few times before giving up -- sometimes it's just a connection failure
-        try:
-            self.timezone = GEOCODER.timezone((self.lat, self.lng))
-        except GeocoderParseError:
-            count = 0
-            while count < 5:
-                try:
-                    self.timezone = GEOCODER.timezone((self.lat, self.lng))
-                except:
-                    count += 1
-                else:
-                    # our work here is done
-                    return
-
-            # failed five times, I guess this one's a goner
-            self.timezone = pytz.timezone('Etc/UTC')
+        timezone_str = TZW.tzNameAt(self.lat, self.lng) or 'Etc/UTC'
+        self.timezone = pytz.timezone(timezone_str)        
 
     def set_time(self, localtime_string):
         """Sets self.utctime based on the local time and the lat/lng.

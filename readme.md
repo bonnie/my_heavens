@@ -1,7 +1,6 @@
-# My Heavens
+# My Heavens [![Build Status](https://travis-ci.org/flyrightsister/my_heavens.svg?branch=master)](https://travis-ci.org/flyrightsister/my_heavens)
 
 ### An open-source view of the stars and planets
-[![Build Status](https://travis-ci.org/flyrightsister/my_heavens.svg?branch=master)](https://travis-ci.org/flyrightsister/my_heavens)
 
 ## Contents
 
@@ -148,6 +147,7 @@ clockwise.
 Helpful web sites for this: 
     
 <https://github.com/d3/d3/issues/2051>
+
 <https://bl.ocks.org/mbostock/a7bdfeb041e850799a8d3dce4d8c50c8>
 
 ### How to rotate the sky sphere

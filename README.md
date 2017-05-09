@@ -96,16 +96,17 @@ sphere.
 
 This turns out to be a very efficient way to present the stars at an arbitrary
 viewing location and time, since there is no need to calculate positions of
-stars as the viewer would see them. You can think of the sphere of the sky like
-a spinning globe: if someone were viewing the earth from a certain location in
-space at a certain time, you could either:
+stars as the viewer would see them. An analogy to help understand this
+efficiency: if you wanted to display the earth as viewed from a certain location
+in space (say, the moon) at a certain time (say, right now), you could either:
 
-a. figure out exactly what the circle of the earth would look like for that
-   viewer, drawing the continents on that circle precisely for that place and
-   time, or
+a. Draw the earth as a circle, determining exactly what the earth would look
+   like for that viewer and drawing the visible continents precisely positioned, or
 
-b. draw all the continents on the earth, and then rotate the earth to display
-   the hemisphere that our particular user would see.
+b. draw *all* the continents on a sphere, and then rotate the
+   sphere to display the half that our particular user would see (of course, on
+   a two-dimensional screen, a sphere is flattened to a circle -- so what the user
+   actually sees looks identical to choice (a)).
 
 This app uses option (b) to approach showing the stars. This means the stars and
 their locations need to load only once, when the app first loads. Any
@@ -113,8 +114,9 @@ repositioning of the user in time or space simply requires rotating the sphere
 of the sky --- whose star data is already plotted --- to represent that view.
 
 Since the planets, sun and moon move against the background of the stars, these
-need to be re-plotted with each new location and time. However, there are very
-few of these compared to the thousands of visible stars in the sky.
+need to be re-plotted with each newly entered time. However, there are very
+few of these compared to the thousands of visible stars in the sky, so this
+takes a negligible amount of time.
 
 ## Testing
 

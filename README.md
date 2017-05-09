@@ -27,7 +27,7 @@ License](http://www.gnu.org/licenses/).
 ## Overview
 
 My Heavens is a web app authored by [Bonnie Schulkin](#about-the-author),
-inspired by Zoe Gotch-Strain's stellar (sorry, couln't resist) [Hackbright
+inspired by Zoe Gotch-Strain's stellar (sorry, couldn't resist) [Hackbright
 Student Project](https://github.com/ZoeShirah/Hackbright_Star_Project). The site
 allows the user to enter a time and location, and it will show the configuration
 of stars and planets (and sun and moon) as viewed from that time and place.

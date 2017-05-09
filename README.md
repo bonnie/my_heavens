@@ -27,10 +27,10 @@ License](http://www.gnu.org/licenses/).
 ## Overview
 
 My Heavens is a web app authored by [Bonnie Schulkin](#about-the-author),
-inspired by [Zoe Gotch-Strain's Hackbright Student
-Project](https://github.com/ZoeShirah/Hackbright_Star_Project). The site allows
-the user to enter a time and location, and it will show the configuration of
-stars and planets (and sun and moon) as viewed from that time and place.
+inspired by Zoe Gotch-Strain's stellar (sorry, couln't resist) [Hackbright
+Student Project](https://github.com/ZoeShirah/Hackbright_Star_Project). The site
+allows the user to enter a time and location, and it will show the configuration
+of stars and planets (and sun and moon) as viewed from that time and place.
 Mouseovers reveal constellations, and clicking on a sky object brings up more
 information about the object. Clicking an astronomical term shows a brief
 definition, as well as a link to more complete information on Wikipedia.
@@ -212,13 +212,14 @@ its own dedicated code for processing its special configuration.
 It turns out the utility I was using for getting a time zone from latitude and
 longitude -- [tzwhere](https://pypi.python.org/pypi/tzwhere) -- is quite memory
 intensive. So memory intensive, in fact that the lowest tier of AWS LightSail
-refuses to run it. In order to run My Heavens successfully on LightSail and not
-have to pay for a higher tier, I switched to
-[geopy](https://pypi.python.org/pypi/geopy/1.11.0) for timezone lookup. 
+refuses to run it. I went down a false path of trying the less-memory intensive
+[geopy](https://pypi.python.org/pypi/geopy/1.11.0) for timezone lookup -- but
+sadly, it was also less reliable. My Travis tests would sporadically fail when
+this service failed.
 
-Unfortunately, geopy is less reliable than tzwhere (since it uses web services),
-so I needed to build in some retries to avoid some travis testing errors (and,
-presumably, actual real world errors too!).
+Ultimately, I went with using tzwhere in conjunction with numpy to reduce memory
+usage. This slows down the travis tests considerably, though, since numpy takes
+a long time to pip install.
 
 ## Future Development
 

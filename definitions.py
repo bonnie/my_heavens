@@ -40,7 +40,7 @@ DEFINITIONS = {
     'compass': {
       'term': 'Why are East and West reversed?',
       'wikipedia': None,
-      'definition': 'On a map looking toward earth, west is clockwise from north, but on this map looking at the sky, east is clockwise from north. Think about holding this map over your head: if north is behind your head and south is in front, then east will be to the left and west to the right.'
+      'definition': 'On a map looking toward earth, east is clockwise from north, but on this map looking at the sky, west is clockwise from north. Think about holding this map over your head: if north is behind your head and south is in front, then east will be to the left and west to the right.'
     },
     'magnitude': {
       'wikipedia': 'Magnitude_(astronomy)',

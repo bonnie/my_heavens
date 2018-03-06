@@ -26,7 +26,7 @@ License](http://www.gnu.org/licenses/).
 
 ## Overview
 
-My Heavens is a web app authored by [Bonnie Schulkin](#about-the-author),
+My Heavens is a web app 
 inspired by Zoe Gotch-Strain's stellar (sorry, couldn't resist) [Hackbright
 Student Project](https://github.com/ZoeShirah/Hackbright_Star_Project). The site
 allows the user to enter a time and location, and it will show the configuration
@@ -91,7 +91,7 @@ The presentation of the star field relies heavily on
 stars, planets, constellations, and all other sky objects are projected onto a
 three-dimensional d3-geo sphere representing the sky. All star coordinates
 needed to be reversed, since d3 presents the outside of the sphere, but the
-viewer needs to have the illusion that she is looking at the inside of the
+viewers need to have the illusion that they are looking at the inside of the
 sphere. 
 
 This turns out to be a very efficient way to present the stars at an arbitrary
@@ -155,7 +155,7 @@ Helpful web sites for this:
 ### How to rotate the sky sphere
 
 I needed to figure out how to rotate the sphere of the sky to represent the view
-that the user would see for her desired place and time. This was a lot more
+that the user would see for the desired place and time. This was a lot more
 difficult that I thought it would be, and required way more wikipedia reading
 and dredging up of college astronomy than I expected.
 

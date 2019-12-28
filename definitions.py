@@ -82,7 +82,7 @@ DEFINITIONS = {
 }
 
 # do some stuff all at once to avoid repetitive code
-for term, term_info in DEFINITIONS.iteritems():
+for term, term_info in DEFINITIONS.items():
     if term_info['wikipedia']:
         term_info['wikipedia'] = WIKIPEDIA_URL.format(term_info['wikipedia'])
     

@@ -19,13 +19,11 @@
 
 import os
 import math
-from math import sin, cos, atan2
 from datetime import datetime
-from sidereal import sidereal
+# from sidereal import sidereal
 import pytz
 from tzwhere import tzwhere
 from geopy import geocoders
-from geopy.exc import GeocoderParseError
 import ephem
 
 from time_functions import to_utc
@@ -35,7 +33,7 @@ from colors import PLANET_COLORS_BY_NAME
 TZW = tzwhere.tzwhere()
 
 # for getting timezone from lat/lng
-GEOCODER = geocoders.GoogleV3()
+GEOCODER = geocoders.GoogleV3(api_key=os.environ['GOOGLE_PLACES_APIKEY'])
 
 # to determine which non-star objects to find
 PLANETS = [ephem.Mercury, ephem.Venus, ephem.Mars,
@@ -452,10 +450,15 @@ class StarField(object):
         # the lambda rotation depends on the right ascension that's transiting
         # at the given latitude and time. The sidereal module's hourAngleToRa
         # calculates this nicely. The hour angle is 0 for the meridian.
-        ha_in_rad = sidereal.hourAngleToRA(0, self.utctime, deg_to_rad(self.lng))
-        lda = rad_to_deg(ha_in_rad)
+        # ha_in_rad = sidereal.hourAngleToRA(0, self.utctime, deg_to_rad(self.lng))
+        # ha_in_degrees = rad_to_deg(ha_in_rad)
+
+        # sidereal is no longer available, and the pyc files I was using were for python2
+        # Using ephem instead for hour angle
+        # reference: https://stackoverflow.com/questions/13664935/is-this-how-to-compute-greenwich-hour-angle-with-pyephem-under-python-3
+        ha_in_degrees = ephem.degrees(self.ephem.sidereal_time())
 
         # the phi rotation is dependent solely on the latitude
         phi = -1 * self.lat
 
-        return {'lambda': lda, 'phi': phi}
+        return {'lambda': ha_in_degrees, 'phi': phi}

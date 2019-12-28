@@ -72,9 +72,9 @@ def announce(action):
 
     if DEBUG:
         print
-        print '*' * 20
-        print action
-        print '*' * 20
+        print('*' * 20)
+        print(action)
+        print('*' * 20)
 
 
 def get_degrees_from_hours_and_invert(ra_in_hrs):
@@ -104,7 +104,7 @@ def get_color(spectral_class):
         if not sc_b or sc_b not in COLOR_BY_SPECTRAL_CLASS[sc_a]:
             # just pick a random color from this spectral class
             spectral_colors = COLOR_BY_SPECTRAL_CLASS[sc_a]
-            return spectral_colors[spectral_colors.keys()[0]]
+            return spectral_colors[list(spectral_colors.keys())[0]]
 
         # if we got to here, all's well
         return COLOR_BY_SPECTRAL_CLASS.get(sc_a).get(sc_b)
@@ -189,37 +189,36 @@ def load_const_boundaries(datadir):
 
     announce('loading constellation boundaries')
 
-    boundfile = open_datafile(datadir, 'bounds')
+    with open_datafile(datadir, 'bounds') as boundfile:
+        # keep track of what constellation we're on, in order to reset indexes when
+        # we switch constellations
+        last_const = None
 
-    # keep track of what constellation we're on, in order to reset indexes when
-    # we switch constellations
-    last_const = None
+        for boundline in boundfile:
+            ra_in_hrs, dec, const = boundline.strip().split()
 
-    for boundline in boundfile:
-        ra_in_hrs, dec, const = boundline.strip().split()
+            # translate ra into degrees and invert for d3
+            ra_in_deg = get_degrees_from_hours_and_invert(ra_in_hrs)
+            dec_in_deg = float(dec)
 
-        # translate ra into degrees and invert for d3
-        ra_in_deg = get_degrees_from_hours_and_invert(ra_in_hrs)
-        dec_in_deg = float(dec)
+            # reset the index if necessary
+            if const != last_const:
+                index = 0
+                last_const = const
 
-        # reset the index if necessary
-        if const != last_const:
-            index = 0
-            last_const = const
+            vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
 
-        vertex = get_bounds_vertex(ra_in_deg, dec_in_deg)
-
-        # add the vertex to the constellation boundary
-        const_bound_vertex = ConstBoundVertex(const_code=const,
-                                              vertex_id=vertex.vertex_id,
-                                              index=index)
-        db.session.add(const_bound_vertex)
+            # add the vertex to the constellation boundary
+            const_bound_vertex = ConstBoundVertex(const_code=const,
+                                                vertex_id=vertex.vertex_id,
+                                                index=index)
+            db.session.add(const_bound_vertex)
 
 
-        # increment the index
-        index += 1
+            # increment the index
+            index += 1
 
-    db.session.commit()
+        db.session.commit()
 
 
 def load_stars(datadir):
@@ -236,7 +235,7 @@ def load_stars(datadir):
             # display progress
             line_num += 1
             if DEBUG and line_num % 5000 == 0:
-                print '{} stars'.format(line_num)
+                print('{} stars'.format(line_num))
 
             # skip really dim stars
             magnitude = float(starline['Mag'].strip())
@@ -300,14 +299,14 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
             try:
                 star = query.one()
                 if DEBUG:
-                    print "matched {} {} without magnitude".format(const, name)
+                    print("matched {} {} without magnitude".format(const, name))
 
             except NoResultFound:
 
                 if DEBUG:
                     error = "couldn't find a star match for {} {} ra {} dec {} mag {}"
-                    print error.format(const, name, ra_in_deg, dec_in_deg, mag)
-                    print "exiting..."
+                    print(error.format(const, name, ra_in_deg, dec_in_deg, mag))
+                    print("exiting...")
                 exit()
 
     except MultipleResultsFound:
@@ -315,7 +314,7 @@ def get_matching_star(ra_in_deg, dec_in_deg, mag, const=None, name=None):
         # just go with the brightest star that matches the coordinates
         star = query.order_by(Star.magnitude).first()
         if DEBUG:
-            print "matched {} {} with brightest star in region".format(const, name)
+            print("matched {} {} with brightest star in region".format(const, name))
 
     return star
 
@@ -394,10 +393,10 @@ if __name__ == '__main__':
     # if we're running it directly, we probably want to see debug
     DEBUG = True
 
-    print 'dropping tables...'
+    print('dropping tables...')
     db.drop_all()
 
-    print 'creating tables...'
+    print('creating tables...')
     db.create_all()
 
     load_seed_data(DATADIR)

@@ -33,16 +33,14 @@ function initPlaces(error) {
         return;
     }
 
-    var autocompleteParams = {placeIdOnly: true}
     var cityInput = document.getElementById('city-input');
 
-    autocomplete = new google.maps.places.Autocomplete(cityInput, autocompleteParams);
+    autocomplete = new google.maps.places.Autocomplete(cityInput);
     autocomplete.setTypes(['(cities)']);
     cityInput.addEventListener("blur", function() {
-        var place = autocomplete.getPlace();
+        autocomplete.getPlace();
     });
 }
-
 
 // on form 'submit'
 var getLatLng = function() {

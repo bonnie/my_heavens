@@ -21,7 +21,7 @@ organization). It also holds common constants."""
     # along with My Heavens. If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from model import db, connect_to_db 
+from model import db, connect_to_db
 from server import app
 from seed import load_seed_data
 
@@ -33,6 +33,7 @@ MAX_MAG = 5
 COORDS_KEY_SET = set(['ra', 'dec'])
 SKYOBJECT_KEY_SET = COORDS_KEY_SET | set(['color', 'magnitude', 'name',
     'distance', 'celestialType', 'distanceUnits', 'constellation'])
+
 
 class MarginTestCase(unittest.TestCase):
     """Parent class for tests that need a margin assertion"""
@@ -55,14 +56,12 @@ class DbTestCase(MarginTestCase):
 
         load_seed_data(TESTDATA_DIR)
 
-
     @classmethod
     def db_setup(cls):
         """Set up database for testing"""
 
         connect_to_db(app, TESTDB_URI)
         db.create_all()
-        
 
     @classmethod
     def db_teardown(cls):
@@ -71,20 +70,18 @@ class DbTestCase(MarginTestCase):
         db.session.close()
         db.drop_all()
 
-
     @classmethod
     def setUpClass(cls):
         """Stuff to do once before running all class test methods."""
 
         cls.db_setup()
 
-
     @classmethod
     def tearDownClass(cls):
         """Stuff to do once after running all class test methods."""
 
         cls.db_teardown()
-  
+
 
 if __name__ == '__main__':
 

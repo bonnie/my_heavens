@@ -44,7 +44,7 @@ def evaluate_compatibility_of_constellations():
     constellations = Constellation.query.all()
 
     for const in constellations:
-        print "\t{}: {}\n".format(const.name, is_d3_compatible(const))
+        print("\t{}: {}\n".format(const.name, is_d3_compatible(const)))
 
 
 if __name__ == "__main__":

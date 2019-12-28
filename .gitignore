@@ -3,3 +3,5 @@ env
 .DS_Store
 secrets.sh
 .coverage
+.vscode
+.mypy_cache

@@ -49,27 +49,27 @@ class FlaskHTMLTests(TestCase):
     def test_title(self):
         """Test main page load."""
 
-        self.assertIn('<title>My Heavens</title>', self.response.data)
+        self.assertIn(b'<title>My Heavens</title>', self.response.data)
 
     def test_home_tab(self):
         """Test that the home tab exists."""
 
-        self.assertIn('div id=\'home\'', self.response.data)
+        self.assertIn(b'div id=\'home\'', self.response.data)
 
     def test_stars_tab(self):
         """Test that the stars tab exists."""
 
-        self.assertIn('div id=\'star-map\'', self.response.data)
+        self.assertIn(b'div id=\'star-map\'', self.response.data)
 
     def test_glossary_tab(self):
         """Test that the glossary tab exists."""
 
-        self.assertIn('div id=\'glossary\'', self.response.data)
+        self.assertIn(b'div id=\'glossary\'', self.response.data)
 
     def test_about_tab(self):
         """Test that the about tab exists."""
 
-        self.assertIn('div id=\'about\'', self.response.data)
+        self.assertIn(b'div id=\'about\'', self.response.data)
 
 class FlaskDefinitionTests(TestCase):
     """Flask tests that aren't testing html, and don't require the db."""
@@ -97,7 +97,7 @@ class FlaskDefinitionTests(TestCase):
     def test_key_datatype(self):
         """Test that the key of the example item is a unicode string."""
 
-        self.assertIsInstance(self.example_term, unicode)
+        self.assertIsInstance(self.example_term, str)
 
     def test_value_wiki_key(self):
         """Test that 'wikipedia' is one of the keys of the example item.

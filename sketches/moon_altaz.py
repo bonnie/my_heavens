@@ -23,7 +23,7 @@ dates = [
 ]
 
 # header
-print ','.join(['city', 'date', 'lambda', 'phi', 'phase', 'ephAlt', 'ephAz', 'sidAlt', 'sidAz'])
+print(','.join(['city', 'date', 'lambda', 'phi', 'phase', 'ephAlt', 'ephAz', 'sidAlt', 'sidAz']))
 
 for loc in [berk_latlng, cc_latlng]:
     for date in dates:
@@ -37,6 +37,6 @@ for loc in [berk_latlng, cc_latlng]:
         mdata = stf.get_moon()
         rot = stf.get_sky_rotation()
 
-        print ','.join([loc[0], date, str(rot['lambda']), str(rot['phi']), mdata['phase'], 
+        print(','.join([loc[0], date, str(rot['lambda']), str(rot['phi']), mdata['phase'], )
                         str(mdata['ephAlt']), str(mdata['ephAz']),
                         str(mdata['sidAlt']), str(mdata['sidAz'])])

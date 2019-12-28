@@ -178,7 +178,7 @@ this seemed to be:
 
 - rotate the correct part of the lit half into view
 
-Thankfully, to the [pyEphem python library](http://rhodesmill.org/pyephem/)
+Thankfully, the [pyEphem python library](http://rhodesmill.org/pyephem/)
 provides the selenegraphic colongitude of the moon (which is the angle of the
 terminus of the lit hemisphere --- more wikipedia research!). Also, you can't
 project a d3 sphere (i.e. the moon) onto another d3 sphere (the sky), so the

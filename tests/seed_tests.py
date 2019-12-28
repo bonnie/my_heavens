@@ -36,8 +36,8 @@ class SeedTestsWithoutDb(TestCase):
     def test_file_error_case(self):
         """Test opening a nonexistent file."""
 
-        none_file = seed.open_datafile(TESTDATA_DIR, 'nonexistent_file')
-        self.assertIsNone(none_file)
+        with seed.open_datafile(TESTDATA_DIR, 'nonexistent_file') as none_file:
+            self.assertIsNone(none_file)
 
     def test_get_degrees_from_hours_and_invert_pos(self):
         """Test translation of RA in hours to inverted degrees for positive RA"""
@@ -54,11 +54,11 @@ class SeedTestsWithoutDb(TestCase):
     def test_open_datafile(self):
         """Test the function that locates and opens the file."""
 
-        f = seed.open_datafile(TESTDATA_DIR, 'stars')
-        first_line_tokens = f.readline().split(',')
+        with seed.open_datafile(TESTDATA_DIR, 'stars') as f:
+            first_line_tokens = f.readline().split(',')
 
-        # check that it's a csv with the appropriate number of columns
-        self.assertEqual(len(first_line_tokens), 14)
+            # check that it's a csv with the appropriate number of columns
+            self.assertEqual(len(first_line_tokens), 14)
 
     def test_get_color_fullyknown(self):
         """Test getting a color for a known spectral class."""
@@ -72,7 +72,7 @@ class SeedTestsWithoutDb(TestCase):
         color = seed.get_color('O9.5II      ')
 
         # the color is chosen randomly from the possible O9 colors
-        O9_colors = ['#9bb0ff', '#a4b9ff', '#9eb1ff', '#a4baff']
+        O9_colors = ['#9bb0ff', '#a4b9ff', '#9eb1ff', '#a4baff', '#9ab2ff']
         self.assertIn(color, O9_colors)
 
     def test_get_color_unknown_type(self):

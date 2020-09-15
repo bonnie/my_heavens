@@ -15,10 +15,6 @@
 9. [Future Development](#future-development)
 10. [About the Author](#about-the-author)
 
-## Deployed Site
-
-My Heavens is deployed at <http://myheavens.space>. Take a look!
-
 ## License
 
 My Heavens is licensed under the [GNU Affero General Public

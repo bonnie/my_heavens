@@ -5,3 +5,4 @@ secrets.sh
 .coverage
 .vscode
 .mypy_cache
+notes
